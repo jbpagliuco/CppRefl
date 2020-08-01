@@ -1,28 +1,31 @@
 #include <string>
 #include <vector>
 
-typedef int mySpecialInt;
-
-enum class TestEnum
+namespace testns
 {
-	VAL1 = 0,
-	VAL2 = 1234,
-	RVAL = 82
-};
+	typedef int mySpecialInt;
 
-struct NestableStruct
-{
-	const bool b = true;
-};
+	enum class TestEnum
+	{
+		VAL1 = 0,
+		VAL2 = 1234,
+		RVAL = 82
+	};
 
-struct TestStruct
-{
-	int i;
-	mySpecialInt typedefInt;
-	int* ptr;
-	float f;
-	TestEnum e;
-	std::string string;
+	struct NestableStruct
+	{
+		const bool b = true;
+	};
 
-	NestableStruct nestedStruct;
-};
+	struct TestStruct
+	{
+		int i;
+		mySpecialInt typedefInt;
+		int* ptr;
+		float f;
+		TestEnum e;
+		std::string string;
+
+		NestableStruct nestedStruct;
+	};
+}

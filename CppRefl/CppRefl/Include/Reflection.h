@@ -52,6 +52,9 @@ namespace refl
 		// Reflected name of this element.
 		std::string mName;
 
+		// Fully qualified name of this element (includes namespaces and classes).
+		std::string mQualifiedName;
+
 		// Reflected attributes of this element.
 		std::map<std::string, std::string> mAttributes;
 	};
@@ -73,6 +76,23 @@ namespace refl
 		// Creates a string representation of this field.
 		virtual std::string ToString(int indent = 0)const override;
 
+		// Is this field a class type?
+		bool IsClassType()const { return mClassType != ""; }
+		// Is this field an enum type?
+		bool IsEnumType()const { return mEnumType != ""; }
+		// Is this field a primitive type?
+		bool IsPrimitive()const { return !IsClassType() && !IsEnumType(); };
+
+		// Is this field a string?
+		bool IsString()const { return mIsString; }
+		// Is this field an array?
+		bool IsArray()const { return mIsArray; }
+
+		// Is this field a pointer?
+		bool IsPointer()const { return mIsPointer; }
+		// Is this field const?
+		bool IsConst()const { return mIsConst; }
+
 	public:
 		// Field data type.
 		Type mType;
@@ -88,16 +108,13 @@ namespace refl
 		std::string mEnumType;
 
 		struct {
-			// Is this field an enum?
-			bool mIsEnum : 1;
-			// Is thie field a pointer?
-			bool mIsPointer : 1;
-
 			// Is this field a string?
 			bool mIsString : 1;
 			// Is this field an array?
 			bool mIsArray : 1;
 
+			// Is thie field a pointer?
+			bool mIsPointer : 1;
 			// Is this field const?
 			bool mIsConst : 1;
 		};
@@ -120,7 +137,7 @@ namespace refl
 		virtual std::string ToString(int indent = 0)const override;
 
 	public:
-		// Invaild reference to a ReflClass.
+		// Invaild reference to a Class.
 		static Class INVALID;
 
 	public:
@@ -147,13 +164,13 @@ namespace refl
 	{
 	public:
 		// Returns the name of an enum value.
-		std::string GetValueString(int enumValue)const;
+		std::string GetValueString(int enumValue, bool qualified = false)const;
 
 		// Creates a string representation of this enum.
 		virtual std::string ToString(int indent = 0)const override;
 
 	public:
-		// Invaild reference to a ReflEnum.
+		// Invaild reference to a Enum.
 		static Enum INVALID;
 
 	public:
@@ -165,20 +182,20 @@ namespace refl
 	class Registry
 	{
 	public:
-		// Retrieves a reflected class representation from this registry, or ReflClass::INVALID if it does not exist.
+		// Retrieves a reflected class representation from this registry, or Class::INVALID if it does not exist.
 		const Class& GetClass(const std::string& className)const;
-		// Retrieves a reflected enum representation from this registry, or ReflEnum::INVALID if it does not exist.
+		// Retrieves a reflected enum representation from this registry, or Enum::INVALID if it does not exist.
 		const Enum& GetEnum(const std::string& enumName)const;
 
-		// Does this registry contain the specified ReflClass?
+		// Does this registry contain the specified Class?
 		bool HasClass(const std::string& className)const;
-		// Does this registry contain the specified ReflEnum?
+		// Does this registry contain the specified Enum?
 		bool HasEnum(const std::string& enumName)const;
 
 		// Adds a reflected class to this registry.
-		bool ReflectClass(Class reflClass);
+		bool ReflectClass(Class Class);
 		// Adds a reflected enum to this registry.
-		bool ReflectEnum(Enum reflEnum);
+		bool ReflectEnum(Enum Enum);
 
 	private:
 		// List of classes defined in this registry.

@@ -35,12 +35,18 @@
     <ClInclude Include="Include\ReflectionGen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\ReflectionUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Reflection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\ReflectionGen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ReflectionUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

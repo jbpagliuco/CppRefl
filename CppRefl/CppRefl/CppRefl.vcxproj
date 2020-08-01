@@ -106,10 +106,12 @@
     <ClInclude Include="Include\ReflectionGen.h" />
     <ClInclude Include="Source\Reflection.h" />
     <ClInclude Include="Source\ReflectionGen.h" />
+    <ClInclude Include="Source\ReflectionUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Reflection.cpp" />
     <ClCompile Include="Source\ReflectionGen.cpp" />
+    <ClCompile Include="Source\ReflectionUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="Vendor\libClang\Lib\libclang.lib" />

@@ -47,10 +47,10 @@ namespace refl
 	{
 		std::string s = BuildIndentString(indent);
 
-		if (mType == Type::CLASS) {
+		if (IsClassType()) {
 			s += mClassType;
 		}
-		else if (mIsEnum) {
+		else if (IsEnumType()) {
 			s += mEnumType;
 		}
 		else {
@@ -108,11 +108,12 @@ namespace refl
 	// Enum
 	///////////////////////////////////////////////////////////
 
-	std::string Enum::GetValueString(int enumValue)const
+	std::string Enum::GetValueString(int enumValue, bool qualified)const
 	{
 		if (mValueTable.find(enumValue) != mValueTable.end())
 		{
-			return mValueTable.at(enumValue).mName;
+			EnumValue value = mValueTable.at(enumValue);
+			return (qualified) ? value.mQualifiedName : value.mName;
 		}
 
 		return "";
@@ -168,8 +169,8 @@ namespace refl
 
 	bool Registry::ReflectClass(Class Class)
 	{
-		if (mClasses.find(Class.mName) == mClasses.end()) {
-			mClasses[Class.mName] = Class;
+		if (mClasses.find(Class.mQualifiedName) == mClasses.end()) {
+			mClasses[Class.mQualifiedName] = Class;
 			return true;
 		}
 
@@ -178,8 +179,8 @@ namespace refl
 
 	bool Registry::ReflectEnum(Enum Enum)
 	{
-		if (mEnums.find(Enum.mName) == mEnums.end()) {
-			mEnums[Enum.mName] = Enum;
+		if (mEnums.find(Enum.mQualifiedName) == mEnums.end()) {
+			mEnums[Enum.mQualifiedName] = Enum;
 			return true;
 		}
 

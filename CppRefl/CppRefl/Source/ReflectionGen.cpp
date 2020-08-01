@@ -161,7 +161,8 @@ namespace refl
 		clang_disposeString(cxFilePath);
 
 		// exclude anything outside the project
-		std::string projectPath = "X:\\projects\\cpprefl\\CppReflTest\\CppReflTest";
+		// TODO: use custom attributes to decide when to generate reflection
+		std::string projectPath = "X:\\projects\\CppRefl\\CppRefl\\CppRefl";
 		if (filepath.rfind(projectPath, 0) != 0) {
 			return false;
 		}
@@ -183,7 +184,6 @@ namespace refl
 		field.mSize = clang_Type_getSizeOf(fieldType);
 		field.mOffset = clang_Type_getOffsetOf(parentType, field.mName.c_str()) / 8;
 
-		field.mIsEnum = fieldType.kind == CXType_Enum;
 		field.mIsPointer = fieldType.kind == CXType_Pointer;
 		field.mIsConst = clang_isConstQualifiedType(fieldType);
 
@@ -216,7 +216,7 @@ namespace refl
 		{
 			field.mClassType = typeDeclarationQName;
 		}
-		else if (field.mIsEnum)
+		else if (fieldType.kind == CXType_Enum)
 		{
 			field.mEnumType = typeDeclarationQName;
 		}
@@ -250,22 +250,23 @@ namespace refl
 	// Reflects a class/struct/record.
 	static Class reflectClass(CXCursor cursor)
 	{
-		Class Class;
+		Class reflClass;
 
-		Class.mName = getCursorName(cursor);
+		reflClass.mName = getCursorName(cursor);
+		reflClass.mQualifiedName = getFullyQualifiedName(cursor);
 
 		std::vector<CXCursor> children = collectTopLevelChildren(cursor);
 		for (auto childCursor : children)
 		{
 			if (childCursor.kind == CXCursor_FieldDecl) {
-				Class.mFields.push_back(reflectField(childCursor, cursor));
+				reflClass.mFields.push_back(reflectField(childCursor, cursor));
 			}
 			else if (childCursor.kind == CXCursor_CXXMethod) {
-				Class.mFunctions.push_back(reflectFunction(childCursor, cursor));
+				reflClass.mFunctions.push_back(reflectFunction(childCursor, cursor));
 			}
 		}
 
-		return Class;
+		return reflClass;
 	}
 
 	static EnumValue reflectEnumValue(CXCursor cursor)
@@ -273,6 +274,7 @@ namespace refl
 		EnumValue enumValue;
 
 		enumValue.mName = getCursorName(cursor);
+		enumValue.mQualifiedName = getFullyQualifiedName(cursor);
 		enumValue.mValue = (int)clang_getEnumConstantDeclValue(cursor);
 
 		return enumValue;
@@ -281,27 +283,24 @@ namespace refl
 	// Reflects an enum.
 	static Enum reflectEnum(CXCursor cursor)
 	{
-		Enum Enum;
+		Enum reflEnum;
 
-		Enum.mName = getCursorName(cursor);
+		reflEnum.mName = getCursorName(cursor);
+		reflEnum.mQualifiedName = getFullyQualifiedName(cursor);
 
 		std::vector<CXCursor> children = collectTopLevelChildren(cursor);
 		for (auto childCursor : children)
 		{
 			EnumValue enumValue = reflectEnumValue(childCursor);
-			Enum.mValueTable[enumValue.mValue] = enumValue;
+			reflEnum.mValueTable[enumValue.mValue] = enumValue;
 		}
 
-		return Enum;
+		return reflEnum;
 	}
 
 	// Builds reflection for a translation unit.
-	static Registry buildReflection(CXTranslationUnit TU)
+	static void buildReflection(Registry &registry, CXCursor cursor)
 	{
-		Registry registry;
-
-		CXCursor cursor = clang_getTranslationUnitCursor(TU);
-
 		for (auto child : collectTopLevelChildren(cursor))
 		{
 			if (!shouldReflectCursor(child)) {
@@ -310,6 +309,10 @@ namespace refl
 
 			switch (child.kind)
 			{
+			case CXCursorKind::CXCursor_Namespace:
+				buildReflection(registry, child);
+				break;
+
 			case CXCursorKind::CXCursor_ClassDecl:
 			case CXCursorKind::CXCursor_StructDecl:
 				registry.ReflectClass(reflectClass(child));
@@ -320,8 +323,6 @@ namespace refl
 				break;
 			}
 		}
-
-		return registry;
 	}
 
 
@@ -344,7 +345,7 @@ namespace refl
 			return false;
 		}
 
-		outRegistry = buildReflection(TU);
+		buildReflection(outRegistry, clang_getTranslationUnitCursor(TU));
 
 		// cleanup
 		clang_disposeTranslationUnit(TU);
