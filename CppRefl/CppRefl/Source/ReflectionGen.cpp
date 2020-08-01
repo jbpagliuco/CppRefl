@@ -6,6 +6,8 @@
 
 namespace refl
 {
+	static GenerationParameters GenerationParams;
+
 	//////////////////////////////////////////////////////////////////////////////
 
 	static void PrintClangVersion()
@@ -200,7 +202,7 @@ namespace refl
 
 	// Decides whether or not to reflect a cursor.
 	// e.g. Disregard anything outside of our project.
-	static bool ShouldReflectCursor(CXCursor cursor, const std::string &projectPath)
+	static bool ShouldReflectCursor(CXCursor cursor)
 	{
 		CXSourceLocation sourceLocation = clang_getCursorLocation(cursor);
 
@@ -215,7 +217,7 @@ namespace refl
 		clang_disposeString(cxFilePath);
 
 		// exclude anything outside the project
-		if (projectPath != "" && filepath.rfind(projectPath, 0) != 0) {
+		if (GenerationParams.mProjectPath != "" && filepath.rfind(GenerationParams.mProjectPath, 0) != 0) {
 			return false;
 		}
 
@@ -361,6 +363,11 @@ namespace refl
 		std::vector<CXCursor> children = CollectTopLevelChildren(cursor);
 		for (auto childCursor : children)
 		{
+			// Don't reflect stuff we're not supposed to.
+			if (!ShouldReflectCursor(childCursor)) {
+				continue;
+			}
+
 			if (childCursor.kind == CXCursor_FieldDecl) {
 				reflClass.mFields.push_back(ReflectField(childCursor, cursor));
 			}
@@ -404,7 +411,7 @@ namespace refl
 	}
 
 	// Builds reflection for a translation unit.
-	static void BuildReflection(Registry &registry, const GenerationParameters& params, CXCursor cursor)
+	static void BuildReflection(Registry &registry, CXCursor cursor)
 	{
 		for (auto child : CollectTopLevelChildren(cursor))
 		{
@@ -422,7 +429,7 @@ namespace refl
 			}
 
 			// Should this cursor be reflected?
-			if (!ShouldReflectCursor(child, params.mProjectPath)) {
+			if (!ShouldReflectCursor(child)) {
 				continue;
 			}
 
@@ -430,7 +437,7 @@ namespace refl
 			switch (child.kind)
 			{
 			case CXCursorKind::CXCursor_Namespace:
-				BuildReflection(registry, params, child);
+				BuildReflection(registry, child);
 				break;
 
 			case CXCursorKind::CXCursor_ClassDecl:
@@ -448,6 +455,8 @@ namespace refl
 
 	bool GenerateReflectionRegistry(Registry& outRegistry, const GenerationParameters& params)
 	{
+		GenerationParams = params;
+
 		PrintClangVersion();
 
 		CXIndex index = clang_createIndex(0, 1);
@@ -457,7 +466,7 @@ namespace refl
 			return false;
 		}
 
-		BuildReflection(outRegistry, params, clang_getTranslationUnitCursor(TU));
+		BuildReflection(outRegistry, clang_getTranslationUnitCursor(TU));
 
 		// cleanup
 		clang_disposeTranslationUnit(TU);
