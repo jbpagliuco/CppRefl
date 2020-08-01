@@ -104,6 +104,29 @@ namespace refl
 		return children;
 	}
 
+	// Collect annotations from a cursor
+	static std::vector<std::string> collectCursorAnnotations(CXCursor cursor)
+	{
+		auto visitor = [](CXCursor cursor, CXCursor parent, CXClientData clientData)
+		{
+			std::vector<std::string>* children = static_cast<std::vector<std::string>*>(clientData);
+
+			// Collect all the annotations that contain our custom reflection markup
+			if (cursor.kind == CXCursor_AnnotateAttr) {
+				const std::string annotation = getCursorName(cursor);
+				if (annotation.find(CPP_REFLECTION_ANNOTATION) != std::string::npos) {
+					children->push_back(annotation);
+				}
+			}
+			return CXChildVisit_Continue;
+		};
+
+		std::vector<std::string> children;
+		clang_visitChildren(cursor, visitor, &children);
+
+		return children;
+	}
+
 	// Maps clang cursor types to Type's.
 	static Type getTypeFromClang(CXTypeKind type)
 	{
@@ -197,10 +220,49 @@ namespace refl
 			return false;
 		}
 
-		return true;
+		// always recurse into namespaces
+		if (cursor.kind == CXCursor_Namespace) {
+			return true;
+		}
+
+		// include anything that is explicitly reflected
+		if (collectCursorAnnotations(cursor).size() > 0) {
+			return true;
+		}
+
+		return false;
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
+
+	static void reflectAttributes(Element& reflElement, CXCursor cursor)
+	{
+		// Attributes are split by a special separator. e.g.:
+		// annotate(cpp_refl-just_a_tag)
+		// annotate(cpp_ref-tag_with_a_value-the_value)
+		for (auto annotation : collectCursorAnnotations(cursor)) {
+			const size_t firstSeparator = annotation.find(CPP_REFLECTION_SEPARATOR);
+			
+			// Is this actually an attribute?
+			if (firstSeparator == std::string::npos) {
+				continue;
+			}
+
+			const std::string metadata = annotation.substr(firstSeparator + 1);
+			
+			// If this separator doesn't exist, this is just a tag with no value
+			const size_t secondSeparator = metadata.find(CPP_REFLECTION_SEPARATOR);
+			if (secondSeparator == std::string::npos) {
+				reflElement.mAttributes[metadata] = "";
+			}
+			else {
+				// This is a tag+value combo
+				const std::string tag = metadata.substr(0, secondSeparator);
+				const std::string value = metadata.substr(secondSeparator + 1);
+				reflElement.mAttributes[tag] = value;
+			}
+		}
+	}
 
 	// Reflects a field within a record.
 	static Field reflectField(CXCursor cursor, CXCursor parent)
@@ -209,8 +271,6 @@ namespace refl
 
 		const CXType parentType = clang_getCursorType(parent);
 		const CXType fieldType = clang_getCursorType(cursor);
-
-		auto children = collectTopLevelChildren(cursor);
 
 		field.mName = getCursorName(cursor);
 		field.mSize = clang_Type_getSizeOf(fieldType);
@@ -252,6 +312,8 @@ namespace refl
 		{
 			field.mEnumType = typeDeclarationQName;
 		}
+
+		reflectAttributes(field, cursor);
 
 		return field;
 	}
@@ -298,6 +360,8 @@ namespace refl
 			}
 		}
 
+		reflectAttributes(reflClass, cursor);
+
 		return reflClass;
 	}
 
@@ -308,6 +372,8 @@ namespace refl
 		enumValue.mName = getCursorName(cursor);
 		enumValue.mQualifiedName = getFullyQualifiedName(cursor);
 		enumValue.mValue = (int)clang_getEnumConstantDeclValue(cursor);
+
+		reflectAttributes(enumValue, cursor);
 
 		return enumValue;
 	}
@@ -327,6 +393,8 @@ namespace refl
 			reflEnum.mValueTable[enumValue.mValue] = enumValue;
 		}
 
+		reflectAttributes(reflEnum, cursor);
+
 		return reflEnum;
 	}
 
@@ -335,10 +403,25 @@ namespace refl
 	{
 		for (auto child : collectTopLevelChildren(cursor))
 		{
+			// Don't bother looking at types we don't support
+			switch (child.kind)
+			{
+			case CXCursorKind::CXCursor_Namespace:
+			case CXCursorKind::CXCursor_ClassDecl:
+			case CXCursorKind::CXCursor_StructDecl:
+			case CXCursorKind::CXCursor_EnumDecl:
+				break;
+
+			default:
+				continue;
+			}
+
+			// Should this cursor be reflected?
 			if (!shouldReflectCursor(child)) {
 				continue;
 			}
 
+			// Do reflection parsing
 			switch (child.kind)
 			{
 			case CXCursorKind::CXCursor_Namespace:

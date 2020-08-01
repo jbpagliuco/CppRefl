@@ -14,15 +14,15 @@ namespace testns
 		RVAL = 82
 	};
 
-	struct NestableStruct
+	struct REFLECTED NestableStruct
 	{
-		const bool b = true;
+		bool b REFLECTED;
 	};
 
-	struct TestStruct
+	struct REFL_TAG("SomeTag") REFL_ATTR("SomeAttr", "SomeValue") TestStruct
 	{
-		int i CPP_REFLECTED;
-		mySpecialInt typedefInt;
+		int i								REFL_TAG("INT");
+		mySpecialInt typedefInt				REFL_ATTR("TYPEDEF", "TRUE");
 		int* ptr;
 		float f;
 		TestEnum e;

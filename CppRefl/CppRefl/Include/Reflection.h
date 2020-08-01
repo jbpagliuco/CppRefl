@@ -50,6 +50,10 @@ namespace refl
 		// Creates a string representation of this element.
 		virtual std::string ToString(int indent = 0)const;
 
+	protected:
+		// A human-readable string containing all of our attributes.
+		std::string GetAttrString()const;
+
 	public:
 		// Reflected name of this element.
 		std::string mName;

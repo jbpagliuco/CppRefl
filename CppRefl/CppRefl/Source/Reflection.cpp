@@ -20,7 +20,27 @@ namespace refl
 
 	std::string Element::ToString(int indent)const
 	{
-		return BuildIndentString(indent) + "mName";
+		return BuildIndentString(indent) + mName;
+	}
+
+	std::string Element::GetAttrString()const
+	{
+		std::string output = "";
+
+		for (auto it : mAttributes) {
+			if (output != "") {
+				output += " ";
+			}
+			output += "[" + it.first;
+			
+			if (it.second != "") {
+				output += "=" + it.second;
+			}
+
+			output += "]";
+		}
+
+		return output;
 	}
 
 
@@ -57,7 +77,7 @@ namespace refl
 			s += TypeToString(mType);
 		}
 
-		return s + " " + mName;
+		return s + " " + mName + " " + GetAttrString();
 	}
 
 	///////////////////////////////////////////////////////////
@@ -78,7 +98,7 @@ namespace refl
 	{
 		std::string s = "";
 
-		s += BuildIndentString(indent) + mName + " {";
+		s += BuildIndentString(indent) + GetAttrString() + " " + mName + " {";
 
 		for (auto field : mFields) {
 			s += "\n" + field.ToString(indent + 1);
@@ -100,7 +120,7 @@ namespace refl
 
 	std::string EnumValue::ToString(int indent)const
 	{
-		return BuildIndentString(indent) + mName + " = " + std::to_string(mValue);
+		return BuildIndentString(indent) + mName + " = " + std::to_string(mValue) + " " + GetAttrString();
 	}
 
 
@@ -123,7 +143,7 @@ namespace refl
 	{
 		std::string s = "";
 
-		s += BuildIndentString(indent) + mName + " {";
+		s += BuildIndentString(indent) + GetAttrString() + " " + mName + " {";
 
 		for (auto item : mValueTable) {
 			s += "\n" + item.second.ToString(indent + 1);
