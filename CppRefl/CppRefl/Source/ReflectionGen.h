@@ -4,5 +4,5 @@
 
 namespace refl
 {
-	bool GenerateReflectionRegistry(refl::Registry& outRegistry, const char* inputFilepath, const char** clangArgs, int numClangArgs);
+	bool GenerateReflectionRegistry(refl::Registry& outRegistry, const std::string& inputFilepath, const std::vector<std::string>& clangArgs, const std::vector<std::string>& includePaths);
 }

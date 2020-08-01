@@ -8,6 +8,14 @@ namespace refl
 {
 	//////////////////////////////////////////////////////////////////////////////
 
+	static void printClangVersion()
+	{
+		auto str = clang_getClangVersion();
+		auto str2 = clang_getCString(str);
+		printf("Clang Version: %s\n\n", str2);
+		clang_disposeString(str);
+	}
+
 	// Report clang diagnostic errors.
 	static bool reportClangError(CXTranslationUnit& TU)
 	{
@@ -29,6 +37,28 @@ namespace refl
 		fflush(stdout);
 
 		return errors;
+	}
+
+	static CXTranslationUnit createTranslationUnit(CXIndex index, const std::string& inputFilepath, const std::vector<std::string>& clangArgs, const std::vector<std::string>& includePaths)
+	{
+		std::vector<std::string> includeArgs;
+		for (const auto& path : includePaths) {
+			includeArgs.push_back("-I" + path);
+		}
+
+		std::vector<const char*> allArgs = {
+			"-DCPP_REFL_BUILD_REFLECTION", // Creates a CPP_REFL_BUILD_REFLECTION macro
+		};
+
+		for (const auto& arg : clangArgs) {
+			allArgs.push_back(const_cast<char*>(arg.c_str()));
+		}
+
+		for (const auto& arg : includeArgs) {
+			allArgs.push_back(const_cast<char*>(arg.c_str()));
+		}
+
+		return clang_createTranslationUnitFromSourceFile(index, inputFilepath.c_str(), (int)allArgs.size(), &allArgs[0], 0, nullptr);
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
@@ -180,6 +210,8 @@ namespace refl
 		const CXType parentType = clang_getCursorType(parent);
 		const CXType fieldType = clang_getCursorType(cursor);
 
+		auto children = collectTopLevelChildren(cursor);
+
 		field.mName = getCursorName(cursor);
 		field.mSize = clang_Type_getSizeOf(fieldType);
 		field.mOffset = clang_Type_getOffsetOf(parentType, field.mName.c_str()) / 8;
@@ -326,21 +358,13 @@ namespace refl
 	}
 
 
-	bool GenerateReflectionRegistry(Registry& outRegistry, const char* inputFilepath, const char** clangArgs, int numClangArgs)
+	bool GenerateReflectionRegistry(Registry& outRegistry, const std::string& inputFilepath, const std::vector<std::string> &clangArgs, const std::vector<std::string>& includePaths)
 	{
-		auto str = clang_getClangVersion();
-		auto str2 = clang_getCString(str);
-		printf("Clang Version: %s\n\n", str2);
-		clang_disposeString(str);
+		printClangVersion();
 
 		CXIndex index = clang_createIndex(0, 1);
 
-		CXTranslationUnit TU = clang_createTranslationUnitFromSourceFile(index, inputFilepath, numClangArgs, clangArgs, 0, nullptr);
-		if (TU == nullptr) {
-			printf("Failed to parse input file: %s", inputFilepath);
-			return false;
-		}
-
+		CXTranslationUnit TU = createTranslationUnit(index, inputFilepath, clangArgs, includePaths);
 		if (reportClangError(TU)) {
 			return false;
 		}

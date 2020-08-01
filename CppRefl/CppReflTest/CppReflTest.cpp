@@ -12,24 +12,33 @@ static refl::Registry registry;
 int main()
 {
 	const char* inputFile = "X:\\projects\\CppRefl\\CppRefl\\CppRefl\\CppReflTest\\RealTestCode.cpp";
-	const char* clangArgs[] = { "-Wall", "-Wmicrosoft" };
+
+	const std::vector<std::string> clangArgs = {
+		"-Wall",
+		"-Wmicrosoft"
+	};
+	const std::vector<std::string> includePaths = {
+		"X:\\projects\\CppRefl\\CppRefl\\CppRefl\\CppRefl\\Include"
+	};
 	
-	bool success = refl::GenerateReflectionRegistry(registry, inputFile, clangArgs, 2);
+	bool success = refl::GenerateReflectionRegistry(registry, inputFile, clangArgs, includePaths);
 	if (!success) {
 		printf("Failed to generate reflection for '%s'\n", inputFile);
 	}
 
-	testns::TestStruct test;
+	/*testns::TestStruct test;
 	test.i = 123;
 	test.f = 654.321f;
 	test.e = testns::TestEnum::VAL2;
 	test.typedefInt = (int)'t';
-	test.string = "this is a string";
+	test.string = "this is a string";*/
 	//test.nestedStruct.b = true;
 
 	const refl::Class& testStructRefl = registry.GetClass("testns::TestStruct");
-	const std::string serialized = refl::util::Serialize(registry, testStructRefl, &test);
-	printf("\n%s\n", serialized.c_str());
+	printf("\n%s\n", testStructRefl.ToString().c_str());
+
+	/*const std::string serialized = refl::util::Serialize(registry, testStructRefl, &test);
+	printf("\n%s\n", serialized.c_str());*/
 
 	fflush(stdout);
 }

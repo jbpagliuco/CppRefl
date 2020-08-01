@@ -38,6 +38,9 @@
     <ClInclude Include="Source\ReflectionUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\ReflectionMarkup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Reflection.cpp">

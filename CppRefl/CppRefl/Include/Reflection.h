@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "ReflectionMarkup.h"
+
 namespace refl
 {
 	////////////////////////////////////////////

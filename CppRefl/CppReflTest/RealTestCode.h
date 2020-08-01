@@ -1,6 +1,8 @@
 #include <string>
 #include <vector>
 
+#include "ReflectionMarkup.h"
+
 namespace testns
 {
 	typedef int mySpecialInt;
@@ -19,7 +21,7 @@ namespace testns
 
 	struct TestStruct
 	{
-		int i;
+		int i CPP_REFLECTED;
 		mySpecialInt typedefInt;
 		int* ptr;
 		float f;
