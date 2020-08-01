@@ -199,7 +199,7 @@ namespace refl
 
 	// Decides whether or not to reflect a cursor.
 	// e.g. Disregard anything outside of our project.
-	static bool shouldReflectCursor(CXCursor cursor)
+	static bool shouldReflectCursor(CXCursor cursor, const std::string &projectPath)
 	{
 		CXSourceLocation sourceLocation = clang_getCursorLocation(cursor);
 
@@ -214,9 +214,7 @@ namespace refl
 		clang_disposeString(cxFilePath);
 
 		// exclude anything outside the project
-		// TODO: use custom attributes to decide when to generate reflection
-		std::string projectPath = "X:\\projects\\CppRefl\\CppRefl\\CppRefl";
-		if (filepath.rfind(projectPath, 0) != 0) {
+		if (projectPath != "" && filepath.rfind(projectPath, 0) != 0) {
 			return false;
 		}
 
@@ -399,7 +397,7 @@ namespace refl
 	}
 
 	// Builds reflection for a translation unit.
-	static void buildReflection(Registry &registry, CXCursor cursor)
+	static void buildReflection(Registry &registry, const GenerationParameters& params, CXCursor cursor)
 	{
 		for (auto child : collectTopLevelChildren(cursor))
 		{
@@ -417,7 +415,7 @@ namespace refl
 			}
 
 			// Should this cursor be reflected?
-			if (!shouldReflectCursor(child)) {
+			if (!shouldReflectCursor(child, params.mProjectPath)) {
 				continue;
 			}
 
@@ -425,7 +423,7 @@ namespace refl
 			switch (child.kind)
 			{
 			case CXCursorKind::CXCursor_Namespace:
-				buildReflection(registry, child);
+				buildReflection(registry, params, child);
 				break;
 
 			case CXCursorKind::CXCursor_ClassDecl:
@@ -441,18 +439,18 @@ namespace refl
 	}
 
 
-	bool GenerateReflectionRegistry(Registry& outRegistry, const std::string& inputFilepath, const std::vector<std::string> &clangArgs, const std::vector<std::string>& includePaths)
+	bool GenerateReflectionRegistry(Registry& outRegistry, const GenerationParameters& params)
 	{
 		printClangVersion();
 
 		CXIndex index = clang_createIndex(0, 1);
 
-		CXTranslationUnit TU = createTranslationUnit(index, inputFilepath, clangArgs, includePaths);
+		CXTranslationUnit TU = createTranslationUnit(index, params.mInputFilepath, params.mClangArgs, params.mIncludePaths);
 		if (reportClangError(TU)) {
 			return false;
 		}
 
-		buildReflection(outRegistry, clang_getTranslationUnitCursor(TU));
+		buildReflection(outRegistry, params, clang_getTranslationUnitCursor(TU));
 
 		// cleanup
 		clang_disposeTranslationUnit(TU);

@@ -11,19 +11,16 @@ static refl::Registry registry;
 
 int main()
 {
-	const char* inputFile = "X:\\projects\\CppRefl\\CppRefl\\CppRefl\\CppReflTest\\RealTestCode.cpp";
-
-	const std::vector<std::string> clangArgs = {
-		"-Wall",
-		"-Wmicrosoft"
-	};
-	const std::vector<std::string> includePaths = {
-		"X:\\projects\\CppRefl\\CppRefl\\CppRefl\\CppRefl\\Include"
-	};
+	refl::GenerationParameters params;
+	params.mInputFilepath = "X:\\projects\\CppRefl\\CppRefl\\CppReflTest\\RealTestCode.cpp";
+	params.mClangArgs.push_back("-Wall");
+	params.mClangArgs.push_back("-Wmicrosoft");
+	params.mIncludePaths.push_back("X:\\projects\\CppRefl\\CppRefl\\CppRefl\\Include");
+	params.mProjectPath = "X:\\projects\\CppRefl\\CppRefl\\CppReflTest";
 	
-	bool success = refl::GenerateReflectionRegistry(registry, inputFile, clangArgs, includePaths);
+	bool success = refl::GenerateReflectionRegistry(registry, params);
 	if (!success) {
-		printf("Failed to generate reflection for '%s'\n", inputFile);
+		printf("Failed to generate reflection for '%s'\n", params.mInputFilepath.c_str());
 	}
 
 	/*testns::TestStruct test;
