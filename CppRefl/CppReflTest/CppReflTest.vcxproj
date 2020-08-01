@@ -13,19 +13,19 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{7667e972-c286-423c-82e7-d02848023d90}</ProjectGuid>
-    <RootNamespace>CppRefl</RootNamespace>
+    <ProjectGuid>{c7889ab4-03b6-4213-85f1-835b7e776ed5}</ProjectGuid>
+    <RootNamespace>CppReflTest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -45,15 +45,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)Source;$(ProjectDir)Vendor\libClang\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)Vendor\libClang\Lib;$(LibraryPath)</LibraryPath>
-    <OutDir>$(ProjectDir)Lib\$(Platform)\$(Configuration)\</OutDir>
+    <IncludePath>$(ProjectDir)..\CppRefl\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\CppRefl\Lib\$(Platform)\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)Vendor\libClang\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)Vendor\libClang\Lib;$(LibraryPath)</LibraryPath>
-    <OutDir>$(ProjectDir)Lib\$(Platform)\$(Configuration)\</OutDir>
+    <IncludePath>$(ProjectDir)..\CppRefl\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\CppRefl\Lib\$(Platform)\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -65,7 +63,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libClang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppRefl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -82,25 +80,15 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libClang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppRefl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="Include\Reflection.inl" />
-    <None Include="Source\Reflection.inl" />
+    <ClCompile Include="CppReflTest.cpp" />
+    <ClCompile Include="RealTestCode.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Reflection.h" />
-    <ClInclude Include="Include\ReflectionGen.h" />
-    <ClInclude Include="Source\Reflection.h" />
-    <ClInclude Include="Source\ReflectionGen.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Source\Reflection.cpp" />
-    <ClCompile Include="Source\ReflectionGen.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="Vendor\libClang\Lib\libclang.lib" />
+    <ClInclude Include="RealTestCode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
