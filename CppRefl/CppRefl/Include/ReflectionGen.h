@@ -14,7 +14,7 @@ namespace refl
 		// [Optional] Include filepaths.
 		std::vector<std::string> mIncludePaths;
 
-		// [Optional] Project filepath (anything symbols defined outside of this file path are ignored).
+		// [Optional] Project filepath (any symbols defined outside of this file path are ignored).
 		std::string mProjectPath;
 	};
 

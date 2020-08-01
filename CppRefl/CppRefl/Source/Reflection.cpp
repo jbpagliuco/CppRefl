@@ -18,6 +18,20 @@ namespace refl
 	// Element
 	///////////////////////////////////////////////////////////
 
+	bool Element::HasAttribute(const std::string& attributeName)
+	{
+		return mAttributes.find(attributeName) != mAttributes.end();
+	}
+
+	std::string Element::GetAttribute(const std::string& attributeName)
+	{
+		if (HasAttribute(attributeName)) {
+			return mAttributes[attributeName];
+		}
+
+		return "";
+	}
+
 	std::string Element::ToString(int indent)const
 	{
 		return BuildIndentString(indent) + mName;
