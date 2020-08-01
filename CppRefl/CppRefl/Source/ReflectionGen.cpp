@@ -8,7 +8,7 @@ namespace refl
 {
 	//////////////////////////////////////////////////////////////////////////////
 
-	static void printClangVersion()
+	static void PrintClangVersion()
 	{
 		auto str = clang_getClangVersion();
 		auto str2 = clang_getCString(str);
@@ -17,7 +17,7 @@ namespace refl
 	}
 
 	// Report clang diagnostic errors.
-	static bool reportClangError(CXTranslationUnit& TU)
+	static bool ReportClangError(CXTranslationUnit& TU)
 	{
 		bool errors = false;
 
@@ -39,7 +39,7 @@ namespace refl
 		return errors;
 	}
 
-	static CXTranslationUnit createTranslationUnit(CXIndex index, const std::string& inputFilepath, const std::vector<std::string>& clangArgs, const std::vector<std::string>& includePaths)
+	static CXTranslationUnit CreateTranslationUnit(CXIndex index, const std::string& inputFilepath, const std::vector<std::string>& clangArgs, const std::vector<std::string>& includePaths)
 	{
 		std::vector<std::string> includeArgs;
 		for (const auto& path : includePaths) {
@@ -64,7 +64,7 @@ namespace refl
 	//////////////////////////////////////////////////////////////////////////////
 
 	// Get a beautified name string for a cursor.
-	static std::string getCursorName(CXCursor cursor)
+	static std::string GetCursorName(CXCursor cursor)
 	{
 		CXString cxString = clang_getCursorSpelling(cursor);
 		std::string name(clang_getCString(cxString));
@@ -73,14 +73,15 @@ namespace refl
 		return name;
 	}
 
-	static std::string getFullyQualifiedName(CXCursor cursor)
+	// Get a fully qualified name string (including namespaces) for a cursor.
+	static std::string GetFullyQualifiedName(CXCursor cursor)
 	{
-		std::string name = getCursorName(cursor);
+		std::string name = GetCursorName(cursor);
 
 		cursor = clang_getCursorSemanticParent(cursor);
 		while (cursor.kind != CXCursor_FirstInvalid && cursor.kind != CXCursor_TranslationUnit)
 		{
-			name = getCursorName(cursor) + "::" + name;
+			name = GetCursorName(cursor) + "::" + name;
 			cursor = clang_getCursorSemanticParent(cursor);
 		}
 
@@ -88,7 +89,7 @@ namespace refl
 	}
 
 	// Collects all top level children cursors from a parent cursor.
-	static std::vector<CXCursor> collectTopLevelChildren(CXCursor cursor)
+	static std::vector<CXCursor> CollectTopLevelChildren(CXCursor cursor)
 	{
 		auto visitor = [](CXCursor cursor, CXCursor parent, CXClientData clientData)
 		{
@@ -104,8 +105,8 @@ namespace refl
 		return children;
 	}
 
-	// Collect annotations from a cursor
-	static std::vector<std::string> collectCursorAnnotations(CXCursor cursor)
+	// Collect annotations from a cursor.
+	static std::vector<std::string> CollectCursorAnnotations(CXCursor cursor)
 	{
 		auto visitor = [](CXCursor cursor, CXCursor parent, CXClientData clientData)
 		{
@@ -113,7 +114,7 @@ namespace refl
 
 			// Collect all the annotations that contain our custom reflection markup
 			if (cursor.kind == CXCursor_AnnotateAttr) {
-				const std::string annotation = getCursorName(cursor);
+				const std::string annotation = GetCursorName(cursor);
 				if (annotation.find(CPP_REFLECTION_ANNOTATION) != std::string::npos) {
 					children->push_back(annotation);
 				}
@@ -127,8 +128,8 @@ namespace refl
 		return children;
 	}
 
-	// Maps clang cursor types to Type's.
-	static Type getTypeFromClang(CXTypeKind type)
+	// Maps clang cursor types to refl::Type.
+	static Type GetTypeFromClang(CXTypeKind type)
 	{
 		static std::map<CXTypeKind, Type> Map = {
 			{ CXType_Bool,			Type::BOOL },
@@ -161,7 +162,7 @@ namespace refl
 	}
 
 	// Maps clang cursor types to Type's.
-	static Type getTypeFromClang(CXCursor cursor)
+	static Type GetTypeFromClang(CXCursor cursor)
 	{
 		CXType cxType = clang_getCursorType(cursor);
 
@@ -194,12 +195,12 @@ namespace refl
 			}
 		}
 
-		return getTypeFromClang(cxType.kind);
+		return GetTypeFromClang(cxType.kind);
 	}
 
 	// Decides whether or not to reflect a cursor.
 	// e.g. Disregard anything outside of our project.
-	static bool shouldReflectCursor(CXCursor cursor, const std::string &projectPath)
+	static bool ShouldReflectCursor(CXCursor cursor, const std::string &projectPath)
 	{
 		CXSourceLocation sourceLocation = clang_getCursorLocation(cursor);
 
@@ -224,7 +225,7 @@ namespace refl
 		}
 
 		// include anything that is explicitly reflected
-		if (collectCursorAnnotations(cursor).size() > 0) {
+		if (CollectCursorAnnotations(cursor).size() > 0) {
 			return true;
 		}
 
@@ -233,21 +234,27 @@ namespace refl
 
 	//////////////////////////////////////////////////////////////////////////////
 
-	static void reflectAttributes(Element& reflElement, CXCursor cursor)
+	// Gathers common reflection information for any refl::Element type.
+	static void ReflectElement(Element& reflElement, CXCursor cursor)
 	{
-		// Attributes are split by a special separator. e.g.:
-		// annotate(cpp_refl-just_a_tag)
-		// annotate(cpp_ref-tag_with_a_value-the_value)
-		for (auto annotation : collectCursorAnnotations(cursor)) {
+		// Names
+		reflElement.mName = GetCursorName(cursor);
+		reflElement.mQualifiedName = GetFullyQualifiedName(cursor);
+
+		// Attributes
+		for (auto annotation : CollectCursorAnnotations(cursor)) {
+			// Attributes are split by a special separator. e.g.:
+			// annotate(cpp_refl,just_a_tag)
+			// annotate(cpp_ref,tag_with_a_value,the_value)
 			const size_t firstSeparator = annotation.find(CPP_REFLECTION_SEPARATOR);
-			
+
 			// Is this actually an attribute?
 			if (firstSeparator == std::string::npos) {
 				continue;
 			}
 
 			const std::string metadata = annotation.substr(firstSeparator + 1);
-			
+
 			// If this separator doesn't exist, this is just a tag with no value
 			const size_t secondSeparator = metadata.find(CPP_REFLECTION_SEPARATOR);
 			if (secondSeparator == std::string::npos) {
@@ -263,14 +270,16 @@ namespace refl
 	}
 
 	// Reflects a field within a record.
-	static Field reflectField(CXCursor cursor, CXCursor parent)
+	static Field ReflectField(CXCursor cursor, CXCursor parent)
 	{
 		Field field;
+
+		// Reflect common properties for any reflected element.
+		ReflectElement(field, cursor);
 
 		const CXType parentType = clang_getCursorType(parent);
 		const CXType fieldType = clang_getCursorType(cursor);
 
-		field.mName = getCursorName(cursor);
 		field.mSize = clang_Type_getSizeOf(fieldType);
 		field.mOffset = clang_Type_getOffsetOf(parentType, field.mName.c_str()) / 8;
 
@@ -278,9 +287,9 @@ namespace refl
 		field.mIsConst = clang_isConstQualifiedType(fieldType);
 
 		const CXCursor typeDeclaration = clang_getTypeDeclaration(fieldType);
-		const std::string typeDeclarationQName = getFullyQualifiedName(typeDeclaration);
+		const std::string typeDeclarationQName = GetFullyQualifiedName(typeDeclaration);
 
-		field.mType = getTypeFromClang(cursor);
+		field.mType = GetTypeFromClang(cursor);
 
 		// Special container types
 		if (typeDeclarationQName == "std::string")
@@ -297,7 +306,7 @@ namespace refl
 
 			// Get the vector element type
 			CXType elementType = clang_Type_getTemplateArgumentAsType(fieldType, 0);
-			field.mType = getTypeFromClang(elementType.kind);
+			field.mType = GetTypeFromClang(elementType.kind);
 			field.mSize = clang_Type_getSizeOf(elementType);
 		}
 
@@ -311,14 +320,15 @@ namespace refl
 			field.mEnumType = typeDeclarationQName;
 		}
 
-		reflectAttributes(field, cursor);
-
 		return field;
 	}
 
-	static Function reflectFunction(CXCursor cursor, CXCursor parent)
+	static Function ReflectFunction(CXCursor cursor, CXCursor parent)
 	{
 		Function function;
+
+		// Reflect common properties for any reflected element.
+		ReflectElement(function, cursor);
 
 		const CXType methodType = clang_getCursorType(cursor);
 
@@ -340,66 +350,63 @@ namespace refl
 	}
 
 	// Reflects a class/struct/record.
-	static Class reflectClass(CXCursor cursor)
+	static Class ReflectClass(CXCursor cursor)
 	{
 		Class reflClass;
 
-		reflClass.mName = getCursorName(cursor);
-		reflClass.mQualifiedName = getFullyQualifiedName(cursor);
+		// Reflect common properties for any reflected element.
+		ReflectElement(reflClass, cursor);
 
-		std::vector<CXCursor> children = collectTopLevelChildren(cursor);
+		// Collect all fields and functions in this class.
+		std::vector<CXCursor> children = CollectTopLevelChildren(cursor);
 		for (auto childCursor : children)
 		{
 			if (childCursor.kind == CXCursor_FieldDecl) {
-				reflClass.mFields.push_back(reflectField(childCursor, cursor));
+				reflClass.mFields.push_back(ReflectField(childCursor, cursor));
 			}
 			else if (childCursor.kind == CXCursor_CXXMethod) {
-				reflClass.mFunctions.push_back(reflectFunction(childCursor, cursor));
+				reflClass.mFunctions.push_back(ReflectFunction(childCursor, cursor));
 			}
 		}
-
-		reflectAttributes(reflClass, cursor);
 
 		return reflClass;
 	}
 
-	static EnumValue reflectEnumValue(CXCursor cursor)
+	static EnumValue ReflectEnumValue(CXCursor cursor)
 	{
 		EnumValue enumValue;
 
-		enumValue.mName = getCursorName(cursor);
-		enumValue.mQualifiedName = getFullyQualifiedName(cursor);
-		enumValue.mValue = (int)clang_getEnumConstantDeclValue(cursor);
+		// Reflect common properties for any reflected element.
+		ReflectElement(enumValue, cursor);
 
-		reflectAttributes(enumValue, cursor);
+		enumValue.mValue = (int)clang_getEnumConstantDeclValue(cursor);
 
 		return enumValue;
 	}
 
 	// Reflects an enum.
-	static Enum reflectEnum(CXCursor cursor)
+	static Enum ReflectEnum(CXCursor cursor)
 	{
 		Enum reflEnum;
 
-		reflEnum.mName = getCursorName(cursor);
-		reflEnum.mQualifiedName = getFullyQualifiedName(cursor);
+		// Reflect common properties for any reflected element.
+		ReflectElement(reflEnum, cursor);
 
-		std::vector<CXCursor> children = collectTopLevelChildren(cursor);
+		// Gather info about each value in this enum.
+		std::vector<CXCursor> children = CollectTopLevelChildren(cursor);
 		for (auto childCursor : children)
 		{
-			EnumValue enumValue = reflectEnumValue(childCursor);
+			EnumValue enumValue = ReflectEnumValue(childCursor);
 			reflEnum.mValueTable[enumValue.mValue] = enumValue;
 		}
-
-		reflectAttributes(reflEnum, cursor);
 
 		return reflEnum;
 	}
 
 	// Builds reflection for a translation unit.
-	static void buildReflection(Registry &registry, const GenerationParameters& params, CXCursor cursor)
+	static void BuildReflection(Registry &registry, const GenerationParameters& params, CXCursor cursor)
 	{
-		for (auto child : collectTopLevelChildren(cursor))
+		for (auto child : CollectTopLevelChildren(cursor))
 		{
 			// Don't bother looking at types we don't support
 			switch (child.kind)
@@ -415,7 +422,7 @@ namespace refl
 			}
 
 			// Should this cursor be reflected?
-			if (!shouldReflectCursor(child, params.mProjectPath)) {
+			if (!ShouldReflectCursor(child, params.mProjectPath)) {
 				continue;
 			}
 
@@ -423,16 +430,16 @@ namespace refl
 			switch (child.kind)
 			{
 			case CXCursorKind::CXCursor_Namespace:
-				buildReflection(registry, params, child);
+				BuildReflection(registry, params, child);
 				break;
 
 			case CXCursorKind::CXCursor_ClassDecl:
 			case CXCursorKind::CXCursor_StructDecl:
-				registry.RegisterClass(reflectClass(child));
+				registry.RegisterClass(ReflectClass(child));
 				break;
 
 			case CXCursorKind::CXCursor_EnumDecl:
-				registry.RegisterEnum(reflectEnum(child));
+				registry.RegisterEnum(ReflectEnum(child));
 				break;
 			}
 		}
@@ -441,16 +448,16 @@ namespace refl
 
 	bool GenerateReflectionRegistry(Registry& outRegistry, const GenerationParameters& params)
 	{
-		printClangVersion();
+		PrintClangVersion();
 
 		CXIndex index = clang_createIndex(0, 1);
 
-		CXTranslationUnit TU = createTranslationUnit(index, params.mInputFilepath, params.mClangArgs, params.mIncludePaths);
-		if (reportClangError(TU)) {
+		CXTranslationUnit TU = CreateTranslationUnit(index, params.mInputFilepath, params.mClangArgs, params.mIncludePaths);
+		if (ReportClangError(TU)) {
 			return false;
 		}
 
-		buildReflection(outRegistry, params, clang_getTranslationUnitCursor(TU));
+		BuildReflection(outRegistry, params, clang_getTranslationUnitCursor(TU));
 
 		// cleanup
 		clang_disposeTranslationUnit(TU);

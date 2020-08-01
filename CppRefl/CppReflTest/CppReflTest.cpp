@@ -31,6 +31,9 @@ int main()
 	test.string = "this is a string";*/
 	//test.nestedStruct.b = true;
 
+	const refl::Enum& testEnumRefl = registry.GetEnum("testns::TestEnum");
+	printf("\n%s\n", testEnumRefl.ToString().c_str());
+
 	const refl::Class& testStructRefl = registry.GetClass("testns::TestStruct");
 	printf("\n%s\n", testStructRefl.ToString().c_str());
 

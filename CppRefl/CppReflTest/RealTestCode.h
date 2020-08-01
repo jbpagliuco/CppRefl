@@ -7,7 +7,7 @@ namespace testns
 {
 	typedef int mySpecialInt;
 
-	enum class TestEnum
+	enum class REFLECTED TestEnum
 	{
 		VAL1 = 0,
 		VAL2 = 1234,
