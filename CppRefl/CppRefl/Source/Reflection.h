@@ -199,9 +199,9 @@ namespace refl
 		bool HasEnum(const std::string& enumName)const;
 
 		// Adds a reflected class to this registry.
-		bool ReflectClass(Class Class);
+		bool RegisterClass(Class Class);
 		// Adds a reflected enum to this registry.
-		bool ReflectEnum(Enum Enum);
+		bool RegisterEnum(Enum Enum);
 
 	private:
 		// List of classes defined in this registry.

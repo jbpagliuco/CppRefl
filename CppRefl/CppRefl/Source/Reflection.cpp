@@ -201,7 +201,7 @@ namespace refl
 		return mEnums.find(enumName) != mEnums.end();
 	}
 
-	bool Registry::ReflectClass(Class Class)
+	bool Registry::RegisterClass(Class Class)
 	{
 		if (mClasses.find(Class.mQualifiedName) == mClasses.end()) {
 			mClasses[Class.mQualifiedName] = Class;
@@ -211,7 +211,7 @@ namespace refl
 		return false;
 	}
 
-	bool Registry::ReflectEnum(Enum Enum)
+	bool Registry::RegisterEnum(Enum Enum)
 	{
 		if (mEnums.find(Enum.mQualifiedName) == mEnums.end()) {
 			mEnums[Enum.mQualifiedName] = Enum;

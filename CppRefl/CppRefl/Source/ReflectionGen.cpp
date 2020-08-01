@@ -428,11 +428,11 @@ namespace refl
 
 			case CXCursorKind::CXCursor_ClassDecl:
 			case CXCursorKind::CXCursor_StructDecl:
-				registry.ReflectClass(reflectClass(child));
+				registry.RegisterClass(reflectClass(child));
 				break;
 
 			case CXCursorKind::CXCursor_EnumDecl:
-				registry.ReflectEnum(reflectEnum(child));
+				registry.RegisterEnum(reflectEnum(child));
 				break;
 			}
 		}
