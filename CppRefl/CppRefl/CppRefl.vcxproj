@@ -67,6 +67,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>libClang.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>call $(ProjectDir)Scripts\copy_headers_to_include.bat</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying header files to include directory.</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -84,6 +90,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>libClang.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>call $(ProjectDir)Scripts\copy_headers_to_include.bat</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying header files to include directory.</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="Include\Reflection.inl" />
