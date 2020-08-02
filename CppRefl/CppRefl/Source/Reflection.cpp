@@ -1,12 +1,16 @@
 #include "Reflection.h"
 
+#include <stdarg.h>
+
 namespace refl
 {
+	// Setup invalid references.
 	Field Field::INVALID;
 	Function Function::INVALID;
 	Class Class::INVALID;
 	Enum Enum::INVALID;
 
+	static ErrorHandler CustomErrorHandler = nullptr;
 
 	///////////////////////////////////////////////////////////
 	// Helper Function Prototypes
@@ -17,6 +21,8 @@ namespace refl
 	static std::string BuildIndentString(int indent);
 	static std::string TypeToString(Type type);
 
+	static void RaiseError(const char* file, int line, const char* fmt, ...);
+	#define RAISE_ERROR(fmt, ...) RaiseError(__FILE__, __LINE__, fmt, __VA_ARGS__)
 
 	///////////////////////////////////////////////////////////
 	// Element
@@ -116,9 +122,12 @@ namespace refl
 
 	void Function::Invoke(void* self)const
 	{
-		if (mFunction != nullptr) {
-			mFunction(self, nullptr, nullptr);
+		if (mFunction == nullptr) {
+			RAISE_ERROR("Tried to invoke function [%s] that wasn't bound.", mQualifiedName.c_str());
+			return;
 		}
+		
+		mFunction(self, nullptr, nullptr);
 	}
 
 	std::string Function::ToString(int indent)const
@@ -258,6 +267,7 @@ namespace refl
 			return (qualified) ? value.mQualifiedName : value.mName;
 		}
 
+		RAISE_ERROR("Failed to find enum value (%d) in [%s]", enumValue, mQualifiedName.c_str());
 		return "";
 	}
 
@@ -342,12 +352,14 @@ namespace refl
 			// Find this function's class in the registry
 			Class& reflClass = mClasses[registration->mQualifiedClassName];
 			if (reflClass == Class::INVALID) {
+				RAISE_ERROR("Failed to find class [%s] while resolving functions.", registration->mQualifiedClassName.c_str());
 				continue;
 			}
 			
 			// Find this function within the class
 			Function& reflFunction = reflClass.GetFunction(registration->mFunctionName);
 			if (reflFunction == Function::INVALID) {
+				RAISE_ERROR("Failed to find function definition [%s::%s] while resolving functions.", registration->mQualifiedClassName.c_str(), registration->mFunctionName.c_str());
 				continue;
 			}
 
@@ -392,5 +404,26 @@ namespace refl
 		}
 
 		return "";
+	}
+
+	static void RaiseError(const char* file, int line, const char* fmt, ...)
+	{
+		if (CustomErrorHandler == nullptr) {
+			return;
+		}
+
+		char buffer[1024];
+
+		va_list args;
+		va_start(args, fmt);
+		vsnprintf(buffer, 1024, fmt, args);
+		va_end(args);
+
+		CustomErrorHandler(buffer, file, line);
+	}
+
+	void SetErrorHandler(ErrorHandler errorHandler)
+	{
+		CustomErrorHandler = errorHandler;
 	}
 }

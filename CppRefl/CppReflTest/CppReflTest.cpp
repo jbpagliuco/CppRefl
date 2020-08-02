@@ -9,8 +9,16 @@
 
 static refl::Registry registry;
 
+static void ErrorHandler(const char* message, const char* file, int line)
+{
+	printf("Error: %s\n", message);
+	printf("%s (%d)\n", file, line);
+}
+
 int main()
 {
+	refl::SetErrorHandler(ErrorHandler);
+
 	refl::GenerationParameters params;
 	params.mInputFilepath = "X:\\projects\\CppRefl\\CppRefl\\CppReflTest\\RealTestCode.cpp";
 	params.mClangArgs.push_back("-Wall");
