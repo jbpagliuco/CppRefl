@@ -113,14 +113,18 @@ namespace refl
 	class Function : public Element
 	{
 	public:
+		// Invoke a reflected function.
 		void Invoke(void* self)const;
 
+		// Invoke a reflected function that returns a value.
 		template <typename ReturnType>
 		void Invoke(void* self, ReturnType* rv)const;
 
+		// Invoke a reflected function with a single parameter that returns a value.
 		template <typename ReturnType, typename ParamType>
 		void Invoke(void* self, ReturnType* rv, ParamType* param)const;
 
+		// Invoke a reflected function with a single parameter.
 		template <typename ParamType>
 		void Invoke(void* self, std::nullptr_t rv, ParamType* param)const;
 
@@ -148,8 +152,13 @@ namespace refl
 		FunctionRegistration(const std::string& qualifiedClassName, const std::string& functionName, Function::FunctionType function);
 
 	public:
+		// Fully qualified class name.
 		std::string mQualifiedClassName;
+
+		// Function name.
 		std::string mFunctionName;
+
+		// Pointer to the function invoker.
 		Function::FunctionType mFunction;
 	};
 
