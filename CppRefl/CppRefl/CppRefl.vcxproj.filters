@@ -41,6 +41,18 @@
     <ClInclude Include="Source\ReflectionMarkup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\ReflectionBindings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ReflectionBindingsInternal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ReflectionTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ReflectionFunctionInvocation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Reflection.cpp">

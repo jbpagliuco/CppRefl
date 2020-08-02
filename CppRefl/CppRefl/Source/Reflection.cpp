@@ -2,6 +2,8 @@
 
 namespace refl
 {
+	Field Field::INVALID;
+	Function Function::INVALID;
 	Class Class::INVALID;
 	Enum Enum::INVALID;
 
@@ -10,6 +12,8 @@ namespace refl
 	// Helper Function Prototypes
 	///////////////////////////////////////////////////////////
 
+	static std::vector<FunctionRegistration*>& GetFunctionRegistrations();
+
 	static std::string BuildIndentString(int indent);
 	static std::string TypeToString(Type type);
 
@@ -17,6 +21,17 @@ namespace refl
 	///////////////////////////////////////////////////////////
 	// Element
 	///////////////////////////////////////////////////////////
+
+	Element::Element() :
+		mName(""),
+		mQualifiedName("")
+	{
+	}
+
+	bool Element::operator==(const Element& rhs)const
+	{
+		return mQualifiedName == rhs.mQualifiedName;
+	}
 
 	bool Element::HasAttribute(const std::string& attributeName)
 	{
@@ -94,6 +109,55 @@ namespace refl
 		return s + " " + mName + " " + GetAttrString();
 	}
 
+
+	///////////////////////////////////////////////////////////
+	// Function
+	///////////////////////////////////////////////////////////
+
+	void Function::Invoke(void* self)const
+	{
+		if (mFunction != nullptr) {
+			mFunction(self, nullptr);
+		}
+	}
+
+	std::string Function::ToString(int indent)const
+	{
+		std::string s = BuildIndentString(indent);
+
+		s += TypeToString(mReturnType);
+
+		const std::string attrs = GetAttrString();
+		if (attrs != "") {
+			s += " " + attrs;
+		}
+		s += " " + mName + "()";
+
+		return s;
+	}
+
+
+	///////////////////////////////////////////////////////////
+	// FunctionRegistration
+	///////////////////////////////////////////////////////////
+
+	static std::vector<FunctionRegistration*>& GetFunctionRegistrations()
+	{
+		// Must be wrapped in a function to make sure it's initialized before use.
+		static std::vector<FunctionRegistration*> FunctionRegistrations;
+		
+		return FunctionRegistrations;
+	}
+
+	FunctionRegistration::FunctionRegistration(const std::string& qualifiedClassName, const std::string& functionName, Function::FunctionType function) :
+		mQualifiedClassName(qualifiedClassName),
+		mFunctionName(functionName),
+		mFunction(function)
+	{
+		GetFunctionRegistrations().push_back(this);
+	}
+
+
 	///////////////////////////////////////////////////////////
 	// Class
 	///////////////////////////////////////////////////////////
@@ -106,6 +170,50 @@ namespace refl
 		}
 
 		return size;
+	}
+
+	const Field& Class::GetField(const std::string& fieldName)const
+	{
+		for (const auto& field : mFields) {
+			if (field.mName == fieldName) {
+				return field;
+			}
+		}
+
+		return Field::INVALID;
+	}
+
+	Field& Class::GetField(const std::string& fieldName)
+	{
+		for (auto& field : mFields) {
+			if (field.mName == fieldName) {
+				return field;
+			}
+		}
+
+		return Field::INVALID;
+	}
+
+	const Function& Class::GetFunction(const std::string& functionName)const
+	{
+		for (const auto& function : mFunctions) {
+			if (function.mName == functionName) {
+				return function;
+			}
+		}
+
+		return Function::INVALID;
+	}
+
+	Function& Class::GetFunction(const std::string& functionName)
+	{
+		for (auto& function : mFunctions) {
+			if (function.mName == functionName) {
+				return function;
+			}
+		}
+
+		return Function::INVALID;
 	}
 
 	std::string Class::ToString(int indent)const
@@ -173,6 +281,13 @@ namespace refl
 	// ReflRegistry
 	///////////////////////////////////////////////////////////
 
+	bool Registry::Finalize()
+	{
+		ResolveFunctions();
+
+		return true;
+	}
+
 	const Class& Registry::GetClass(const std::string& className)const
 	{
 		if (mClasses.find(className) == mClasses.end()) {
@@ -221,6 +336,25 @@ namespace refl
 		return false;
 	}
 
+	void Registry::ResolveFunctions()
+	{
+		for (auto &registration : GetFunctionRegistrations()) {
+			// Find this function's class in the registry
+			Class& reflClass = mClasses[registration->mQualifiedClassName];
+			if (reflClass == Class::INVALID) {
+				continue;
+			}
+			
+			// Find this function within the class
+			Function& reflFunction = reflClass.GetFunction(registration->mFunctionName);
+			if (reflFunction == Function::INVALID) {
+				continue;
+			}
+
+			reflFunction.mFunction = registration->mFunction;
+		}
+	}
+
 
 
 
@@ -249,7 +383,8 @@ namespace refl
 			{ Type::INT64,			"int64" },
 			{ Type::FLOAT,			"float" },
 			{ Type::DOUBLE,			"double" },
-			{ Type::LONG_DOUBLE,	"long double" }
+			{ Type::LONG_DOUBLE,	"long double" },
+			{ Type::VOID,			"void" }
 		};
 
 		if (Map.find(type) != Map.end()) {

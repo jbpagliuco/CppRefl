@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <vector>
 
@@ -23,11 +25,17 @@ namespace testns
 	{
 		int i								REFL_TAG("INT");
 		mySpecialInt typedefInt				REFL_ATTR("TYPEDEF", "TRUE");
-		int* ptr;
-		float f;
-		TestEnum e;
-		std::string string;
+		int* ptr							REFLECTED;
+		float f								REFLECTED;
+		TestEnum e							REFLECTED;
+		std::string string					REFLECTED;
 
-		NestableStruct nestedStruct;
+		NestableStruct nestedStruct			REFLECTED;
+
+		REFLECTED
+		void FuncVoidNoParams();
+		
+		REFLECTED
+		int FuncIntNoParams();
 	};
 }

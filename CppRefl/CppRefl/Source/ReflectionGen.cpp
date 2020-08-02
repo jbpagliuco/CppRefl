@@ -152,7 +152,8 @@ namespace refl
 			{ CXType_LongLong,		Type::INT64 },
 			{ CXType_Float,			Type::FLOAT },
 			{ CXType_Double,		Type::DOUBLE },
-			{ CXType_LongDouble,	Type::LONG_DOUBLE }
+			{ CXType_LongDouble,	Type::LONG_DOUBLE },
+			{ CXType_Void,			Type::VOID },
 		};
 
 		// Recognized type?
@@ -332,17 +333,11 @@ namespace refl
 		// Reflect common properties for any reflected element.
 		ReflectElement(function, cursor);
 
-		const CXType methodType = clang_getCursorType(cursor);
 
 		// Return type
-		/*const CXType returnType = clang_getResultType(methodType);
-		if (returnType.kind == CXType_Void) {
-			function.mReturnType = FunctionReturnType::VOID;
-		}
-		else if (returnType.kind == CXType_Bool) {
-			function.mReturnType = FunctionReturnType::BOOL;
-		}*/
-
+		const CXType methodType = clang_getCursorType(cursor);
+		const CXType returnType = clang_getResultType(methodType);
+		function.mReturnType = GetTypeFromClang(returnType.kind);
 
 		// Arguments
 		int numArgs = clang_Cursor_getNumArguments(cursor);
@@ -471,6 +466,9 @@ namespace refl
 		// cleanup
 		clang_disposeTranslationUnit(TU);
 		clang_disposeIndex(index);
+
+		// finalize
+		outRegistry.Finalize();
 
 		return true;
 	}

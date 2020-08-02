@@ -48,12 +48,14 @@
     <IncludePath>$(ProjectDir)Source;$(ProjectDir)Vendor\libClang\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)Vendor\libClang\Lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)Lib\$(Platform)\$(Configuration)\</OutDir>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(ProjectDir)Source;$(ProjectDir)Vendor\libClang\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)Vendor\libClang\Lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)Lib\$(Platform)\$(Configuration)\</OutDir>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -103,11 +105,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Reflection.h" />
+    <ClInclude Include="Source\ReflectionBindingsInternal.h" />
     <ClInclude Include="Include\ReflectionGen.h" />
     <ClInclude Include="Source\Reflection.h" />
+    <ClInclude Include="Source\ReflectionBindings.h" />
+    <ClInclude Include="Source\ReflectionFunctionInvocation.h" />
     <ClInclude Include="Source\ReflectionGen.h" />
     <ClInclude Include="Source\ReflectionMarkup.h" />
     <ClInclude Include="Source\ReflectionUtil.h" />
+    <ClInclude Include="Source\ReflectionTypes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Reflection.cpp" />

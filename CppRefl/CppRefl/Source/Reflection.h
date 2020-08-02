@@ -4,38 +4,13 @@
 #include <string>
 #include <vector>
 
+#include "ReflectionBindings.h"
+#include "ReflectionFunctionInvocation.h"
 #include "ReflectionMarkup.h"
+#include "ReflectionTypes.h"
 
 namespace refl
 {
-	////////////////////////////////////////////
-	// Enums
-	////////////////////////////////////////////
-
-	// All support data types.
-	enum class Type
-	{
-		INVALID = 0,
-
-		BOOL = 1,
-
-		UINT8,
-		INT8,
-		UINT16,
-		INT16,
-		UINT32,
-		INT32,
-		UINT64,
-		INT64,
-
-		FLOAT,
-		DOUBLE,
-		LONG_DOUBLE,
-
-		CLASS, // struct, class, record, whatever
-	};
-
-
 	////////////////////////////////////////////
 	// Classes
 	////////////////////////////////////////////
@@ -44,6 +19,10 @@ namespace refl
 	class Element
 	{
 	public:
+		Element();
+
+		virtual bool operator==(const Element& rhs)const;
+
 		bool HasAttribute(const std::string& attributeName);
 		std::string GetAttribute(const std::string& attributeName);
 
@@ -100,6 +79,10 @@ namespace refl
 		bool IsConst()const { return mIsConst; }
 
 	public:
+		// Invaild reference to a Field.
+		static Field INVALID;
+
+	public:
 		// Field data type.
 		Type mType;
 
@@ -130,6 +113,38 @@ namespace refl
 	class Function : public Element
 	{
 	public:
+		void Invoke(void* self)const;
+
+		template <typename ReturnType>
+		void Invoke(void* self, ReturnType &rv)const;
+
+		// Creates a string representation of this class.
+		virtual std::string ToString(int indent = 0)const override;
+
+	public:
+		// Invaild reference to a Function.
+		static Function INVALID;
+
+		typedef void (*FunctionType)(void* self, void* returnValue);
+
+	public:
+		// Return value type of this function (only primitive data types are supported).
+		Type mReturnType;
+
+		// Function pointer
+		FunctionType mFunction = nullptr;
+	};
+
+	// Registers a function with the reflection at runtime.
+	class FunctionRegistration
+	{
+	public:
+		FunctionRegistration(const std::string& qualifiedClassName, const std::string& functionName, Function::FunctionType function);
+
+	public:
+		std::string mQualifiedClassName;
+		std::string mFunctionName;
+		Function::FunctionType mFunction;
 	};
 
 	// Represents a reflected class or struct.
@@ -138,6 +153,14 @@ namespace refl
 	public:
 		// Returns the size of this class.
 		size_t GetSize()const;
+
+		// Get a field by name.
+		const Field& GetField(const std::string& fieldName)const;
+		Field& GetField(const std::string& fieldName);
+
+		// Get a function by name.
+		const Function& GetFunction(const std::string& functionName)const;
+		Function& GetFunction(const std::string& functionName);
 
 		// Creates a string representation of this class.
 		virtual std::string ToString(int indent = 0)const override;
@@ -188,6 +211,9 @@ namespace refl
 	class Registry
 	{
 	public:
+		// Finalizes the data in this registry (must be called after all reflected data is registered).
+		bool Finalize();
+
 		// Retrieves a reflected class representation from this registry, or Class::INVALID if it does not exist.
 		const Class& GetClass(const std::string& className)const;
 		// Retrieves a reflected enum representation from this registry, or Enum::INVALID if it does not exist.
@@ -202,6 +228,10 @@ namespace refl
 		bool RegisterClass(Class Class);
 		// Adds a reflected enum to this registry.
 		bool RegisterEnum(Enum Enum);
+
+	private:
+		// Resolve function pointers for all Function's.
+		void ResolveFunctions();
 
 	private:
 		// List of classes defined in this registry.
