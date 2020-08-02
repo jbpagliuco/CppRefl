@@ -32,10 +32,9 @@ namespace testns
 
 		NestableStruct nestedStruct			REFLECTED;
 
-		REFLECTED
-		void FuncVoidNoParams();
-		
-		REFLECTED
-		int FuncIntNoParams();
+		void FuncVoidNoParams()						REFLECTED;
+		int FuncIntNoParams()						REFLECTED;
+		void FuncVoidOneParam(int*)					REFLECTED;
+		int FuncIntOneParam(NestableStruct*)		REFLECTED;
 	};
 }

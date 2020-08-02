@@ -116,7 +116,13 @@ namespace refl
 		void Invoke(void* self)const;
 
 		template <typename ReturnType>
-		void Invoke(void* self, ReturnType &rv)const;
+		void Invoke(void* self, ReturnType* rv)const;
+
+		template <typename ReturnType, typename ParamType>
+		void Invoke(void* self, ReturnType* rv, ParamType* param)const;
+
+		template <typename ParamType>
+		void Invoke(void* self, std::nullptr_t rv, ParamType* param)const;
 
 		// Creates a string representation of this class.
 		virtual std::string ToString(int indent = 0)const override;
@@ -125,7 +131,7 @@ namespace refl
 		// Invaild reference to a Function.
 		static Function INVALID;
 
-		typedef void (*FunctionType)(void* self, void* returnValue);
+		typedef void (*FunctionType)(void* self, void* returnValue, void* param);
 
 	public:
 		// Return value type of this function (only primitive data types are supported).

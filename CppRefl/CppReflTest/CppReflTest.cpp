@@ -37,9 +37,9 @@ int main()
 	const refl::Class& testStructRefl = registry.GetClass("testns::TestStruct");
 	printf("\n%s\n", testStructRefl.ToString().c_str());
 
-	const refl::Function& reflFunction = testStructRefl.GetFunction("FuncIntNoParams");
-	int i = 0;
-	reflFunction.Invoke((void*)&test, i);
+	const refl::Function& reflFunction = testStructRefl.GetFunction("FuncIntOneParam");
+	int i = 55;
+	reflFunction.Invoke((void*)&test, &i, &test.nestedStruct);
 
 	/*const std::string serialized = refl::util::Serialize(registry, testStructRefl, &test);
 	printf("\n%s\n", serialized.c_str());*/

@@ -16,4 +16,17 @@ namespace testns
 		printf("TestStruct::FuncIntNoParams() called.\n");
 		return 1;
 	}
+
+	REFL_BIND_FUNCTION_PARAM(testns::TestStruct, FuncVoidOneParam, int);
+	void TestStruct::FuncVoidOneParam(int* p)
+	{
+		printf("TestStruct::FuncIntNoParams(%d) called.\n", *p);
+	}
+
+	REFL_BIND_FUNCTION_RV_PARAM(int, testns::TestStruct, FuncIntOneParam, NestableStruct);
+	int TestStruct::FuncIntOneParam(NestableStruct* p)
+	{
+		printf("TestStruct::FuncIntNoParams({%s}) called.\n", p->b ? "true" : "false");
+		return 1;
+	}
 }

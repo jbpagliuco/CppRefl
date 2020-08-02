@@ -117,7 +117,7 @@ namespace refl
 	void Function::Invoke(void* self)const
 	{
 		if (mFunction != nullptr) {
-			mFunction(self, nullptr);
+			mFunction(self, nullptr, nullptr);
 		}
 	}
 
