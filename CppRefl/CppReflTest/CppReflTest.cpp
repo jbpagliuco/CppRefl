@@ -50,6 +50,7 @@ int main()
 	const refl::Function& fNothing = testStructRefl.GetFunction("FuncVoidNoParams");
 	auto badRV = fNothing.Invoke<int>(test);
 	if (badRV) {
+		// Should not happen.
 		printf("GOT A BAD RETURN VALUE. BAAAAAAAAAAAAAAAAADDDDDDDDDDDD.");
 	}
 
