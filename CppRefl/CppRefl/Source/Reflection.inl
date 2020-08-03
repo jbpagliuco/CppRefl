@@ -8,27 +8,45 @@ namespace refl
 	}
 
 
-	template <typename ReturnType>
-	void Function::Invoke(void* self, ReturnType *rv)const
+	template <typename ObjectType>
+	void Function::Invoke(ObjectType& obj)const
 	{
 		if (mFunction != nullptr) {
-			mFunction(self, rv, nullptr);
+			mFunction((void*)&obj, nullptr, nullptr);
 		}
 	}
 
-	template <typename ReturnType, typename ParamType>
-	void Function::Invoke(void* self, ReturnType *rv, ParamType& param)const
+	template <typename ReturnType, typename ObjectType>
+	std::optional<ReturnType> Function::Invoke(ObjectType& obj)const
 	{
 		if (mFunction != nullptr) {
-			mFunction(self, rv, (void*)&param);
+			ReturnType rv;
+			mFunction((void*)&obj, &rv, nullptr);
+			
+			return { rv };
+		}
+		
+		return std::nullopt;
+	}
+
+	template <typename ObjectType, typename ParamType>
+	void Function::Invoke(ObjectType& obj, ParamType& param)const
+	{
+		if (mFunction != nullptr) {
+			mFunction((void*)&obj, nullptr, (void*)&param);
 		}
 	}
 
-	template <typename ParamType>
-	void Function::Invoke(void* self, std::nullptr_t rv, ParamType& param)const
+	template <typename ReturnType, typename ObjectType, typename ParamType>
+	std::optional<ReturnType> Function::Invoke(ObjectType& obj, ParamType& param)const
 	{
 		if (mFunction != nullptr) {
-			mFunction(self, nullptr, (void*)&param);
+			ReturnType rv;
+			mFunction((void*)&obj, &rv, (void*)&param);
+
+			return { rv };
 		}
+
+		return std::nullopt;
 	}
 }

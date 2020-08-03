@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -114,19 +115,20 @@ namespace refl
 	{
 	public:
 		// Invoke a reflected function.
-		void Invoke(void* self)const;
+		template <typename ObjectType>
+		void Invoke(ObjectType& obj)const;
 
 		// Invoke a reflected function that returns a value.
-		template <typename ReturnType>
-		void Invoke(void* self, ReturnType* rv)const;
-
-		// Invoke a reflected function with a single parameter that returns a value.
-		template <typename ReturnType, typename ParamType>
-		void Invoke(void* self, ReturnType* rv, ParamType &param)const;
+		template <typename ReturnType, typename ObjectType>
+		std::optional<ReturnType> Invoke(ObjectType& obj)const;
 
 		// Invoke a reflected function with a single parameter.
-		template <typename ParamType>
-		void Invoke(void* self, std::nullptr_t rv, ParamType &param)const;
+		template <typename ObjectType, typename ParamType>
+		void Invoke(ObjectType& obj, ParamType& param)const;
+
+		// Invoke a reflected function with a single parameter that returns a value.
+		template <typename ReturnType, typename ObjectType, typename ParamType>
+		std::optional<ReturnType> Invoke(ObjectType& obj, ParamType& param)const;
 
 		// Creates a string representation of this class.
 		virtual std::string ToString(int indent = 0)const override;

@@ -120,16 +120,6 @@ namespace refl
 	// Function
 	///////////////////////////////////////////////////////////
 
-	void Function::Invoke(void* self)const
-	{
-		if (mFunction == nullptr) {
-			RAISE_ERROR("Tried to invoke function [%s] that wasn't bound.", mQualifiedName.c_str());
-			return;
-		}
-		
-		mFunction(self, nullptr, nullptr);
-	}
-
 	std::string Function::ToString(int indent)const
 	{
 		std::string s = BuildIndentString(indent);

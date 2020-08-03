@@ -14,7 +14,7 @@ namespace testns
 	int TestStruct::FuncIntNoParams()
 	{
 		printf("TestStruct::FuncIntNoParams() called.\n");
-		return 1;
+		return 123456;
 	}
 
 	REFL_BIND_FUNCTION_PARAM(testns::TestStruct, FuncVoidOneParam, int);

@@ -21,6 +21,7 @@ int main()
 
 	refl::GenerationParameters params;
 	params.mInputFilepath = "X:\\projects\\CppRefl\\CppRefl\\CppReflTest\\RealTestCode.cpp";
+	params.mClangArgs.push_back("-std=c++1z");
 	params.mClangArgs.push_back("-Wall");
 	params.mClangArgs.push_back("-Wmicrosoft");
 	params.mIncludePaths.push_back("X:\\projects\\CppRefl\\CppRefl\\CppRefl\\Source");
@@ -44,14 +45,25 @@ int main()
 
 	const refl::Class& testStructRefl = registry.GetClass("testns::TestStruct");
 	printf("\n%s\n", testStructRefl.ToString().c_str());
+	
+	const refl::Function& fNothing = testStructRefl.GetFunction("FuncVoidNoParams");
+	fNothing.Invoke(test);
 
-	const refl::Function& reflFunction = testStructRefl.GetFunction("FuncIntOneParam");
-	int i = 55;
-	reflFunction.Invoke((void*)&test, &i, test.nestedStruct);
+	const refl::Function& fOneParam = testStructRefl.GetFunction("FuncVoidOneParam");
+	int i = 420;
+	fOneParam.Invoke(test, i);
 
-	const refl::Function& reflFunction2 = testStructRefl.GetFunction("FuncVoidOneParam");
-	const int t = 0;
-	reflFunction2.Invoke((void*)&test, &i, t);
+	const refl::Function& fReturnValueParam = testStructRefl.GetFunction("FuncIntOneParam");
+	auto rv = fReturnValueParam.Invoke<int>(test, test.nestedStruct);
+	if (rv) {
+		printf("GOT RETURN VALUE: %d\n", *rv);
+	}
+
+	const refl::Function& reflFunction = testStructRefl.GetFunction("FuncIntNoParams");
+	auto rv2 = reflFunction.Invoke<int>(test);
+	if (rv2) {
+		printf("GOT RETURN VALUE: %d\n", *rv2);
+	}
 
 	/*const std::string serialized = refl::util::Serialize(registry, testStructRefl, &test);
 	printf("\n%s\n", serialized.c_str());*/
