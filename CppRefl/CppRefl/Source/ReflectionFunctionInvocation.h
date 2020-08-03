@@ -6,18 +6,18 @@
 namespace refl
 {
 	template <typename ReturnType, typename ClassType, ReturnType (ClassType::*FunctionType)()>
-	void FunctionInvokerTemplated(void* self, void *rv, void* dummyParam)
+	void FunctionInvokerTemplated(void* obj, void *rv, void* dummyParam)
 	{
 		if (rv != nullptr) {
-			*((ReturnType*)rv) = ((ClassType*)self->*FunctionType)();
+			*((ReturnType*)rv) = ((ClassType*)obj->*FunctionType)();
 		}
 		else {
-			((ClassType*)self->*FunctionType)();
+			((ClassType*)obj->*FunctionType)();
 		}
 	}
 
 	template <typename ReturnType, typename ClassType, typename ParamType, ReturnType (ClassType::*FunctionType)(ParamType)>
-	void FunctionInvokerTemplatedParam(void* self, void* rv, void* param)
+	void FunctionInvokerTemplatedParam(void* obj, void* rv, void* param)
 	{
 		if (param == nullptr) {
 			REFL_RAISE_ERROR_INTERNAL("Tried to invoke a function with a null parameter.");
@@ -25,27 +25,27 @@ namespace refl
 		}
 
 		if (rv != nullptr) {
-			*((ReturnType*)rv) = ((ClassType*)self->*FunctionType)(*(ParamType*)param);
+			*((ReturnType*)rv) = ((ClassType*)obj->*FunctionType)(*(ParamType*)param);
 		}
 		else {
-			((ClassType*)self->*FunctionType)(*(ParamType*)param);
+			((ClassType*)obj->*FunctionType)(*(ParamType*)param);
 		}
 	}
 
 	template <typename ClassType, void (ClassType::*FunctionType)()>
-	void FunctionInvokerTemplatedVoid(void* self, void* dummyRV, void* dummyParam)
+	void FunctionInvokerTemplatedVoid(void* obj, void* dummyRV, void* dummyParam)
 	{
-		((ClassType*)self->*FunctionType)();
+		((ClassType*)obj->*FunctionType)();
 	}
 
 	template <typename ClassType, typename ParamType, void (ClassType::*FunctionType)(ParamType)>
-	void FunctionInvokerTemplatedVoidParam(void* self, void* dummyRV, void* param)
+	void FunctionInvokerTemplatedVoidParam(void* obj, void* dummyRV, void* param)
 	{
 		if (param == nullptr) {
 			//RAISE_ERROR
 			return;
 		}
 
-		((ClassType*)self->*FunctionType)(*(ParamType*)param);
+		((ClassType*)obj->*FunctionType)(*(ParamType*)param);
 	}
 }
