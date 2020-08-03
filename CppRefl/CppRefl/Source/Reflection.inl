@@ -2,9 +2,9 @@
 namespace refl
 {
 	template <typename T>
-	T* Field::GetDataPtr(void* blob)const
+	T* Field::GetDataPtr(void* obj)const
 	{
-		return static_cast<T*>(GetRawDataPtr(blob));
+		return static_cast<T*>(GetRawDataPtr(obj));
 	}
 
 

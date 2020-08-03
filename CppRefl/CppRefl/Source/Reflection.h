@@ -49,15 +49,15 @@ namespace refl
 	class Field : public Element
 	{
 	public:
-		// Returns a pointer to the start of this field in blob of data.
-		void* GetRawDataPtr(void* blob)const;
+		// Returns a pointer to the start of this field in a buffer of data.
+		void* GetRawDataPtr(void* obj)const;
 
-		// Returns a strongly-typed pointer to the start of this field in a blob of data.
+		// Returns a strongly-typed pointer to the start of this field in a buffer of data.
 		template <typename T>
-		T* GetDataPtr(void* blob)const;
+		T* GetDataPtr(void* obj)const;
 
-		// Returns a string pointer to the start of this field in a blob of data.
-		std::string* GetString(void* blob)const;
+		// Returns a string pointer to the start of this field in a buffer of data.
+		std::string* GetString(void* obj)const;
 
 		// Creates a string representation of this field.
 		virtual std::string ToString(int indent = 0)const override;

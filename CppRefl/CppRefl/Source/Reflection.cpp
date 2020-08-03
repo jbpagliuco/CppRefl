@@ -78,16 +78,16 @@ namespace refl
 	// Field
 	///////////////////////////////////////////////////////////
 
-	void* Field::GetRawDataPtr(void* blob)const
+	void* Field::GetRawDataPtr(void* obj)const
 	{
-		char* cBlob = static_cast<char*>(blob);
-		return cBlob + mOffset;
+		char* cobj = static_cast<char*>(obj);
+		return cobj + mOffset;
 	}
 
-	std::string* Field::GetString(void* blob)const
+	std::string* Field::GetString(void* obj)const
 	{
 		if (mIsString) {
-			return GetDataPtr<std::string>(blob);
+			return GetDataPtr<std::string>(obj);
 		}
 
 		return nullptr;
