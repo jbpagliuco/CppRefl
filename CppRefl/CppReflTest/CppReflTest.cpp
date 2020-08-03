@@ -47,7 +47,11 @@ int main()
 
 	const refl::Function& reflFunction = testStructRefl.GetFunction("FuncIntOneParam");
 	int i = 55;
-	reflFunction.Invoke((void*)&test, &i, &test.nestedStruct);
+	reflFunction.Invoke((void*)&test, &i, test.nestedStruct);
+
+	const refl::Function& reflFunction2 = testStructRefl.GetFunction("FuncVoidOneParam");
+	const int t = 0;
+	reflFunction2.Invoke((void*)&test, &i, t);
 
 	/*const std::string serialized = refl::util::Serialize(registry, testStructRefl, &test);
 	printf("\n%s\n", serialized.c_str());*/

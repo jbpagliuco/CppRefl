@@ -18,15 +18,15 @@ namespace testns
 	}
 
 	REFL_BIND_FUNCTION_PARAM(testns::TestStruct, FuncVoidOneParam, int);
-	void TestStruct::FuncVoidOneParam(int* p)
+	void TestStruct::FuncVoidOneParam(int p)
 	{
-		printf("TestStruct::FuncIntNoParams(%d) called.\n", *p);
+		printf("TestStruct::FuncIntNoParams(%d) called.\n", p);
 	}
 
 	REFL_BIND_FUNCTION_RV_PARAM(int, testns::TestStruct, FuncIntOneParam, NestableStruct);
-	int TestStruct::FuncIntOneParam(NestableStruct* p)
+	int TestStruct::FuncIntOneParam(NestableStruct p)
 	{
-		printf("TestStruct::FuncIntNoParams({%s}) called.\n", p->b ? "true" : "false");
+		printf("TestStruct::FuncIntNoParams({%s}) called.\n", p.b ? "true" : "false");
 		return 1;
 	}
 }

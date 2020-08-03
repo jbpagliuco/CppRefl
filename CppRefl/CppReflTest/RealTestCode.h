@@ -34,7 +34,7 @@ namespace testns
 
 		void FuncVoidNoParams()						REFLECTED;
 		int FuncIntNoParams()						REFLECTED;
-		void FuncVoidOneParam(int*)					REFLECTED;
-		int FuncIntOneParam(NestableStruct*)		REFLECTED;
+		void FuncVoidOneParam(int)					REFLECTED;
+		int FuncIntOneParam(NestableStruct)			REFLECTED;
 	};
 }

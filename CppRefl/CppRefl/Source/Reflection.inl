@@ -17,18 +17,18 @@ namespace refl
 	}
 
 	template <typename ReturnType, typename ParamType>
-	void Function::Invoke(void* self, ReturnType *rv, ParamType* param)const
+	void Function::Invoke(void* self, ReturnType *rv, ParamType& param)const
 	{
 		if (mFunction != nullptr) {
-			mFunction(self, rv, param);
+			mFunction(self, rv, (void*)&param);
 		}
 	}
 
 	template <typename ParamType>
-	void Function::Invoke(void* self, std::nullptr_t rv, ParamType* param)const
+	void Function::Invoke(void* self, std::nullptr_t rv, ParamType& param)const
 	{
 		if (mFunction != nullptr) {
-			mFunction(self, nullptr, param);
+			mFunction(self, nullptr, (void*)&param);
 		}
 	}
 }
