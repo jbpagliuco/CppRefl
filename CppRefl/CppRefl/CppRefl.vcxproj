@@ -107,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Reflection.h" />
+    <ClInclude Include="Source\ErrorHandling.h" />
     <ClInclude Include="Source\ReflectionBindingsInternal.h" />
     <ClInclude Include="Include\ReflectionGen.h" />
     <ClInclude Include="Source\Reflection.h" />
@@ -118,6 +119,7 @@
     <ClInclude Include="Source\ReflectionTypes.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\ErrorHandling.cpp" />
     <ClCompile Include="Source\Reflection.cpp" />
     <ClCompile Include="Source\ReflectionGen.cpp" />
     <ClCompile Include="Source\ReflectionUtil.cpp" />

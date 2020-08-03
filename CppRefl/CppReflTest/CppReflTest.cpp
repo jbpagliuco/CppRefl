@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string>
 
+#include "ErrorHandling.h"
 #include "Reflection.h"
 #include "ReflectionGen.h"
 #include "ReflectionUtil.h"
@@ -47,7 +48,10 @@ int main()
 	printf("\n%s\n", testStructRefl.ToString().c_str());
 	
 	const refl::Function& fNothing = testStructRefl.GetFunction("FuncVoidNoParams");
-	fNothing.Invoke(test);
+	auto badRV = fNothing.Invoke<int>(test);
+	if (badRV) {
+		printf("GOT A BAD RETURN VALUE. BAAAAAAAAAAAAAAAAADDDDDDDDDDDD.");
+	}
 
 	const refl::Function& fOneParam = testStructRefl.GetFunction("FuncVoidOneParam");
 	int i = 420;

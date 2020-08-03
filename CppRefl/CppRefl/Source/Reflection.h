@@ -256,10 +256,6 @@ namespace refl
 		// List of enums defined in this registry.
 		std::map<std::string, Enum> mEnums;
 	};
-
-
-	typedef void(*ErrorHandler)(const char* message, const char* file, int line);
-	void SetErrorHandler(ErrorHandler errorHandler);
 }
 
 #include "Reflection.inl"

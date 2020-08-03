@@ -53,6 +53,9 @@
     <ClInclude Include="Source\ReflectionFunctionInvocation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\ErrorHandling.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Reflection.cpp">
@@ -62,6 +65,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\ReflectionUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ErrorHandling.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

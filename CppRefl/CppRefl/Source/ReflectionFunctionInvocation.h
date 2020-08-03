@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ErrorHandling.h"
 #include "ReflectionTypes.h"
 
 namespace refl
@@ -19,7 +20,7 @@ namespace refl
 	void FunctionInvokerTemplatedParam(void* self, void* rv, void* param)
 	{
 		if (param == nullptr) {
-			//RAISE_ERROR
+			REFL_RAISE_ERROR_INTERNAL("Tried to invoke a function with a null parameter.");
 			return;
 		}
 

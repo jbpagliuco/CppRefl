@@ -23,7 +23,12 @@ namespace refl
 			ReturnType rv;
 			mFunction((void*)&obj, &rv, nullptr);
 			
-			return { rv };
+			if (mReturnType != Type::VOID) {
+				return { rv };
+			}
+			else {
+				REFL_RAISE_ERROR_INTERNAL("Tried to read return value from a function that doesn't return a value.");
+			}
 		}
 		
 		return std::nullopt;
@@ -44,7 +49,12 @@ namespace refl
 			ReturnType rv;
 			mFunction((void*)&obj, &rv, (void*)&param);
 
-			return { rv };
+			if (mReturnType != Type::VOID) {
+				return { rv };
+			}
+			else {
+				REFL_RAISE_ERROR_INTERNAL("Tried to read return value from a function that doesn't return a value.");
+			}
 		}
 
 		return std::nullopt;
