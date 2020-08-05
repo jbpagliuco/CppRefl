@@ -32,6 +32,8 @@ namespace testns
 
 		NestableStruct nestedStruct			REFLECTED;
 
+		std::vector<int> vectorOfInts		REFLECTED;
+
 		void FuncVoidNoParams()						REFLECTED;
 		int FuncIntNoParams()						REFLECTED;
 		void FuncVoidOneParam(int)					REFLECTED;

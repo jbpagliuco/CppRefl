@@ -43,6 +43,9 @@ namespace refl
 
 		// Reflected attributes of this element.
 		std::map<std::string, std::string> mAttributes;
+
+		// Pointer to the registry that contains this element.
+		class Registry* mRegistry;
 	};
 
 	// Represents a reflected field in a reflected class.
@@ -115,6 +118,21 @@ namespace refl
 	{
 	public:
 		// Invoke a reflected function.
+		void Invoke(void* obj)const;
+
+		// Invoke a reflected function that returns a value.
+		template <typename ReturnType>
+		std::optional<ReturnType> Invoke(void* obj)const;
+
+		// Invoke a reflected function with a single parameter.
+		template <typename ParamType>
+		void Invoke(void* obj, ParamType& param)const;
+
+		// Invoke a reflected function with a single parameter that returns a value.
+		template <typename ReturnType, typename ParamType>
+		std::optional<ReturnType> Invoke(void* obj, ParamType& param)const;
+
+		// Invoke a reflected function.
 		template <typename ObjectType>
 		void Invoke(ObjectType& obj)const;
 
@@ -151,6 +169,7 @@ namespace refl
 	class FunctionRegistration
 	{
 	public:
+		// Registers a class member function.
 		FunctionRegistration(const std::string& qualifiedClassName, const std::string& functionName, Function::FunctionType function);
 
 	public:

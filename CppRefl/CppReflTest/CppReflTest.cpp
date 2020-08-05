@@ -14,6 +14,7 @@ static void ErrorHandler(const char* message, const char* file, int line)
 {
 	printf("Error: %s\n", message);
 	printf("%s (%d)\n", file, line);
+	__debugbreak();
 }
 
 int main()
@@ -40,6 +41,9 @@ int main()
 	test.typedefInt = (int)'t';
 	test.string = "this is a string";
 	test.nestedStruct.b = true;
+	test.vectorOfInts.push_back(4);
+	test.vectorOfInts.push_back(7);
+	test.vectorOfInts.push_back(11);
 
 	const refl::Enum& testEnumRefl = registry.GetEnum("testns::TestEnum");
 	printf("\n%s\n", testEnumRefl.ToString().c_str());
@@ -70,8 +74,9 @@ int main()
 		printf("GOT RETURN VALUE: %d\n", *rv2);
 	}
 
-	/*const std::string serialized = refl::util::Serialize(registry, testStructRefl, &test);
-	printf("\n%s\n", serialized.c_str());*/
+	const refl::Field& vectorField = testStructRefl.GetField("vectorOfInts");
+	size_t elems = vectorField.GetArraySize((void*)&test);
+	printf("vector has %zu elements", elems);
 
 	fflush(stdout);
 }

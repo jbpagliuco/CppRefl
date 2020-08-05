@@ -25,7 +25,8 @@ namespace refl
 
 	Element::Element() :
 		mName(""),
-		mQualifiedName("")
+		mQualifiedName(""),
+		mRegistry(nullptr)
 	{
 	}
 
@@ -62,7 +63,7 @@ namespace refl
 				output += " ";
 			}
 			output += "[" + it.first;
-			
+
 			if (it.second != "") {
 				output += "=" + it.second;
 			}
@@ -97,7 +98,12 @@ namespace refl
 	{
 		std::string s = BuildIndentString(indent);
 
-		if (IsClassType()) {
+		if (mIsArray) {
+			s += "std::vector<";
+			s += TypeToString(mType);
+			s += ">";
+		}
+		else if (IsClassType()) {
 			s += mClassType;
 		}
 		else if (IsEnumType()) {
@@ -114,6 +120,13 @@ namespace refl
 	///////////////////////////////////////////////////////////
 	// Function
 	///////////////////////////////////////////////////////////
+
+	void Function::Invoke(void* obj)const
+	{
+		if (mFunction != nullptr) {
+			mFunction((void*)&obj, nullptr, nullptr);
+		}
+	}
 
 	std::string Function::ToString(int indent)const
 	{
@@ -214,14 +227,16 @@ namespace refl
 	{
 		std::string s = "";
 
-		s += BuildIndentString(indent) + GetAttrString() + " " + mName + " {";
+		s += BuildIndentString(indent) + GetAttrString() + " " + mName + " {\n";
 
+		s += BuildIndentString(indent + 1) + "Fields:";
 		for (auto field : mFields) {
-			s += "\n" + field.ToString(indent + 1);
+			s += "\n" + field.ToString(indent + 2);
 		}
 
+		s += "\n" + BuildIndentString(indent + 1) + "Functions:";
 		for (auto function : mFunctions) {
-			s += "\n" + function.ToString(indent + 1);
+			s += "\n" + function.ToString(indent + 2);
 		}
 
 		s += "\n" + BuildIndentString(indent) + "}";
@@ -279,6 +294,25 @@ namespace refl
 	bool Registry::Finalize()
 	{
 		ResolveFunctions();
+
+		for (auto& reflClass : mClasses) {
+			reflClass.second.mRegistry = this;
+
+			for (auto& field : reflClass.second.mFields) {
+				field.mRegistry = this;
+			}
+			for (auto& function : reflClass.second.mFunctions) {
+				function.mRegistry = this;
+			}
+		}
+
+		for (auto& reflEnum : mEnums) {
+			reflEnum.second.mRegistry = this;
+
+			for (auto& value : reflEnum.second.mValueTable) {
+				value.second.mRegistry = this;
+			}
+		}
 
 		return true;
 	}

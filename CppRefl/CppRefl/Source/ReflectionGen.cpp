@@ -333,7 +333,6 @@ namespace refl
 		// Reflect common properties for any reflected element.
 		ReflectElement(function, cursor);
 
-
 		// Return type
 		const CXType methodType = clang_getCursorType(cursor);
 		const CXType returnType = clang_getResultType(methodType);
