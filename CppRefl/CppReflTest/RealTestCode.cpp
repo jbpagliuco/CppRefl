@@ -31,9 +31,9 @@ namespace testns
 	}
 
 
-
 	int TestGlobalFunction()
 	{
+		printf("TestGlobalFunction() called.\n");
 		return 69;
 	}
 }

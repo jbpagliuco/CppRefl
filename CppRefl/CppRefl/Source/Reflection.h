@@ -120,6 +120,14 @@ namespace refl
 		//////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Global functions
 
+		// Invoke a reflected global function.
+		template <typename... ParamTypes>
+		void Invoke(ParamTypes&&... params)const;
+
+		// Invoke a reflected global function that returns a value.
+		template <typename ReturnType, typename... ParamTypes>
+		std::optional<ReturnType> Invoke(ParamTypes&&... params)const;
+
 		//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,7 +167,9 @@ namespace refl
 		// Invaild reference to a Function.
 		static Function INVALID;
 
-		typedef void (*FunctionType)(void* self, void* returnValue, void* param);
+		// Function pointer type. This must include the maximum number of
+		// allowed parameters (any of which can be null depending on the real reflected function definition).
+		typedef void (*FunctionType)(void* self, void* returnValue, void* param1);
 
 	public:
 		// Return value type of this function (only primitive data types are supported).

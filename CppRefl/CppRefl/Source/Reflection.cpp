@@ -302,8 +302,10 @@ namespace refl
 
 	bool Registry::Finalize()
 	{
+		// Resolve all function pointers.
 		ResolveFunctions();
 
+		// Add a reference to this registry in every element (there's probably a better a way to do this :))
 		for (auto& reflClass : mClasses) {
 			reflClass.second.mRegistry = this;
 
@@ -311,6 +313,10 @@ namespace refl
 				field.mRegistry = this;
 			}
 			for (auto& function : reflClass.second.mFunctions) {
+				if (function.mFunction == nullptr) {
+					REFL_RAISE_ERROR_INTERNAL("Member function [%s] was not bound. Use REFL_BIND_* functions in ReflectionBindings.h to bind it.", function.mQualifiedName.c_str());
+				}
+
 				function.mRegistry = this;
 			}
 		}
@@ -324,6 +330,11 @@ namespace refl
 		}
 
 		for (auto& reflFunction : mFunctions) {
+			// Make sure this function is bound.
+			if (reflFunction.second.mFunction == nullptr) {
+				REFL_RAISE_ERROR_INTERNAL("Global function [%s] was not bound. Use REFL_BIND_* functions in ReflectionBindings.h to bind it.", reflFunction.second.mQualifiedName.c_str());
+			}
+
 			reflFunction.second.mRegistry = this;
 		}
 

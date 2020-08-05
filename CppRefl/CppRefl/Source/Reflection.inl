@@ -31,24 +31,43 @@ namespace refl
 		return static_cast<void*>(&_Arg);
 	}
 
+
+	// Invoke a reflected global function with no return value.
+	template <typename... ParamTypes>
+	void Function::Invoke(ParamTypes&&... params)const
+	{
+		InvokeInternal(nullptr, forward_and_cast_to_void_ptr<ParamTypes>(params)...);
+	}
+
+	// Invoke a reflected global function that returns a value.
+	template <typename ReturnType, typename... ParamTypes>
+	std::optional<ReturnType> Function::Invoke(ParamTypes&&... params)const
+	{
+		return InvokeInternal<ReturnType>(nullptr, forward_and_cast_to_void_ptr<ParamTypes>(params)...);
+	}
+
+	// Invoke a reflected member function with no return value.
 	template <typename... ParamTypes>
 	void Function::Invoke(void* obj, ParamTypes&&... params)const
 	{
 		InvokeInternal(obj, forward_and_cast_to_void_ptr<ParamTypes>(params)...);
 	}
 
+	// Invoke a reflected member function that returns a value.
 	template <typename ReturnType, typename... ParamTypes>
 	std::optional<ReturnType> Function::Invoke(void* obj, ParamTypes&&... params)const
 	{
 		return InvokeInternal<ReturnType>(obj, forward_and_cast_to_void_ptr<ParamTypes>(params)...);
 	}
 
+	// Invoke a reflected member function with no return value.
 	template <typename ObjectType, typename... ParamTypes>
 	void Function::Invoke(ObjectType& obj, ParamTypes&&... params)const
 	{
 		InvokeInternal((void*)&obj, forward_and_cast_to_void_ptr<ParamTypes>(params)...);
 	}
 
+	// Invoke a reflected member function that returns a value.
 	template <typename ReturnType, typename ObjectType, typename... ParamTypes>
 	std::optional<ReturnType> Function::Invoke(ObjectType& obj, ParamTypes&&... params)const
 	{

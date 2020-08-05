@@ -76,6 +76,10 @@ int main()
 
 
 	const refl::Function& globalFunction = registry.GetFunction("TestGlobalFunction");
+	auto globalRV = globalFunction.Invoke<int>();
+	if (globalRV) {
+		printf("GOT RETURN VALUE: %d\n", *globalRV);
+	}
 
 	// const refl::Field& vectorField = testStructRefl.GetField("vectorOfInts");
 	// size_t elems = vectorField.GetArraySize((void*)&test);
