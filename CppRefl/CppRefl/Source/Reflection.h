@@ -117,49 +117,43 @@ namespace refl
 	class Function : public Element
 	{
 	public:
-		///////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Global functions
 
-		///////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		///////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Member functions
 
 		// Invoke a reflected member function.
-		void Invoke(void* obj)const;
+		template <typename... ParamTypes>
+		void Invoke(void* obj, ParamTypes&&... params)const;
 
 		// Invoke a reflected member function that returns a value.
-		template <typename ReturnType>
-		std::optional<ReturnType> Invoke(void* obj)const;
-
-		// Invoke a reflected member function with a single parameter.
-		template <typename ParamType>
-		void Invoke(void* obj, ParamType& param)const;
-
-		// Invoke a reflected member function with a single parameter that returns a value.
-		template <typename ReturnType, typename ParamType>
-		std::optional<ReturnType> Invoke(void* obj, ParamType& param)const;
+		template <typename ReturnType, typename... ParamTypes>
+		std::optional<ReturnType> Invoke(void* obj, ParamTypes&&... params)const;
 
 		// Invoke a reflected member function.
-		template <typename ObjectType>
-		void Invoke(ObjectType& obj)const;
+		template <typename ObjectType, typename... ParamTypes>
+		void Invoke(ObjectType& obj, ParamTypes&&... params)const;
 
 		// Invoke a reflected member function that returns a value.
-		template <typename ReturnType, typename ObjectType>
-		std::optional<ReturnType> Invoke(ObjectType& obj)const;
+		template <typename ReturnType, typename ObjectType, typename... ParamTypes>
+		std::optional<ReturnType> Invoke(ObjectType& obj, ParamTypes&&... params)const;
 
-		// Invoke a reflected member function with a single parameter.
-		template <typename ObjectType, typename ParamType>
-		void Invoke(ObjectType& obj, ParamType& param)const;
-
-		// Invoke a reflected member function with a single parameter that returns a value.
-		template <typename ReturnType, typename ObjectType, typename ParamType>
-		std::optional<ReturnType> Invoke(ObjectType& obj, ParamType& param)const;
-
-		///////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		// Creates a string representation of this class.
 		virtual std::string ToString(int indent = 0)const override;
+
+	private:
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		// These two functions actually invoke the real function.
+		void InvokeInternal(void* obj_or_null, void* param1_or_null = nullptr)const;
+
+		template <typename ReturnType>
+		std::optional<ReturnType> InvokeInternal(void* obj_or_null, void* param1_or_null = nullptr)const;
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public:
 		// Invaild reference to a Function.

@@ -120,11 +120,12 @@ namespace refl
 	///////////////////////////////////////////////////////////
 	// Function
 	///////////////////////////////////////////////////////////
-	
-	void Function::Invoke(void* obj)const
+
+	// The real invoker.
+	void Function::InvokeInternal(void* obj_or_null, void* param1_or_null)const
 	{
 		if (mFunction != nullptr) {
-			mFunction((void*)&obj, nullptr, nullptr);
+			mFunction(obj_or_null, nullptr, param1_or_null);
 		}
 	}
 
