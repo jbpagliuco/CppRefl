@@ -29,4 +29,11 @@ namespace testns
 		printf("TestStruct::FuncIntNoParams({%s}) called.\n", p.b ? "true" : "false");
 		return 1;
 	}
+
+
+
+	int TestGlobalFunction()
+	{
+		return 69;
+	}
 }

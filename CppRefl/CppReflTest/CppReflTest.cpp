@@ -52,11 +52,11 @@ int main()
 	printf("\n%s\n", testStructRefl.ToString().c_str());
 	
 	const refl::Function& fNothing = testStructRefl.GetFunction("FuncVoidNoParams");
-	auto badRV = fNothing.Invoke<int>(test);
-	if (badRV) {
-		// Should not happen.
-		printf("GOT A BAD RETURN VALUE. BAAAAAAAAAAAAAAAAADDDDDDDDDDDD.");
-	}
+	//auto badRV = fNothing.Invoke<int>(test);
+	//if (badRV) {
+	//	// Should not happen.
+	//	printf("GOT A BAD RETURN VALUE. BAAAAAAAAAAAAAAAAADDDDDDDDDDDD.");
+	//}
 
 	const refl::Function& fOneParam = testStructRefl.GetFunction("FuncVoidOneParam");
 	int i = 420;
@@ -74,9 +74,12 @@ int main()
 		printf("GOT RETURN VALUE: %d\n", *rv2);
 	}
 
-	const refl::Field& vectorField = testStructRefl.GetField("vectorOfInts");
-	size_t elems = vectorField.GetArraySize((void*)&test);
-	printf("vector has %zu elements", elems);
+
+	const refl::Function& globalFunction = registry.GetFunction("TestGlobalFunction");
+
+	// const refl::Field& vectorField = testStructRefl.GetField("vectorOfInts");
+	// size_t elems = vectorField.GetArraySize((void*)&test);
+	// printf("vector has %zu elements", elems);
 
 	fflush(stdout);
 }

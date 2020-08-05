@@ -8,7 +8,7 @@ namespace refl
 	}
 
 
-
+	
 	template <typename ReturnType>
 	std::optional<ReturnType> Function::Invoke(void* obj)const
 	{

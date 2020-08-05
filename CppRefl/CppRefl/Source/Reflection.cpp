@@ -120,7 +120,7 @@ namespace refl
 	///////////////////////////////////////////////////////////
 	// Function
 	///////////////////////////////////////////////////////////
-
+	
 	void Function::Invoke(void* obj)const
 	{
 		if (mFunction != nullptr) {
@@ -154,6 +154,14 @@ namespace refl
 		static std::vector<FunctionRegistration*> FunctionRegistrations;
 		
 		return FunctionRegistrations;
+	}
+
+	FunctionRegistration::FunctionRegistration(const std::string& functionName, Function::FunctionType function) :
+		mQualifiedClassName(""),
+		mFunctionName(functionName),
+		mFunction(function)
+	{
+		GetFunctionRegistrations().push_back(this);
 	}
 
 	FunctionRegistration::FunctionRegistration(const std::string& qualifiedClassName, const std::string& functionName, Function::FunctionType function) :
@@ -314,6 +322,10 @@ namespace refl
 			}
 		}
 
+		for (auto& reflFunction : mFunctions) {
+			reflFunction.second.mRegistry = this;
+		}
+
 		return true;
 	}
 
@@ -335,6 +347,15 @@ namespace refl
 		return mEnums.at(enumName);
 	}
 
+	const Function& Registry::GetFunction(const std::string& functionName)const
+	{
+		if (mFunctions.find(functionName) == mFunctions.end()) {
+			return Function::INVALID;
+		}
+
+		return mFunctions.at(functionName);
+	}
+
 	bool Registry::HasClass(const std::string& className)const
 	{
 		return mClasses.find(className) != mClasses.end();
@@ -345,20 +366,35 @@ namespace refl
 		return mEnums.find(enumName) != mEnums.end();
 	}
 
-	bool Registry::RegisterClass(Class Class)
+	bool Registry::HasFunction(const std::string& functionName)const
 	{
-		if (mClasses.find(Class.mQualifiedName) == mClasses.end()) {
-			mClasses[Class.mQualifiedName] = Class;
+		return mFunctions.find(functionName) != mFunctions.end();
+	}
+
+	bool Registry::RegisterClass(Class reflClass)
+	{
+		if (mClasses.find(reflClass.mQualifiedName) == mClasses.end()) {
+			mClasses[reflClass.mQualifiedName] = reflClass;
 			return true;
 		}
 
 		return false;
 	}
 
-	bool Registry::RegisterEnum(Enum Enum)
+	bool Registry::RegisterEnum(Enum reflEnum)
 	{
-		if (mEnums.find(Enum.mQualifiedName) == mEnums.end()) {
-			mEnums[Enum.mQualifiedName] = Enum;
+		if (mEnums.find(reflEnum.mQualifiedName) == mEnums.end()) {
+			mEnums[reflEnum.mQualifiedName] = reflEnum;
+			return true;
+		}
+
+		return false;
+	}
+
+	bool Registry::RegisterFunction(Function reflFunction)
+	{
+		if (mFunctions.find(reflFunction.mQualifiedName) == mFunctions.end()) {
+			mFunctions[reflFunction.mQualifiedName] = reflFunction;
 			return true;
 		}
 
@@ -368,6 +404,19 @@ namespace refl
 	void Registry::ResolveFunctions()
 	{
 		for (auto &registration : GetFunctionRegistrations()) {
+			// Is this a global function?
+			if (registration->mQualifiedClassName == "") {
+				if (HasFunction(registration->mFunctionName)) {
+					mFunctions[registration->mFunctionName].mFunction = registration->mFunction;
+				}
+				else {
+					REFL_RAISE_ERROR_INTERNAL("Failed to find global function [%s] while resolving functions.", registration->mFunctionName.c_str());
+				}
+				continue;
+			}
+
+			// This function is a member of a class.
+
 			// Find this function's class in the registry
 			Class& reflClass = mClasses[registration->mQualifiedClassName];
 			if (reflClass == Class::INVALID) {

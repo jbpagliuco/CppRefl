@@ -326,7 +326,7 @@ namespace refl
 		return field;
 	}
 
-	static Function ReflectFunction(CXCursor cursor, CXCursor parent)
+	static Function ReflectFunction(CXCursor cursor)
 	{
 		Function function;
 
@@ -366,7 +366,7 @@ namespace refl
 				reflClass.mFields.push_back(ReflectField(childCursor, cursor));
 			}
 			else if (childCursor.kind == CXCursor_CXXMethod) {
-				reflClass.mFunctions.push_back(ReflectFunction(childCursor, cursor));
+				reflClass.mFunctions.push_back(ReflectFunction(childCursor));
 			}
 		}
 
@@ -416,6 +416,7 @@ namespace refl
 			case CXCursorKind::CXCursor_ClassDecl:
 			case CXCursorKind::CXCursor_StructDecl:
 			case CXCursorKind::CXCursor_EnumDecl:
+			case CXCursorKind::CXCursor_FunctionDecl:
 				break;
 
 			default:
@@ -441,6 +442,10 @@ namespace refl
 
 			case CXCursorKind::CXCursor_EnumDecl:
 				registry.RegisterEnum(ReflectEnum(child));
+				break;
+
+			case CXCursorKind::CXCursor_FunctionDecl:
+				registry.RegisterFunction(ReflectFunction(child));
 				break;
 			}
 		}

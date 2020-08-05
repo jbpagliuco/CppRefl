@@ -117,36 +117,46 @@ namespace refl
 	class Function : public Element
 	{
 	public:
-		// Invoke a reflected function.
+		///////////////////////////////////////////////////
+		// Global functions
+
+		///////////////////////////////////////////////////
+
+		///////////////////////////////////////////////////
+		// Member functions
+
+		// Invoke a reflected member function.
 		void Invoke(void* obj)const;
 
-		// Invoke a reflected function that returns a value.
+		// Invoke a reflected member function that returns a value.
 		template <typename ReturnType>
 		std::optional<ReturnType> Invoke(void* obj)const;
 
-		// Invoke a reflected function with a single parameter.
+		// Invoke a reflected member function with a single parameter.
 		template <typename ParamType>
 		void Invoke(void* obj, ParamType& param)const;
 
-		// Invoke a reflected function with a single parameter that returns a value.
+		// Invoke a reflected member function with a single parameter that returns a value.
 		template <typename ReturnType, typename ParamType>
 		std::optional<ReturnType> Invoke(void* obj, ParamType& param)const;
 
-		// Invoke a reflected function.
+		// Invoke a reflected member function.
 		template <typename ObjectType>
 		void Invoke(ObjectType& obj)const;
 
-		// Invoke a reflected function that returns a value.
+		// Invoke a reflected member function that returns a value.
 		template <typename ReturnType, typename ObjectType>
 		std::optional<ReturnType> Invoke(ObjectType& obj)const;
 
-		// Invoke a reflected function with a single parameter.
+		// Invoke a reflected member function with a single parameter.
 		template <typename ObjectType, typename ParamType>
 		void Invoke(ObjectType& obj, ParamType& param)const;
 
-		// Invoke a reflected function with a single parameter that returns a value.
+		// Invoke a reflected member function with a single parameter that returns a value.
 		template <typename ReturnType, typename ObjectType, typename ParamType>
 		std::optional<ReturnType> Invoke(ObjectType& obj, ParamType& param)const;
+
+		///////////////////////////////////////////////////
 
 		// Creates a string representation of this class.
 		virtual std::string ToString(int indent = 0)const override;
@@ -159,7 +169,7 @@ namespace refl
 
 	public:
 		// Return value type of this function (only primitive data types are supported).
-		Type mReturnType;
+		Type mReturnType = Type::VOID;
 
 		// Function pointer
 		FunctionType mFunction = nullptr;
@@ -169,6 +179,9 @@ namespace refl
 	class FunctionRegistration
 	{
 	public:
+		// Registers a global function.
+		FunctionRegistration(const std::string& functionName, Function::FunctionType function);
+
 		// Registers a class member function.
 		FunctionRegistration(const std::string& qualifiedClassName, const std::string& functionName, Function::FunctionType function);
 
@@ -254,16 +267,22 @@ namespace refl
 		const Class& GetClass(const std::string& className)const;
 		// Retrieves a reflected enum representation from this registry, or Enum::INVALID if it does not exist.
 		const Enum& GetEnum(const std::string& enumName)const;
+		// Retrieves a reflected global function representation from this registry, or Function::INVALID if it does not exist.
+		const Function& GetFunction(const std::string& functionName)const;
 
 		// Does this registry contain the specified Class?
 		bool HasClass(const std::string& className)const;
 		// Does this registry contain the specified Enum?
 		bool HasEnum(const std::string& enumName)const;
+		// Does this registry contain the specified Function?
+		bool HasFunction(const std::string& functionName)const;
 
 		// Adds a reflected class to this registry.
-		bool RegisterClass(Class Class);
+		bool RegisterClass(Class reflClass);
 		// Adds a reflected enum to this registry.
-		bool RegisterEnum(Enum Enum);
+		bool RegisterEnum(Enum reflEnum);
+		// Adds a reflected function to this registry.
+		bool RegisterFunction(Function reflFunction);
 
 	private:
 		// Resolve function pointers for all Function's.
@@ -274,6 +293,8 @@ namespace refl
 		std::map<std::string, Class> mClasses;
 		// List of enums defined in this registry.
 		std::map<std::string, Enum> mEnums;
+		// List of global functions defined in this registry.
+		std::map<std::string, Function> mFunctions;
 	};
 }
 
