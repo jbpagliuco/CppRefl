@@ -1,21 +1,16 @@
 #pragma once
 
-// One parameter, no return value
-#define REFL_BIND_FUNCTION_INTERNAL2(ClassName, Function, Line) \
-	static refl::FunctionRegistration _##Function##Line(#ClassName, #Function, &refl::FunctionInvokerTemplatedVoid<ClassName, &ClassName::Function>);
-#define REFL_BIND_FUNCTION_INTERNAL(ClassName, Function, Line) REFL_BIND_FUNCTION_INTERNAL2(ClassName, Function, Line)
+#define REFL_BIND_GEN_NAME2(FunctionName, Line)		_##FunctionName##Line
+#define REFL_BIND_GEN_NAME1(FunctionName, Line)		REFL_BIND_GEN_NAME2(FunctionName, Line)
+#define REFL_BIND_GEN_NAME(FunctionName, Desc)		REFL_BIND_GEN_NAME1(FunctionName ## Desc, __LINE__)
 
-// No parameter, no return value
-#define REFL_BIND_FUNCTION_PARAM_INTERNAL2(ClassName, Function, ParamType, Line) \
-	static refl::FunctionRegistration _##Function##Line(#ClassName, #Function, &refl::FunctionInvokerTemplatedVoidParam<ClassName, ParamType, &ClassName::Function>);
-#define REFL_BIND_FUNCTION_PARAM_INTERNAL(ClassName, Function, ParamType, Line) REFL_BIND_FUNCTION_PARAM_INTERNAL2(ClassName, Function, ParamType, Line)
 
-// No parameter, one return value
-#define REFL_BIND_FUNCTION_RV_INTERNAL2(ReturnType, ClassName, Function, Line) \
-	static refl::FunctionRegistration _##Function##Line(#ClassName, #Function, &refl::FunctionInvokerTemplated<ReturnType, ClassName, &ClassName::Function>);
-#define REFL_BIND_FUNCTION_RV_INTERNAL(ReturnType, ClassName, Function, Line) REFL_BIND_FUNCTION_RV_INTERNAL2(ReturnType, ClassName, Function, Line)
 
-// One parameter, one return value
-#define REFL_BIND_FUNCTION_RV_PARAM_INTERNAL2(ReturnType, ClassName, Function, ParamType, Line) \
-	static refl::FunctionRegistration _##Function##Line(#ClassName, #Function, &refl::FunctionInvokerTemplatedParam<ReturnType, ClassName, ParamType, &ClassName::Function>);
-#define REFL_BIND_FUNCTION_RV_PARAM_INTERNAL(ReturnType, ClassName, Function, ParamType, Line) REFL_BIND_FUNCTION_RV_PARAM_INTERNAL2(ReturnType, ClassName, Function, ParamType, Line)
+#define REFL_INTERNAL_BIND_VOID_FUNCTION(ClassName, FunctionName, ...)																				\
+	static refl::FunctionInvoker<void (ClassName::*)(__VA_ARGS__), &ClassName::FunctionName> REFL_BIND_GEN_NAME(FunctionName, Invoker);				\
+	static refl::FunctionRegistration REFL_BIND_GEN_NAME(FunctionName, Wrapper)(#ClassName, #FunctionName, &refl::VoidFunctionInvokerWrapper<decltype(REFL_BIND_GEN_NAME(FunctionName, Invoker)), ClassName, __VA_ARGS__>, &REFL_BIND_GEN_NAME(FunctionName, Invoker));
+
+
+#define REFL_INTERNAL_BIND_FUNCTION(ReturnType, ClassName, FunctionName, ...)																				\
+	static refl::FunctionInvoker<ReturnType (ClassName::*)(__VA_ARGS__), &ClassName::FunctionName> REFL_BIND_GEN_NAME(FunctionName, Invoker);				\
+	static refl::FunctionRegistration REFL_BIND_GEN_NAME(FunctionName, Wrapper)(#ClassName, #FunctionName, &refl::FunctionInvokerWrapper<decltype(REFL_BIND_GEN_NAME(FunctionName, Invoker)), ReturnType, ClassName, __VA_ARGS__>, &REFL_BIND_GEN_NAME(FunctionName, Invoker));

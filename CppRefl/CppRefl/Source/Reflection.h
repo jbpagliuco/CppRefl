@@ -169,7 +169,7 @@ namespace refl
 
 		// Function pointer type. This must include the maximum number of
 		// allowed parameters (any of which can be null depending on the real reflected function definition).
-		typedef void (*FunctionType)(void* self, void* returnValue, void* param1);
+		typedef void (*FunctionType)(void* functionInvoker, void* obj, void* returnValue, void* param1);
 
 	public:
 		// Return value type of this function (only primitive data types are supported).
@@ -177,6 +177,7 @@ namespace refl
 
 		// Function pointer
 		FunctionType mFunction = nullptr;
+		void* mFunctionInvoker = nullptr;
 	};
 
 	// Registers a function with the reflection at runtime.
@@ -187,7 +188,7 @@ namespace refl
 		FunctionRegistration(const std::string& functionName, Function::FunctionType function);
 
 		// Registers a class member function.
-		FunctionRegistration(const std::string& qualifiedClassName, const std::string& functionName, Function::FunctionType function);
+		FunctionRegistration(const std::string& qualifiedClassName, const std::string& functionName, Function::FunctionType function, void* functionInvoker);
 
 	public:
 		// Fully qualified class name.
@@ -196,8 +197,9 @@ namespace refl
 		// Function name.
 		std::string mFunctionName;
 
-		// Pointer to the function invoker.
+		// Pointer to the function invoker
 		Function::FunctionType mFunction;
+		void* mFunctionInvoker;
 	};
 
 	// Represents a reflected class or struct.

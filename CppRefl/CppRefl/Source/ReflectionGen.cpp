@@ -33,7 +33,17 @@ namespace refl
 				errors = true;
 			}
 
-			printf("CLANG ERRORS\n");
+			CXString diagnosticString = clang_getDiagnosticSpelling(diagnostic);
+
+			CXFile file;
+			clang_getExpansionLocation(clang_getDiagnosticLocation(diagnostic), &file, nullptr, nullptr, nullptr);
+
+			CXString cxFilePath = clang_getFileName(file);
+
+			printf("%s\n%s\n\n", clang_getCString(cxFilePath), clang_getCString(diagnosticString));
+
+			clang_disposeString(cxFilePath);
+			clang_disposeString(diagnosticString);
 		}
 
 		fflush(stdout);

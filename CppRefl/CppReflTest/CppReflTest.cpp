@@ -85,5 +85,9 @@ int main()
 	// size_t elems = vectorField.GetArraySize((void*)&test);
 	// printf("vector has %zu elements", elems);
 
+
+	/*refl::FunctionInvoker<void (testns::TestStruct::*)(int), &testns::TestStruct::FuncVoidOneParam> testerboy2;
+	refl::FunctionInvokerVoidWrapper<decltype(testerboy2), testns::TestStruct, int>(&testerboy2, &test, &test, &test);*/
+
 	fflush(stdout);
 }

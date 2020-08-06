@@ -38,7 +38,8 @@ namespace testns
 		int FuncIntNoParams()						REFLECTED;
 		void FuncVoidOneParam(int)					REFLECTED;
 		int FuncIntOneParam(NestableStruct)			REFLECTED;
+		int FuncIntOneParam2(int)					;
 	};
 
-	int REFLECTED TestGlobalFunction();
+	int TestGlobalFunction();
 }

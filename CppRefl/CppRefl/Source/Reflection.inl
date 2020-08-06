@@ -80,7 +80,7 @@ namespace refl
 	{
 		if (mFunction != nullptr) {
 			ReturnType rv;
-			mFunction(obj_or_null, &rv, param1_or_null);
+			mFunction(mFunctionInvoker, obj_or_null, &rv, param1_or_null);
 
 			if (mReturnType != Type::VOID) {
 				return { rv };

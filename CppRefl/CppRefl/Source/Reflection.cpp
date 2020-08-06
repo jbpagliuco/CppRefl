@@ -125,7 +125,7 @@ namespace refl
 	void Function::InvokeInternal(void* obj_or_null, void* param1_or_null)const
 	{
 		if (mFunction != nullptr) {
-			mFunction(obj_or_null, nullptr, param1_or_null);
+			mFunction(mFunctionInvoker, obj_or_null, nullptr, param1_or_null);
 		}
 	}
 
@@ -160,19 +160,20 @@ namespace refl
 	FunctionRegistration::FunctionRegistration(const std::string& functionName, Function::FunctionType function) :
 		mQualifiedClassName(""),
 		mFunctionName(functionName),
-		mFunction(function)
+		mFunction(function),
+		mFunctionInvoker(nullptr)
 	{
 		GetFunctionRegistrations().push_back(this);
 	}
 
-	FunctionRegistration::FunctionRegistration(const std::string& qualifiedClassName, const std::string& functionName, Function::FunctionType function) :
+	FunctionRegistration::FunctionRegistration(const std::string& qualifiedClassName, const std::string& functionName, Function::FunctionType function, void* functionInvoker) :
 		mQualifiedClassName(qualifiedClassName),
 		mFunctionName(functionName),
-		mFunction(function)
+		mFunction(function),
+		mFunctionInvoker(functionInvoker)
 	{
 		GetFunctionRegistrations().push_back(this);
 	}
-
 
 	///////////////////////////////////////////////////////////
 	// Class
@@ -444,6 +445,7 @@ namespace refl
 			}
 
 			reflFunction.mFunction = registration->mFunction;
+			reflFunction.mFunctionInvoker = registration->mFunctionInvoker;
 		}
 	}
 

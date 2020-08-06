@@ -5,47 +5,66 @@
 
 namespace refl
 {
-	template <typename ReturnType, typename ClassType, ReturnType (ClassType::*FunctionType)()>
-	void FunctionInvokerTemplated(void* obj, void *rv, void* dummyParam)
+	template<typename T, T> struct FunctionInvoker;
+
+	// Member function invoker.
+	template<typename ClassType, typename ReturnType, typename ...ParamTypes, ReturnType (ClassType::*FunctionPtr)(ParamTypes...)>
+	struct FunctionInvoker<ReturnType (ClassType::*)(ParamTypes...), FunctionPtr>
+	{
+		ReturnType Invoke(ClassType* obj, ParamTypes... params)const
+		{
+			return (obj->*FunctionPtr)(std::forward<ParamTypes>(params)...);
+		}
+	};
+
+	// Global function invoker.
+	/*template <typename ReturnType, typename ...ParamTypes, ReturnType (*FunctionPtr)(ParamTypes...)>
+	struct FunctionInvoker<ReturnType(*)(ParamTypes...), FunctionPtr>
+	{
+		ReturnType operator()(ParamTypes&&... params)
+		{
+			return (*FunctionPtr)(std::forward<ParamTypes>(params)...);
+		}
+	};*/
+
+
+	#define REFL_INTERNAL_INVOKE(...) static_cast<FunctionInvokerType*>(functionInvoker)->Invoke((ClassType*)obj, __VA_ARGS__)
+
+	// No parameters.
+	template <typename FunctionInvokerType, typename ClassType>
+	void VoidFunctionInvokerWrapper(void* functionInvoker, void* obj, void* rv, void* dummyParam)
+	{
+		REFL_INTERNAL_INVOKE();
+	}
+
+	template <typename FunctionInvokerType, typename ReturnType, typename ClassType>
+	void FunctionInvokerWrapper(void* functionInvoker, void* obj, void* rv, void* dummyParam)
 	{
 		if (rv != nullptr) {
-			*((ReturnType*)rv) = ((ClassType*)obj->*FunctionType)();
+			*((ReturnType*)rv) = REFL_INTERNAL_INVOKE();
 		}
 		else {
-			((ClassType*)obj->*FunctionType)();
+			REFL_INTERNAL_INVOKE();
 		}
 	}
-
-	template <typename ReturnType, typename ClassType, typename ParamType, ReturnType (ClassType::*FunctionType)(ParamType)>
-	void FunctionInvokerTemplatedParam(void* obj, void* rv, void* param)
+	
+	// One parameter.
+	template <typename FunctionInvokerType, typename ClassType, typename ParamType>
+	void VoidFunctionInvokerWrapper(void* functionInvoker, void* obj, void* rv, void* param)
 	{
-		if (param == nullptr) {
-			REFL_RAISE_ERROR_INTERNAL("Tried to invoke a function with a null parameter.");
-			return;
-		}
+		REFL_INTERNAL_INVOKE(*(ParamType*)param);
+	}
 
+	template <typename FunctionInvokerType, typename ReturnType, typename ClassType, typename ParamType>
+	void FunctionInvokerWrapper(void* functionInvoker, void* obj, void* rv, void* param)
+	{
 		if (rv != nullptr) {
-			*((ReturnType*)rv) = ((ClassType*)obj->*FunctionType)(*(ParamType*)param);
+			*((ReturnType*)rv) = REFL_INTERNAL_INVOKE(*(ParamType*)param);
 		}
 		else {
-			((ClassType*)obj->*FunctionType)(*(ParamType*)param);
+			REFL_INTERNAL_INVOKE(*(ParamType*)param);
 		}
 	}
 
-	template <typename ClassType, void (ClassType::*FunctionType)()>
-	void FunctionInvokerTemplatedVoid(void* obj, void* dummyRV, void* dummyParam)
-	{
-		((ClassType*)obj->*FunctionType)();
-	}
-
-	template <typename ClassType, typename ParamType, void (ClassType::*FunctionType)(ParamType)>
-	void FunctionInvokerTemplatedVoidParam(void* obj, void* dummyRV, void* param)
-	{
-		if (param == nullptr) {
-			//RAISE_ERROR
-			return;
-		}
-
-		((ClassType*)obj->*FunctionType)(*(ParamType*)param);
-	}
+	#undef REFL_INTERNAL_INVOKE
 }
