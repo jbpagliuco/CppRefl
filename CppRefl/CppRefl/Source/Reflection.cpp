@@ -420,7 +420,9 @@ namespace refl
 			// Is this a global function?
 			if (registration->mQualifiedClassName == "") {
 				if (HasFunction(registration->mFunctionName)) {
+					// Bind the real function to our reflected function representation.
 					mFunctions[registration->mFunctionName].mFunction = registration->mFunction;
+					mFunctions[registration->mFunctionName].mFunctionInvoker = registration->mFunctionInvoker;
 				}
 				else {
 					REFL_RAISE_ERROR_INTERNAL("Failed to find global function [%s] while resolving functions.", registration->mFunctionName.c_str());
@@ -444,6 +446,7 @@ namespace refl
 				continue;
 			}
 
+			// Bind the real function to our reflected function representation.
 			reflFunction.mFunction = registration->mFunction;
 			reflFunction.mFunctionInvoker = registration->mFunctionInvoker;
 		}
