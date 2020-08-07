@@ -75,7 +75,7 @@ int main()
 	}
 
 
-	const refl::Function& globalFunction = registry.GetFunction("TestGlobalFunction");
+	const refl::Function& globalFunction = registry.GetFunction("testns::TestGlobalFunction");
 	auto globalRV = globalFunction.Invoke<int>();
 	if (globalRV) {
 		printf("GOT RETURN VALUE: %d\n", *globalRV);

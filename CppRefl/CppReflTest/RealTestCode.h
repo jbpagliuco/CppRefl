@@ -41,5 +41,5 @@ namespace testns
 		int FuncIntOneParam2(int)					;
 	};
 
-	int TestGlobalFunction();
+	int REFLECTED TestGlobalFunction();
 }

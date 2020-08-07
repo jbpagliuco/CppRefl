@@ -124,9 +124,12 @@ namespace refl
 	// The real invoker.
 	void Function::InvokeInternal(void* obj_or_null, void* param1_or_null)const
 	{
-		if (mFunction != nullptr) {
-			mFunction(mFunctionInvoker, obj_or_null, nullptr, param1_or_null);
+		if (mFunction == nullptr) {
+			REFL_RAISE_ERROR_INTERNAL("Tried to invoke a function [%s] that was not bound.", mQualifiedName.c_str());
+			return;
 		}
+
+		mFunction(mFunctionInvoker, obj_or_null, nullptr, param1_or_null);
 	}
 
 	std::string Function::ToString(int indent)const
@@ -157,11 +160,11 @@ namespace refl
 		return FunctionRegistrations;
 	}
 
-	FunctionRegistration::FunctionRegistration(const std::string& functionName, Function::FunctionType function) :
+	FunctionRegistration::FunctionRegistration(const std::string& functionName, Function::FunctionType function, void* functionInvoker) :
 		mQualifiedClassName(""),
 		mFunctionName(functionName),
 		mFunction(function),
-		mFunctionInvoker(nullptr)
+		mFunctionInvoker(functionInvoker)
 	{
 		GetFunctionRegistrations().push_back(this);
 	}

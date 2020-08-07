@@ -89,6 +89,9 @@ namespace refl
 				REFL_RAISE_ERROR_INTERNAL("Tried to read return value from a function that doesn't return a value.");
 			}
 		}
+		else {
+			REFL_RAISE_ERROR_INTERNAL("Tried to invoke a function [%s] that was not bound.", mQualifiedName.c_str());
+		}
 
 		return std::nullopt;
 	}

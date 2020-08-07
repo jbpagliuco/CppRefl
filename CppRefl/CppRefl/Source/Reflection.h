@@ -185,7 +185,7 @@ namespace refl
 	{
 	public:
 		// Registers a global function.
-		FunctionRegistration(const std::string& functionName, Function::FunctionType function);
+		FunctionRegistration(const std::string& functionName, Function::FunctionType function, void* functionInvoker);
 
 		// Registers a class member function.
 		FunctionRegistration(const std::string& qualifiedClassName, const std::string& functionName, Function::FunctionType function, void* functionInvoker);

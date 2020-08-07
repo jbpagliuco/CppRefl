@@ -16,3 +16,17 @@
 #define REFL_INTERNAL_BIND_FUNCTION(ReturnType, ClassName, FunctionName, ...)																				\
 	static refl::FunctionInvoker<ReturnType (ClassName::*)(__VA_ARGS__), &ClassName::FunctionName> REFL_BIND_GEN_NAME(FunctionName, Invoker);				\
 	static refl::FunctionRegistration REFL_BIND_GEN_NAME(FunctionName, Wrapper)(#ClassName, #FunctionName, &refl::MemberFunctionInvokerWrapper<decltype(REFL_BIND_GEN_NAME(FunctionName, Invoker)), ReturnType, ClassName, __VA_ARGS__>, &REFL_BIND_GEN_NAME(FunctionName, Invoker));
+
+
+
+// Bind and register a global function with no return value.
+#define REFL_INTERNAL_BIND_VOID_GLOBAL_FUNCTION(Namespace, FunctionName, ...)															\
+	static refl::FunctionInvoker<void (*)(__VA_ARGS__), &Namespace::FunctionName> REFL_BIND_GEN_NAME(FunctionName, Invoker);			\
+	static refl::FunctionRegistration REFL_BIND_GEN_NAME(FunctionName, Wrapper)(#Namespace "::" #FunctionName, &refl::VoidGlobalFunctionInvokerWrapper<decltype(REFL_BIND_GEN_NAME(FunctionName, Invoker)), __VA_ARGS__>, &REFL_BIND_GEN_NAME(FunctionName, Invoker));
+
+
+// Bind and register a global function with no return value.
+#define REFL_INTERNAL_BIND_GLOBAL_FUNCTION(Namespace, ReturnType, FunctionName, ...)													\
+	static refl::FunctionInvoker<ReturnType (*)(__VA_ARGS__), &Namespace::FunctionName> REFL_BIND_GEN_NAME(FunctionName, Invoker);		\
+	static refl::FunctionRegistration REFL_BIND_GEN_NAME(FunctionName, Wrapper)(#Namespace "::" #FunctionName, &refl::GlobalFunctionInvokerWrapper<decltype(REFL_BIND_GEN_NAME(FunctionName, Invoker)), ReturnType, __VA_ARGS__>, &REFL_BIND_GEN_NAME(FunctionName, Invoker));
+

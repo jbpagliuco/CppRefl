@@ -8,6 +8,10 @@ namespace refl
 	// FunctionInvoker is a wrapper class that can invoke a function with any number of parameters.
 	template<typename T, T> struct FunctionInvoker;
 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Member function invocation
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	// Function invoker for a member function of a class.
 	template<typename ClassType, typename ReturnType, typename ...ParamTypes, ReturnType (ClassType::*FunctionPtr)(ParamTypes...)>
 	struct FunctionInvoker<ReturnType (ClassType::*)(ParamTypes...), FunctionPtr>
@@ -17,16 +21,6 @@ namespace refl
 			return (obj->*FunctionPtr)(std::forward<ParamTypes>(params)...);
 		}
 	};
-
-	// Global function invoker.
-	/*template <typename ReturnType, typename ...ParamTypes, ReturnType (*FunctionPtr)(ParamTypes...)>
-	struct FunctionInvoker<ReturnType(*)(ParamTypes...), FunctionPtr>
-	{
-		ReturnType operator()(ParamTypes&&... params)
-		{
-			return (*FunctionPtr)(std::forward<ParamTypes>(params)...);
-		}
-	};*/
 
 
 	// Helper define to invoke a member function.
@@ -71,4 +65,66 @@ namespace refl
 	}
 
 	#undef REFL_INTERNAL_INVOKE_MEMBER
+
+
+
+
+
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Global function invocation
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Function invoker for a global function of a class.
+	template <typename ReturnType, typename ...ParamTypes, ReturnType (*FunctionPtr)(ParamTypes...)>
+	struct FunctionInvoker<ReturnType (*)(ParamTypes...), FunctionPtr>
+	{
+		ReturnType Invoke(ParamTypes&&... params)const
+		{
+			return (*FunctionPtr)(std::forward<ParamTypes>(params)...);
+		}
+	};
+
+	// Helper define to invoke a member function.
+	#define REFL_INTERNAL_INVOKE_GLOBAL(...) static_cast<FunctionInvokerType*>(functionInvoker)->Invoke(__VA_ARGS__)
+
+	// Invokes a global function with no return value and no parameters.
+	template <typename FunctionInvokerType>
+	void VoidGlobalFunctionInvokerWrapper(void* functionInvoker, void* obj, void* rv, void* dummyParam)
+	{
+		REFL_INTERNAL_INVOKE_GLOBAL();
+	}
+
+	// Invokes a global function with a return value and no parameters.
+	template <typename FunctionInvokerType, typename ReturnType>
+	void GlobalFunctionInvokerWrapper(void* functionInvoker, void* obj, void* rv, void* dummyParam)
+	{
+		if (rv != nullptr) {
+			*((ReturnType*)rv) = REFL_INTERNAL_INVOKE_GLOBAL();
+		}
+		else {
+			REFL_INTERNAL_INVOKE_GLOBAL();
+		}
+	}
+
+	// Invokes a global function with no return value and one parameter.
+	template <typename FunctionInvokerType, typename ParamType>
+	void VoidGlobalFunctionInvokerWrapper(void* functionInvoker, void* obj, void* rv, void* param)
+	{
+		REFL_INTERNAL_INVOKE_GLOBAL(*(ParamType*)param);
+	}
+
+	// Invokes a global function with a return value and one parameter.
+	template <typename FunctionInvokerType, typename ReturnType, typename ParamType>
+	void GlobalFunctionInvokerWrapper(void* functionInvoker, void* obj, void* rv, void* param)
+	{
+		if (rv != nullptr) {
+			*((ReturnType*)rv) = REFL_INTERNAL_INVOKE_GLOBAL(*(ParamType*)param);
+		}
+		else {
+			REFL_INTERNAL_INVOKE_GLOBAL(*(ParamType*)param);
+		}
+	}
+
+	#undef REFL_INTERNAL_INVOKE_GLOBAL
 }

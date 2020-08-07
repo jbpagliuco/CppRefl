@@ -36,6 +36,7 @@ namespace testns
 	}
 
 
+	REFL_BIND_GLOBAL_FUNCTION(int, testns, TestGlobalFunction);
 	int TestGlobalFunction()
 	{
 		printf("TestGlobalFunction() called.\n");
