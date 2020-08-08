@@ -78,7 +78,7 @@ namespace refl
 	template <typename ReturnType>
 	std::optional<ReturnType> Function::InvokeInternal(void* obj_or_null, void* param1_or_null)const
 	{
-		if (mFunction != nullptr) {
+		if (ValidateInvocation(obj_or_null, param1_or_null)) {
 			ReturnType rv;
 			mFunction(mFunctionInvoker, obj_or_null, &rv, param1_or_null);
 
@@ -88,9 +88,6 @@ namespace refl
 			else {
 				REFL_INTERNAL_RAISE_ERROR("Tried to read return value from a function that doesn't return a value.");
 			}
-		}
-		else {
-			REFL_INTERNAL_RAISE_ERROR("Tried to invoke a function [%s] that was not bound.", mQualifiedName.c_str());
 		}
 
 		return std::nullopt;

@@ -128,20 +128,41 @@ namespace refl
 	// The real invoker.
 	void Function::InvokeInternal(void* obj_or_null, void* param1_or_null)const
 	{
-		if (mFunction == nullptr) {
-			REFL_INTERNAL_RAISE_ERROR("Tried to invoke a function [%s] that was not bound.", mQualifiedName.c_str());
-			return;
-		}
-
-		// Make sure we have an object if this is a member function (and vice versa).
-		if ((obj_or_null != nullptr) != mIsMemberFunction) {
-			REFL_INTERNAL_RAISE_ERROR("Tried to invoke a %s function with %s.",
-				mIsMemberFunction ? "member" : "global",
-				mIsMemberFunction ? "no object" : "an object");
+		if (!ValidateInvocation(obj_or_null, param1_or_null)) {
 			return;
 		}
 
 		mFunction(mFunctionInvoker, obj_or_null, nullptr, param1_or_null);
+	}
+
+	bool Function::ValidateInvocation(void* obj, void* param1)const
+	{
+		// Make sure the function is bound.
+		if (mFunction == nullptr) {
+			REFL_INTERNAL_RAISE_ERROR("Tried to invoke a function [%s] that was not bound.", mQualifiedName.c_str());
+			return false;
+		}
+
+		// Make sure we have an object if this is a member function (and vice versa).
+		if ((obj != nullptr) != mIsMemberFunction) {
+			REFL_INTERNAL_RAISE_ERROR("Tried to invoke a %s function [%s] with %s.",
+				mIsMemberFunction ? "member" : "global",
+				mQualifiedName.c_str(),
+				mIsMemberFunction ? "no object" : "an object");
+			return false;
+		}
+
+		// Make sure the number of parameters match.
+		const int numParams = (param1 == nullptr) ? 0 : 1;
+		if (numParams != mNumParameters) {
+			REFL_INTERNAL_RAISE_ERROR("Tried to invoke function [%s] with (%d) parameters, when (%d) are required.",
+				mQualifiedName.c_str(),
+				numParams,
+				mNumParameters);
+			return false;
+		}
+
+		return true;
 	}
 
 	std::string Function::ToString(int indent)const

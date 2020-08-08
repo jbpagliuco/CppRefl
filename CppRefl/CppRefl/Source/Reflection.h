@@ -168,6 +168,9 @@ namespace refl
 		std::optional<ReturnType> InvokeInternal(void* obj_or_null, void* param1_or_null = nullptr)const;
 		//////////////////////////////////////////////////////////////////////////////////////////////////////
 
+		// Check if we can safely invoke a function with the given parameters.
+		bool ValidateInvocation(void* obj, void* param1)const;
+
 	public:
 		// Invaild reference to a Function.
 		static Function INVALID;
