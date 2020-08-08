@@ -204,3 +204,19 @@ TEST_F(DataTest, TestClassInfo)
 	EXPECT_EQ(reflClass.mFields.size(), 21);
 	EXPECT_EQ(reflClass.mFunctions.size(), 0);
 }
+
+TEST_F(DataTest, TestEnumInfo)
+{
+	const refl::Enum& reflEnum = mRegistry.GetEnum("TestEnum");
+	EXPECT_NE(reflEnum, refl::Enum::INVALID);
+
+	EXPECT_EQ(reflEnum.mValueTable.size(), 3);
+
+	EXPECT_EQ(reflEnum.GetValueString((int)TestEnum::VAL1), "VAL1");
+	EXPECT_EQ(reflEnum.GetValueString((int)TestEnum::VAL2), "VAL2");
+	EXPECT_EQ(reflEnum.GetValueString((int)TestEnum::VAL3), "VAL3");
+
+	EXPECT_EQ(reflEnum.GetValueString((int)TestEnum::VAL1, true), "TestEnum::VAL1");
+	EXPECT_EQ(reflEnum.GetValueString((int)TestEnum::VAL2, true), "TestEnum::VAL2");
+	EXPECT_EQ(reflEnum.GetValueString((int)TestEnum::VAL3, true), "TestEnum::VAL3");
+}
