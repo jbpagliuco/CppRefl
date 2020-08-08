@@ -7,7 +7,7 @@ namespace refl
 {
 	static ErrorHandler CustomErrorHandler = nullptr;
 
-	void RaiseErrorInternal(const char* file, int line, const char* fmt, ...)
+	void RaiseErrorInternal(ErrorType errorType, const char* file, int line, const char* fmt, ...)
 	{
 		if (CustomErrorHandler == nullptr) {
 			return;
@@ -20,7 +20,7 @@ namespace refl
 		vsnprintf(buffer, 1024, fmt, args);
 		va_end(args);
 
-		CustomErrorHandler(buffer, file, line);
+		CustomErrorHandler(errorType, buffer, file, line);
 	}
 
 	void SetErrorHandler(ErrorHandler errorHandler)

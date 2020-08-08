@@ -10,7 +10,7 @@
 
 static refl::Registry registry;
 
-static void ErrorHandler(const char* message, const char* file, int line)
+static void ErrorHandler(refl::ErrorType errorType, const char* message, const char* file, int line)
 {
 	printf("Error: %s\n", message);
 	printf("%s (%d)\n", file, line);

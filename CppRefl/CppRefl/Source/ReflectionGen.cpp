@@ -75,7 +75,7 @@ namespace refl
 		};
 
 		if (INCLUDE_COMPILER_FLAGS.find(driverMode) == INCLUDE_COMPILER_FLAGS.end()) {
-			REFL_RAISE_ERROR_INTERNAL("Unrecognized driver type: '%s'", driverMode.c_str());
+			REFL_INTERNAL_RAISE_ERROR("Unrecognized driver type: '%s'", driverMode.c_str());
 			return nullptr;
 		}
 
@@ -347,22 +347,32 @@ namespace refl
 
 		field.mType = GetTypeFromClang(cursor);
 
-		// Special container types
-		if (typeDeclarationQName == "std::string")
-		{
-			field.mIsString = true;
-			field.mClassType = typeDeclarationQName;
-			field.mType = Type::CLASS;
-		}
-		else if (typeDeclarationQName == "std::vector")
-		{
-			field.mIsArray = true;
-			field.mClassType = typeDeclarationQName;
+		// Raise warnings when using std:: types, as the internal layouts of each class can differ between compilers.
+		if (typeDeclarationQName.find_first_of("std::") == 0) {
+			if (!GenerationParams.mDisableStdWarnings) {
+				REFL_INTERNAL_RAISE_WARNING(
+					"Tried to reflect a class in the std namespace [%s] (see %s). This is discouraged, as the implementations of these classes can differ between compilers.",
+					typeDeclarationQName.c_str(),
+					field.mQualifiedName.c_str());
+			}
 
-			// Get the vector element type
-			CXType elementType = clang_Type_getTemplateArgumentAsType(fieldType, 0);
-			field.mType = GetTypeFromClang(elementType);
-			field.mSize = clang_Type_getSizeOf(elementType);
+			// Special container types
+			if (typeDeclarationQName == "std::string")
+			{
+				field.mIsString = true;
+				field.mClassType = typeDeclarationQName;
+				field.mType = Type::CLASS;
+			}
+			else if (typeDeclarationQName == "std::vector")
+			{
+				field.mIsArray = true;
+				field.mClassType = typeDeclarationQName;
+
+				// Get the vector element type
+				CXType elementType = clang_Type_getTemplateArgumentAsType(fieldType, 0);
+				field.mType = GetTypeFromClang(elementType);
+				field.mSize = clang_Type_getSizeOf(elementType);
+			}
 		}
 
 		// Non primitive types

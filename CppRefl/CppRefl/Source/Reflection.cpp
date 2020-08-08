@@ -128,7 +128,7 @@ namespace refl
 	void Function::InvokeInternal(void* obj_or_null, void* param1_or_null)const
 	{
 		if (mFunction == nullptr) {
-			REFL_RAISE_ERROR_INTERNAL("Tried to invoke a function [%s] that was not bound.", mQualifiedName.c_str());
+			REFL_INTERNAL_RAISE_ERROR("Tried to invoke a function [%s] that was not bound.", mQualifiedName.c_str());
 			return;
 		}
 
@@ -243,7 +243,7 @@ namespace refl
 			return (qualified) ? value.mQualifiedName : value.mName;
 		}
 
-		REFL_RAISE_ERROR_INTERNAL("Failed to find enum value (%d) in [%s]", enumValue, mQualifiedName.c_str());
+		REFL_INTERNAL_RAISE_ERROR("Failed to find enum value (%d) in [%s]", enumValue, mQualifiedName.c_str());
 		return "";
 	}
 
@@ -281,7 +281,7 @@ namespace refl
 			}
 			for (auto& function : reflClass.second.mFunctions) {
 				if (function.mFunction == nullptr) {
-					REFL_RAISE_ERROR_INTERNAL("Member function [%s] was not bound. Use REFL_BIND_* functions in ReflectionBindings.h to bind it.", function.mQualifiedName.c_str());
+					REFL_INTERNAL_RAISE_ERROR("Member function [%s] was not bound. Use REFL_BIND_* functions in ReflectionBindings.h to bind it.", function.mQualifiedName.c_str());
 				}
 
 				function.mRegistry = this;
@@ -299,7 +299,7 @@ namespace refl
 		for (auto& reflFunction : mFunctions) {
 			// Make sure this function is bound.
 			if (reflFunction.second.mFunction == nullptr) {
-				REFL_RAISE_ERROR_INTERNAL("Global function [%s] was not bound. Use REFL_BIND_* functions in ReflectionBindings.h to bind it.", reflFunction.second.mQualifiedName.c_str());
+				REFL_INTERNAL_RAISE_ERROR("Global function [%s] was not bound. Use REFL_BIND_* functions in ReflectionBindings.h to bind it.", reflFunction.second.mQualifiedName.c_str());
 			}
 
 			reflFunction.second.mRegistry = this;
@@ -391,7 +391,7 @@ namespace refl
 					mFunctions[registration->mFunctionName].mFunctionInvoker = registration->mFunctionInvoker;
 				}
 				else {
-					REFL_RAISE_ERROR_INTERNAL("Failed to find global function [%s] while resolving functions.", registration->mFunctionName.c_str());
+					REFL_INTERNAL_RAISE_ERROR("Failed to find global function [%s] while resolving functions.", registration->mFunctionName.c_str());
 				}
 				continue;
 			}
@@ -401,14 +401,14 @@ namespace refl
 			// Find this function's class in the registry
 			Class& reflClass = mClasses[registration->mQualifiedClassName];
 			if (reflClass == Class::INVALID) {
-				REFL_RAISE_ERROR_INTERNAL("Failed to find class [%s] while resolving functions.", registration->mQualifiedClassName.c_str());
+				REFL_INTERNAL_RAISE_ERROR("Failed to find class [%s] while resolving functions.", registration->mQualifiedClassName.c_str());
 				continue;
 			}
 			
 			// Find this function within the class
 			Function& reflFunction = reflClass.GetFunction(registration->mFunctionName);
 			if (reflFunction == Function::INVALID) {
-				REFL_RAISE_ERROR_INTERNAL("Failed to find function definition [%s::%s] while resolving functions.", registration->mQualifiedClassName.c_str(), registration->mFunctionName.c_str());
+				REFL_INTERNAL_RAISE_ERROR("Failed to find function definition [%s::%s] while resolving functions.", registration->mQualifiedClassName.c_str(), registration->mFunctionName.c_str());
 				continue;
 			}
 

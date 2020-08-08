@@ -6,7 +6,7 @@
 
 #include "ReflectionGen.h"
 
-static void CppReflErrorHandler(const char* message, const char* file, int line)
+static void CppReflErrorHandler(refl::ErrorType errorType, const char* message, const char* file, int line)
 {
 	EXPECT_TRUE(false);
 	printf("CppRefl Error: %s (%d)\n", file, line);
