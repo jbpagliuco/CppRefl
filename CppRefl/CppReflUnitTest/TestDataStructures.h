@@ -53,10 +53,6 @@ struct REFLECTED TestStruct
 
 	TypedefInt mTypedefInt				REFLECTED;
 
-	std::string mString					REFLECTED;
-
-	std::vector<int32_t> mArrayOfInts	REFLECTED;
-
 	int32_t mIntWithAttrs				REFLECTED REFL_TAG("tag") REFL_ATTR("attr", "value");
 
 	int32_t* mIntPtr					REFLECTED;

@@ -79,26 +79,6 @@ TEST_F(DataTest, TestFieldDataTypes)
 	testPrimitive("mTypedefInt", refl::Type::INT32);
 
 	{
-		const refl::Field& stringField = reflClass.GetField("mString");
-		testCommon(stringField, refl::Type::CLASS);
-		EXPECT_EQ(stringField.mClassType, "std::string");
-		EXPECT_FALSE(stringField.IsEnumType());
-		EXPECT_TRUE(stringField.IsString());
-		EXPECT_FALSE(stringField.IsConst());
-		EXPECT_FALSE(stringField.IsPointer());
-	}
-
-	{
-		const refl::Field& vectorOfIntsField = reflClass.GetField("mArrayOfInts");
-		testCommon(vectorOfIntsField, refl::Type::INT32); // type here is the vector templated type
-		EXPECT_TRUE(vectorOfIntsField.IsArray());			// but it is still an array
-		EXPECT_EQ(vectorOfIntsField.mClassType, "std::vector");
-		EXPECT_FALSE(vectorOfIntsField.IsEnumType());
-		EXPECT_FALSE(vectorOfIntsField.IsConst());
-		EXPECT_FALSE(vectorOfIntsField.IsPointer());
-	}
-
-	{
 		const refl::Field& pointerField = reflClass.GetField("mIntPtr");
 		testCommon(pointerField, refl::Type::INT32);
 		EXPECT_FALSE(pointerField.IsEnumType());
@@ -167,8 +147,6 @@ TEST_F(DataTest, TestFieldDataSizes)
 
 	TEST_SIZE(mTypedefInt);
 
-	TEST_SIZE(mString);
-
 	TEST_SIZE(mIntWithAttrs);
 
 	TEST_SIZE(mNestableStruct);
@@ -179,9 +157,6 @@ TEST_F(DataTest, TestFieldDataSizes)
 
 	// The size of a pointer is actually the pointee type
 	EXPECT_EQ(reflClass.GetField("mIntPtr").mSize, sizeof(int32_t));
-
-	// The size of an array is actually the element type
-	EXPECT_EQ(reflClass.GetField("mArrayOfInts").mSize, sizeof(int32_t));
 
 	EXPECT_EQ(reflClass.mSize, sizeof(TestStruct));
 }
@@ -214,9 +189,6 @@ TEST_F(DataTest, TestFieldDataOffsets)
 
 	TEST_OFFSET(mTypedefInt);
 
-	TEST_OFFSET(mString);
-	TEST_OFFSET(mArrayOfInts);
-
 	TEST_OFFSET(mIntWithAttrs);
 
 	TEST_OFFSET(mIntPtr);
@@ -245,7 +217,9 @@ TEST_F(DataTest, TestClassInfo)
 	const refl::Class& reflClass = mRegistry.GetClass("TestStruct");
 	EXPECT_NE(reflClass, refl::Class::INVALID);
 
-	EXPECT_EQ(reflClass.mFields.size(), 21);
+	EXPECT_EQ(reflClass.mQualifiedName, "TestStruct");
+
+	EXPECT_EQ(reflClass.mFields.size(), 19);
 	EXPECT_EQ(reflClass.mFunctions.size(), 0);
 }
 

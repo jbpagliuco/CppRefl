@@ -63,7 +63,6 @@ void CreateRegistry(refl::Registry &registry)
 	params.mClangArgs = GetClangArgs();
 	params.mIncludePaths.push_back(reflIncludePath.string());
 	params.mProjectPath = projectPath.string();
-	params.mDisableStdWarnings = true; // TEMP
 
 	const bool success = refl::GenerateReflectionRegistry(registry, params);
 	ASSERT_TRUE(success);
