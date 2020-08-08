@@ -126,11 +126,12 @@ namespace refl
 
 		// Invoke a reflected global function.
 		template <typename... ParamTypes>
-		void Invoke(ParamTypes&&... params)const;
+		void InvokeGlobal(ParamTypes&&... params)const;
 
 		// Invoke a reflected global function that returns a value.
+		// NB: If you invoke this function, you must actually specify all parameter template arguments.
 		template <typename ReturnType, typename... ParamTypes>
-		std::optional<ReturnType> Invoke(ParamTypes&&... params)const;
+		std::optional<ReturnType> InvokeGlobal(ParamTypes&&... params)const;
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -139,19 +140,19 @@ namespace refl
 
 		// Invoke a reflected member function.
 		template <typename... ParamTypes>
-		void Invoke(void* obj, ParamTypes&&... params)const;
+		void InvokeMember(void* obj, ParamTypes&&... params)const;
 
 		// Invoke a reflected member function that returns a value.
 		template <typename ReturnType, typename... ParamTypes>
-		std::optional<ReturnType> Invoke(void* obj, ParamTypes&&... params)const;
+		std::optional<ReturnType> InvokeMember(void* obj, ParamTypes&&... params)const;
 
 		// Invoke a reflected member function.
 		template <typename ObjectType, typename... ParamTypes>
-		void Invoke(ObjectType& obj, ParamTypes&&... params)const;
+		void InvokeMember(ObjectType& obj, ParamTypes&&... params)const;
 
 		// Invoke a reflected member function that returns a value.
 		template <typename ReturnType, typename ObjectType, typename... ParamTypes>
-		std::optional<ReturnType> Invoke(ObjectType& obj, ParamTypes&&... params)const;
+		std::optional<ReturnType> InvokeMember(ObjectType& obj, ParamTypes&&... params)const;
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -58,7 +58,7 @@ int main()
 	//	printf("GOT A BAD RETURN VALUE. BAAAAAAAAAAAAAAAAADDDDDDDDDDDD.");
 	//}
 
-	const refl::Function& fOneParam = testStructRefl.GetFunction("FuncVoidOneParam");
+	/*const refl::Function& fOneParam = testStructRefl.GetFunction("FuncVoidOneParam");
 	int i = 420;
 	fOneParam.Invoke(test, i);
 
@@ -79,7 +79,7 @@ int main()
 	auto globalRV = globalFunction.Invoke<int>();
 	if (globalRV) {
 		printf("GOT RETURN VALUE: %d\n", *globalRV);
-	}
+	}*/
 
 	// const refl::Field& vectorField = testStructRefl.GetField("vectorOfInts");
 	// size_t elems = vectorField.GetArraySize((void*)&test);

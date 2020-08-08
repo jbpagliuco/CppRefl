@@ -67,6 +67,7 @@ class REFLECTED TestClass
 {
 public:
 	TestStruct mNestedStruct			REFLECTED;
+	int mValue;
 
 public:
 	void VoidFunction()					REFLECTED;

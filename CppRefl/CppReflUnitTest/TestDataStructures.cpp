@@ -36,7 +36,7 @@ void TestClass::VoidFunction()
 REFL_BIND_FUNCTION(int, TestClass, IntFunction);
 int TestClass::IntFunction()
 {
-	return 3;
+	return mValue;
 }
 
 REFL_BIND_VOID_FUNCTION(TestClass, VoidFunctionInt, int);
@@ -46,7 +46,7 @@ void TestClass::VoidFunctionInt(int)
 }
 
 REFL_BIND_FUNCTION(float, TestClass, FloatFunctionInt,int);
-float TestClass::FloatFunctionInt(int)
+float TestClass::FloatFunctionInt(int param0)
 {
-	return 4;
+	return (float)param0;
 }
