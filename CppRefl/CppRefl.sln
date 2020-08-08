@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppReflGen", "CppReflGen\Cp
 		{7667E972-C286-423C-82E7-D02848023D90} = {7667E972-C286-423C-82E7-D02848023D90}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppReflUnitTest", "CppReflUnitTest\CppReflUnitTest.vcxproj", "{CAC222C1-DE6D-4D56-AAD8-8B34C5DF1B5E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{10078925-6184-4564-9702-9A739AB985CF}.Release|x64.ActiveCfg = Release|x64
 		{10078925-6184-4564-9702-9A739AB985CF}.Release|x64.Build.0 = Release|x64
 		{10078925-6184-4564-9702-9A739AB985CF}.Release|x86.ActiveCfg = Release|x64
+		{CAC222C1-DE6D-4D56-AAD8-8B34C5DF1B5E}.Debug|x64.ActiveCfg = Debug|x64
+		{CAC222C1-DE6D-4D56-AAD8-8B34C5DF1B5E}.Debug|x64.Build.0 = Debug|x64
+		{CAC222C1-DE6D-4D56-AAD8-8B34C5DF1B5E}.Debug|x86.ActiveCfg = Debug|Win32
+		{CAC222C1-DE6D-4D56-AAD8-8B34C5DF1B5E}.Debug|x86.Build.0 = Debug|Win32
+		{CAC222C1-DE6D-4D56-AAD8-8B34C5DF1B5E}.Release|x64.ActiveCfg = Release|x64
+		{CAC222C1-DE6D-4D56-AAD8-8B34C5DF1B5E}.Release|x64.Build.0 = Release|x64
+		{CAC222C1-DE6D-4D56-AAD8-8B34C5DF1B5E}.Release|x86.ActiveCfg = Release|Win32
+		{CAC222C1-DE6D-4D56-AAD8-8B34C5DF1B5E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -87,10 +87,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CppReflTest.cpp" />
-    <ClCompile Include="RealTestCode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTestCode.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CppRefl\CppRefl.vcxproj">
+      <Project>{7667e972-c286-423c-82e7-d02848023d90}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
