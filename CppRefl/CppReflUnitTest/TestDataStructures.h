@@ -16,9 +16,9 @@ enum class REFLECTED TestEnum : int32_t
 
 struct REFLECTED NestableStruct
 {
-	bool mBoolVal;
-	int32_t mIntVal;
-	float mFloatVal;
+	bool mBoolVal						REFLECTED;
+	int32_t mIntVal						REFLECTED;
+	float mFloatVal						REFLECTED;
 };
 
 namespace testnamespace

@@ -17,8 +17,7 @@ static std::vector<std::string> GetClangArgs()
 {
 	std::vector<std::string> args;
 
-	args.push_back("--driver-mode=cl");
-	args.push_back("/std:c++17");
+	args.push_back("-std=c++1z");
 	args.push_back("-fms-compatibility");
 	args.push_back("-fms-compatibility-version=19.26");
 	args.push_back("-fms-extensions");
@@ -35,7 +34,8 @@ static std::vector<std::string> GetClangCLArgs()
 {
 	std::vector<std::string> args;
 
-	args.push_back("-std=c++1z");
+	args.push_back("--driver-mode=cl");
+	args.push_back("/std:c++17");
 	args.push_back("-fms-compatibility");
 	args.push_back("-fms-compatibility-version=19.26");
 	args.push_back("-fms-extensions");
@@ -63,6 +63,7 @@ void CreateRegistry(refl::Registry &registry)
 	params.mClangArgs = GetClangArgs();
 	params.mIncludePaths.push_back(reflIncludePath.string());
 	params.mProjectPath = projectPath.string();
+	params.mDisableStdWarnings = true; // TEMP
 
 	const bool success = refl::GenerateReflectionRegistry(registry, params);
 	ASSERT_TRUE(success);

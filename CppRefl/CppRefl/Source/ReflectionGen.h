@@ -17,8 +17,13 @@ namespace refl
 		// [Optional] Project filepath (any symbols defined outside of this file path are ignored).
 		std::string mProjectPath;
 
-		// [Optioanl] Disables warnings about reflected classes in the std namespace.
+		// [Optional] Disables warnings about reflected classes in the std namespace.
 		bool mDisableStdWarnings = false;
+
+		// [Optional] Raise clang warnings.
+		bool mRaiseClangWarnings = true;
+		// [Optional] Raise clang errors.
+		bool mRaiseClangErrors = true;
 	};
 
 	bool GenerateReflectionRegistry(refl::Registry& outRegistry, const GenerationParameters& params);

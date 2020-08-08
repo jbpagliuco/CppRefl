@@ -269,6 +269,10 @@ namespace refl
 		// Adds a reflected function to this registry.
 		bool RegisterFunction(Function reflFunction);
 
+	public:
+		// Invaild reference to a Enum.
+		static Registry INVALID;
+
 	private:
 		// Resolve function pointers for all Function's.
 		void ResolveFunctions();

@@ -9,6 +9,7 @@ namespace refl
 	Function Function::INVALID;
 	Class Class::INVALID;
 	Enum Enum::INVALID;
+	Registry Registry::INVALID;
 
 	///////////////////////////////////////////////////////////
 	// Helper Function Prototypes

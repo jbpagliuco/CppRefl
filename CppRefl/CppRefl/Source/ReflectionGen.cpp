@@ -6,10 +6,41 @@
 
 namespace refl
 {
-	static GenerationParameters GenerationParams;
+	class RegistryGenerator
+	{
+	public:
+		bool Generate(Registry& outRegistry, GenerationParameters params);
+
+	private:
+		bool ReportClangErrors(CXTranslationUnit tu);
+		CXTranslationUnit CreateTranslationUnit(CXIndex index);
+
+		bool BuildReflection(CXCursor cursor);
+
+		bool ShouldReflectCursor(CXCursor cursor);
+
+		bool ReflectElement(Element& reflElement, CXCursor cursor);
+
+		bool ReflectField(Field& reflField, CXCursor cursor, CXCursor parent);
+		bool ReflectFunction(Function& reflFunction, CXCursor cursor);
+
+		bool ReflectClass(Class& reflClass, CXCursor cursor);
+
+		bool ReflectEnumValue(EnumValue& reflEnumValue, CXCursor cursor);
+		bool ReflectEnum(Enum& reflEnum, CXCursor cursor);
+
+	private:
+		GenerationParameters mParams;
+		Registry* mRegistry = nullptr;
+
+		CXIndex mIndex;
+		CXTranslationUnit mTU;
+	};
+
 
 	//////////////////////////////////////////////////////////////////////////////
 
+	// Print the clang version to stdout
 	static void PrintClangVersion()
 	{
 		auto str = clang_getClangVersion();
@@ -17,100 +48,6 @@ namespace refl
 		printf("Clang Version: %s\n\n", str2);
 		clang_disposeString(str);
 	}
-
-	// Report clang diagnostic errors.
-	static bool ReportClangError(CXTranslationUnit& TU)
-	{
-		bool errors = false;
-
-		CXDiagnosticSet diagnosticSet = clang_getDiagnosticSetFromTU(TU);
-		const int numDiagnostics = clang_getNumDiagnosticsInSet(diagnosticSet);
-		for (int i = 0; i < numDiagnostics; ++i) {
-			CXDiagnostic diagnostic = clang_getDiagnosticInSet(diagnosticSet, i);
-
-			CXDiagnosticSeverity severity = clang_getDiagnosticSeverity(diagnostic);
-			if (severity > CXDiagnosticSeverity::CXDiagnostic_Warning) {
-				errors = true;
-			}
-
-			CXString diagnosticString = clang_getDiagnosticSpelling(diagnostic);
-
-			CXFile file;
-			clang_getExpansionLocation(clang_getDiagnosticLocation(diagnostic), &file, nullptr, nullptr, nullptr);
-
-			CXString cxFilePath = clang_getFileName(file);
-
-			printf("%s\n%s\n\n", clang_getCString(cxFilePath), clang_getCString(diagnosticString));
-
-			clang_disposeString(cxFilePath);
-			clang_disposeString(diagnosticString);
-		}
-
-		fflush(stdout);
-
-		return errors;
-	}
-
-	static CXTranslationUnit CreateTranslationUnit(CXIndex index, const std::string& inputFilepath, const std::vector<std::string>& clangArgs, const std::vector<std::string>& includePaths)
-	{
-		// See if there was a specified driver type
-		std::string driverMode;
-		for (const auto& arg : clangArgs) {
-			const std::string driverModeStr = "--driver-mode=";
-			if (arg.find(driverModeStr) != std::string::npos) {
-				driverMode = arg.substr(arg.find(driverModeStr) + driverModeStr.size());
-			}
-		}
-
-		////////////////////////////////////////////////////////////////////////////
-
-		std::map<std::string, std::string> INCLUDE_COMPILER_FLAGS = {
-			{ "", "-I" }, // default clang
-			{ "cl", "/I" }, // cl driver
-		};
-
-		std::map<std::string, std::string> DEFINE_COMPILER_FLAGS = {
-			{ "", "-D" }, // default clang
-			{ "cl", "/D" }, // cl driver
-		};
-
-		if (INCLUDE_COMPILER_FLAGS.find(driverMode) == INCLUDE_COMPILER_FLAGS.end()) {
-			REFL_INTERNAL_RAISE_ERROR("Unrecognized driver type: '%s'", driverMode.c_str());
-			return nullptr;
-		}
-
-		////////////////////////////////////////////////////////////////////////////
-
-		// Temp buffer of std::string args
-		std::vector<std::string> stringArgs;
-
-		// Add include paths
-		for (const auto& path : includePaths) {
-			stringArgs.push_back(INCLUDE_COMPILER_FLAGS[driverMode] + path);
-		}
-
-		// Add cpp refl flags
-		stringArgs.push_back(DEFINE_COMPILER_FLAGS[driverMode] + "CPP_REFL_BUILD_REFLECTION"); // Creates a CPP_REFL_BUILD_REFLECTION macro
-
-	   ////////////////////////////////////////////////////////////////////////////
-
-		// Final list of raw args
-		std::vector<const char*> allArgs;
-
-		// Add user-given clang args
-		for (const auto& arg : clangArgs) {
-			allArgs.push_back(const_cast<char*>(arg.c_str()));
-		}
-
-		// Add our cpp refl args
-		for (const auto& arg : stringArgs) {
-			allArgs.push_back(const_cast<char*>(arg.c_str()));
-		}
-
-		return clang_createTranslationUnitFromSourceFile(index, inputFilepath.c_str(), (int)allArgs.size(), &allArgs[0], 0, nullptr);
-	}
-
-	//////////////////////////////////////////////////////////////////////////////
 
 	// Get a beautified name string for a cursor.
 	static std::string GetCursorName(CXCursor cursor)
@@ -124,7 +61,7 @@ namespace refl
 
 	// Get a fully qualified name string (including namespaces) for a cursor.
 	// Strips the :: from global namespaces.
-	static std::string GetFullyQualifiedName(CXCursor cursor)
+	static std::string GetFullyQualifiedCursorName(CXCursor cursor)
 	{
 		std::string name = GetCursorName(cursor);
 
@@ -155,7 +92,7 @@ namespace refl
 		return children;
 	}
 
-	// Collect annotations from a cursor.
+	// Collects annotations from a cursor.
 	static std::vector<std::string> CollectCursorAnnotations(CXCursor cursor)
 	{
 		auto visitor = [](CXCursor cursor, CXCursor parent, CXClientData clientData)
@@ -249,9 +186,118 @@ namespace refl
 		return GetTypeFromClang(cxType);
 	}
 
-	// Decides whether or not to reflect a cursor.
-	// e.g. Disregard anything outside of our project.
-	static bool ShouldReflectCursor(CXCursor cursor)
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	
+	bool RegistryGenerator::ReportClangErrors(CXTranslationUnit tu)
+	{
+		bool errors = false;
+
+		CXDiagnosticSet diagnosticSet = clang_getDiagnosticSetFromTU(tu);
+		const int numDiagnostics = clang_getNumDiagnosticsInSet(diagnosticSet);
+		for (int i = 0; i < numDiagnostics; ++i) {
+			CXDiagnostic diagnostic = clang_getDiagnosticInSet(diagnosticSet, i);
+
+			CXDiagnosticSeverity severity = clang_getDiagnosticSeverity(diagnostic);
+
+			// Low-severity, skip
+			if (severity < CXDiagnosticSeverity::CXDiagnostic_Warning) {
+				continue;
+			}
+			
+			// Get diagnostic information
+			CXString diagnosticString = clang_getDiagnosticSpelling(diagnostic);
+
+			CXFile file;
+			unsigned int line;
+			clang_getExpansionLocation(clang_getDiagnosticLocation(diagnostic), &file, &line, nullptr, nullptr);
+
+			CXString cxFilePath = clang_getFileName(file);
+
+			// Raise error, if necessary
+			if (severity == CXDiagnosticSeverity::CXDiagnostic_Warning) {
+				refl::RaiseErrorInternal(ErrorType::WARNING, clang_getCString(cxFilePath), line, clang_getCString(diagnosticString));
+				errors |= mParams.mRaiseClangWarnings;
+			}
+			else {
+				refl::RaiseErrorInternal(ErrorType::ERROR, clang_getCString(cxFilePath), line, clang_getCString(diagnosticString));
+				errors |= mParams.mRaiseClangErrors;
+			}
+			
+			// Cleanup
+			clang_disposeString(cxFilePath);
+			clang_disposeString(diagnosticString);
+		}
+
+		return errors;
+	}
+
+	CXTranslationUnit RegistryGenerator::CreateTranslationUnit(CXIndex index)
+	{
+		// See if there was a specified driver type
+		std::string driverMode;
+		for (const auto& arg : mParams.mClangArgs) {
+			const std::string driverModeStr = "--driver-mode=";
+			if (arg.find(driverModeStr) != std::string::npos) {
+				driverMode = arg.substr(arg.find(driverModeStr) + driverModeStr.size());
+				break;
+			}
+		}
+
+		////////////////////////////////////////////////////////////////////////////
+
+		std::map<std::string, std::string> INCLUDE_COMPILER_FLAGS = {
+			{ "", "-I" }, // default clang
+			{ "cl", "/I" }, // cl driver
+		};
+
+		std::map<std::string, std::string> DEFINE_COMPILER_FLAGS = {
+			{ "", "-D" }, // default clang
+			{ "cl", "/D" }, // cl driver
+		};
+
+		if (INCLUDE_COMPILER_FLAGS.find(driverMode) == INCLUDE_COMPILER_FLAGS.end()) {
+			REFL_INTERNAL_RAISE_ERROR("Unrecognized driver type: '%s'", driverMode.c_str());
+			return nullptr;
+		}
+
+		////////////////////////////////////////////////////////////////////////////
+
+		// Temp buffer of std::string args
+		std::vector<std::string> stringArgs;
+
+		// Add include paths
+		for (const auto& path : mParams.mIncludePaths) {
+			stringArgs.push_back(INCLUDE_COMPILER_FLAGS[driverMode] + path);
+		}
+
+		// Add cpp refl flags
+		stringArgs.push_back(DEFINE_COMPILER_FLAGS[driverMode] + "CPP_REFL_BUILD_REFLECTION"); // Creates a CPP_REFL_BUILD_REFLECTION macro
+
+		////////////////////////////////////////////////////////////////////////////
+
+		// Final list of raw args
+		std::vector<const char*> allArgs;
+
+		// Add user-given clang args
+		for (const auto& arg : mParams.mClangArgs) {
+			allArgs.push_back(const_cast<char*>(arg.c_str()));
+		}
+
+		// Add our cpp refl args
+		for (const auto& arg : stringArgs) {
+			allArgs.push_back(const_cast<char*>(arg.c_str()));
+		}
+
+		return clang_createTranslationUnitFromSourceFile(index, mParams.mInputFilepath.c_str(), (int)allArgs.size(), &allArgs[0], 0, nullptr);
+	}
+
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+
+	bool RegistryGenerator::ShouldReflectCursor(CXCursor cursor)
 	{
 		CXSourceLocation sourceLocation = clang_getCursorLocation(cursor);
 
@@ -266,7 +312,7 @@ namespace refl
 		clang_disposeString(cxFilePath);
 
 		// exclude anything outside the project
-		if (GenerationParams.mProjectPath != "" && filepath.rfind(GenerationParams.mProjectPath, 0) != 0) {
+		if (mParams.mProjectPath != "" && filepath.rfind(mParams.mProjectPath, 0) != 0) {
 			return false;
 		}
 
@@ -284,17 +330,20 @@ namespace refl
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
 
 	// Gathers common reflection information for any refl::Element type.
-	static void ReflectElement(Element& reflElement, CXCursor cursor)
+	bool RegistryGenerator::ReflectElement(Element& reflElement, CXCursor cursor)
 	{
 		// Names
 		reflElement.mName = GetCursorName(cursor);
-		reflElement.mQualifiedName = GetFullyQualifiedName(cursor);
+		reflElement.mQualifiedName = GetFullyQualifiedCursorName(cursor);
 
 		// Attributes
 		for (auto annotation : CollectCursorAnnotations(cursor)) {
 			// Attributes are split by a special separator. e.g.:
+			// annotate(cpp_refl)
 			// annotate(cpp_refl,just_a_tag)
 			// annotate(cpp_ref,tag_with_a_value,the_value)
 			const size_t firstSeparator = annotation.find(CPP_REFLECTION_SEPARATOR);
@@ -318,103 +367,131 @@ namespace refl
 				reflElement.mAttributes[tag] = value;
 			}
 		}
+
+		return true;
 	}
 
 	// Reflects a field within a record.
-	static Field ReflectField(CXCursor cursor, CXCursor parent)
+	bool RegistryGenerator::ReflectField(Field& reflField, CXCursor cursor, CXCursor parent)
 	{
-		Field field;
-
 		// Reflect common properties for any reflected element.
-		ReflectElement(field, cursor);
+		if (!ReflectElement(reflField, cursor)) {
+			return false;
+		}
 
 		const CXType parentType = clang_getCursorType(parent);
 		const CXType fieldType = clang_getCursorType(cursor);
 
-		field.mSize = clang_Type_getSizeOf(fieldType);
-		field.mOffset = clang_Type_getOffsetOf(parentType, field.mName.c_str()) / 8;
-		
-		field.mIsPointer = fieldType.kind == CXType_Pointer;
-		if (field.mIsPointer) {
+		// Type/Size
+		reflField.mType = GetTypeFromClang(cursor);
+		reflField.mSize = clang_Type_getSizeOf(fieldType);
+
+		// Field offset
+		const size_t offsetBits = clang_Type_getOffsetOf(parentType, reflField.mName.c_str());
+		if (offsetBits % 8 != 0) {
+			// TODO: Unsupported/tested at the moment.
+			REFL_INTERNAL_RAISE_ERROR("Field [%s] has a bit offset not divisible by 8. This must be resolved internally.", reflField.mQualifiedName.c_str());
+			return false;
+		}
+		reflField.mOffset = offsetBits / 8;
+
+		// Pointers
+		reflField.mIsPointer = fieldType.kind == CXType_Pointer;
+		if (reflField.mIsPointer) {
 			// We want the size of the pointee
-			field.mSize = clang_Type_getSizeOf(clang_getPointeeType(fieldType));
+			reflField.mSize = clang_Type_getSizeOf(clang_getPointeeType(fieldType));
 		}
 
-		field.mIsConst = clang_isConstQualifiedType(fieldType);
+		// Const
+		reflField.mIsConst = clang_isConstQualifiedType(fieldType);
 
+		// Complex data types (i.e. non primitives)
 		const CXCursor typeDeclaration = clang_getTypeDeclaration(fieldType);
-		const std::string typeDeclarationQName = GetFullyQualifiedName(typeDeclaration);
+		const std::string typeDeclarationQName = GetFullyQualifiedCursorName(typeDeclaration);
 
-		field.mType = GetTypeFromClang(cursor);
-
-		// Raise warnings when using std:: types, as the internal layouts of each class can differ between compilers.
-		if (typeDeclarationQName.find_first_of("std::") == 0) {
-			if (!GenerationParams.mDisableStdWarnings) {
+		// Raise warnings when using std types, as the internal layouts of each class can differ between compilers.
+		if (typeDeclarationQName.rfind("std::", 0) == 0) {
+			if (!mParams.mDisableStdWarnings) {
 				REFL_INTERNAL_RAISE_WARNING(
 					"Tried to reflect a class in the std namespace [%s] (see %s). This is discouraged, as the implementations of these classes can differ between compilers.",
 					typeDeclarationQName.c_str(),
-					field.mQualifiedName.c_str());
+					reflField.mQualifiedName.c_str());
 			}
 
 			// Special container types
 			if (typeDeclarationQName == "std::string")
 			{
-				field.mIsString = true;
-				field.mClassType = typeDeclarationQName;
-				field.mType = Type::CLASS;
+				reflField.mIsString = true;
+				reflField.mClassType = typeDeclarationQName;
+				reflField.mType = Type::CLASS;
 			}
 			else if (typeDeclarationQName == "std::vector")
 			{
-				field.mIsArray = true;
-				field.mClassType = typeDeclarationQName;
+				reflField.mIsArray = true;
+				reflField.mClassType = typeDeclarationQName;
 
 				// Get the vector element type
 				CXType elementType = clang_Type_getTemplateArgumentAsType(fieldType, 0);
-				field.mType = GetTypeFromClang(elementType);
-				field.mSize = clang_Type_getSizeOf(elementType);
+				reflField.mType = GetTypeFromClang(elementType);
+				reflField.mSize = clang_Type_getSizeOf(elementType);
+			}
+			else
+			{
+				// Always raise warnings about these. Either they must be supported, or some other non-std class must be used.
+				REFL_INTERNAL_RAISE_ERROR("Unrecognized class type from the std namespace [%s].", reflField.mQualifiedName.c_str());
+				return false;
 			}
 		}
 
 		// Non primitive types
-		if (field.mType == Type::CLASS)
+		if (reflField.mType == Type::CLASS)
 		{
-			field.mClassType = typeDeclarationQName;
+			reflField.mClassType = typeDeclarationQName;
 		}
 		else if (fieldType.kind == CXType_Enum)
 		{
-			field.mEnumType = typeDeclarationQName;
+			reflField.mEnumType = typeDeclarationQName;
 		}
 
-		return field;
+		return true;
 	}
 
-	static Function ReflectFunction(CXCursor cursor)
+	bool RegistryGenerator::ReflectFunction(Function& reflFunction, CXCursor cursor)
 	{
-		Function function;
-
 		// Reflect common properties for any reflected element.
-		ReflectElement(function, cursor);
+		if (!ReflectElement(reflFunction, cursor)) {
+			return false;
+		}
 
 		// Return type
 		const CXType methodType = clang_getCursorType(cursor);
 		const CXType returnType = clang_getResultType(methodType);
-		function.mReturnType = GetTypeFromClang(returnType);
+		reflFunction.mReturnType = GetTypeFromClang(returnType);
 
 		// Arguments
-		int numArgs = clang_Cursor_getNumArguments(cursor);
+		const int numArgs = clang_Cursor_getNumArguments(cursor);
+		if (numArgs > MAX_SUPPORTED_FUNCTION_PARAMETERS) {
+			REFL_INTERNAL_RAISE_ERROR(
+				"Tried to reflect function [%s] with (%d) parameters. Only a maximum of (%d) parameters are supported.",
+				reflFunction.mQualifiedName.c_str(),
+				numArgs,
+				MAX_SUPPORTED_FUNCTION_PARAMETERS);
+			return false;
+		}
 		//clang_Cursor_getArgument(cursor, i);
 
-		return function;
+		return true;
 	}
 
 	// Reflects a class/struct/record.
-	static Class ReflectClass(CXCursor cursor)
+	bool RegistryGenerator::ReflectClass(Class& reflClass, CXCursor cursor)
 	{
-		Class reflClass;
-
 		// Reflect common properties for any reflected element.
-		ReflectElement(reflClass, cursor);
+		if (!ReflectElement(reflClass, cursor)) {
+			return false;
+		}
 
+		// Class size
 		reflClass.mSize = clang_Type_getSizeOf(clang_getCursorType(cursor));
 
 		// Collect all fields and functions in this class.
@@ -427,49 +504,56 @@ namespace refl
 			}
 
 			if (childCursor.kind == CXCursor_FieldDecl) {
-				reflClass.mFields.push_back(ReflectField(childCursor, cursor));
+				Field reflField;
+				if (ReflectField(reflField, childCursor, cursor)) {
+					reflClass.mFields.push_back(reflField);
+				}
 			}
 			else if (childCursor.kind == CXCursor_CXXMethod) {
-				reflClass.mFunctions.push_back(ReflectFunction(childCursor));
+				Function reflFunction;
+				if (ReflectFunction(reflFunction, childCursor)) {
+					reflClass.mFunctions.push_back(reflFunction);
+				}
 			}
 		}
 
-		return reflClass;
+		return true;
 	}
 
-	static EnumValue ReflectEnumValue(CXCursor cursor)
+	bool RegistryGenerator::ReflectEnumValue(EnumValue& reflEnumValue, CXCursor cursor)
 	{
-		EnumValue enumValue;
-
 		// Reflect common properties for any reflected element.
-		ReflectElement(enumValue, cursor);
+		if (!ReflectElement(reflEnumValue, cursor)) {
+			return false;
+		}
 
-		enumValue.mValue = (int)clang_getEnumConstantDeclValue(cursor);
+		reflEnumValue.mValue = (int)clang_getEnumConstantDeclValue(cursor);
 
-		return enumValue;
+		return true;
 	}
 
 	// Reflects an enum.
-	static Enum ReflectEnum(CXCursor cursor)
+	bool RegistryGenerator::ReflectEnum(Enum& reflEnum, CXCursor cursor)
 	{
-		Enum reflEnum;
-
 		// Reflect common properties for any reflected element.
-		ReflectElement(reflEnum, cursor);
+		if (!ReflectElement(reflEnum, cursor)) {
+			return false;
+		}
 
 		// Gather info about each value in this enum.
 		std::vector<CXCursor> children = CollectTopLevelChildren(cursor);
 		for (auto childCursor : children)
 		{
-			EnumValue enumValue = ReflectEnumValue(childCursor);
-			reflEnum.mValueTable[enumValue.mValue] = enumValue;
+			EnumValue reflEnumValue;
+			if (ReflectEnumValue(reflEnumValue, childCursor)) {
+				reflEnum.mValueTable[reflEnumValue.mValue] = reflEnumValue;
+			}
 		}
 
-		return reflEnum;
+		return true;
 	}
 
-	// Builds reflection for a translation unit.
-	static void BuildReflection(Registry &registry, CXCursor cursor)
+	bool RegistryGenerator::BuildReflection(CXCursor cursor)
 	{
 		for (auto child : CollectTopLevelChildren(cursor))
 		{
@@ -496,48 +580,77 @@ namespace refl
 			switch (child.kind)
 			{
 			case CXCursorKind::CXCursor_Namespace:
-				BuildReflection(registry, child);
+				BuildReflection(child);
 				break;
 
 			case CXCursorKind::CXCursor_ClassDecl:
 			case CXCursorKind::CXCursor_StructDecl:
-				registry.RegisterClass(ReflectClass(child));
-				break;
-
-			case CXCursorKind::CXCursor_EnumDecl:
-				registry.RegisterEnum(ReflectEnum(child));
-				break;
-
-			case CXCursorKind::CXCursor_FunctionDecl:
-				registry.RegisterFunction(ReflectFunction(child));
+			{
+				Class reflClass;
+				if (ReflectClass(reflClass, child)) {
+					mRegistry->RegisterClass(reflClass);
+				}
 				break;
 			}
+
+			case CXCursorKind::CXCursor_EnumDecl:
+			{
+				Enum reflEnum;
+				if (ReflectEnum(reflEnum, child)) {
+					mRegistry->RegisterEnum(reflEnum);
+				}
+				break;
+			}
+
+			case CXCursorKind::CXCursor_FunctionDecl:
+			{
+				Function reflFunction;
+				if (ReflectFunction(reflFunction, child)) {
+					mRegistry->RegisterFunction(reflFunction);
+				}
+				break;
+			}
+			};
 		}
+
+		return true;
 	}
 
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
 
-	bool GenerateReflectionRegistry(Registry& outRegistry, const GenerationParameters& params)
+	bool RegistryGenerator::Generate(Registry& outRegistry, GenerationParameters params)
 	{
-		GenerationParams = params;
+		mRegistry = &outRegistry;
+		mParams = params;
 
-		PrintClangVersion();
+		mIndex = clang_createIndex(0, 1);
 
-		CXIndex index = clang_createIndex(0, 1);
-
-		CXTranslationUnit TU = CreateTranslationUnit(index, params.mInputFilepath, params.mClangArgs, params.mIncludePaths);
-		if (ReportClangError(TU)) {
+		mTU = CreateTranslationUnit(mIndex);
+		if (ReportClangErrors(mTU)) {
 			return false;
 		}
 
-		BuildReflection(outRegistry, clang_getTranslationUnitCursor(TU));
+		BuildReflection(clang_getTranslationUnitCursor(mTU));
 
-		// cleanup
-		clang_disposeTranslationUnit(TU);
-		clang_disposeIndex(index);
+		// Cleanup
+		clang_disposeTranslationUnit(mTU);
+		clang_disposeIndex(mIndex);
 
 		// finalize
-		outRegistry.Finalize();
+		mRegistry->Finalize();
 
 		return true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+
+	bool GenerateReflectionRegistry(Registry& outRegistry, const GenerationParameters& params)
+	{
+		RegistryGenerator generator;
+		return generator.Generate(outRegistry, params);
 	}
 }

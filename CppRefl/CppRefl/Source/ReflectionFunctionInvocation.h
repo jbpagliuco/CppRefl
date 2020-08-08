@@ -5,6 +5,9 @@
 
 namespace refl
 {
+	// We only support up to 1 parameter for a reflected function.
+	constexpr int MAX_SUPPORTED_FUNCTION_PARAMETERS = 1;
+
 	// FunctionInvoker is a wrapper class that can invoke a function with any number of parameters.
 	template<typename T, T> struct FunctionInvoker;
 
