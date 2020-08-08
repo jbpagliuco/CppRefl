@@ -49,6 +49,7 @@
     <ClCompile Include="UnitTests\Common.cpp" />
     <ClCompile Include="UnitTests\DataTests.cpp" />
     <ClCompile Include="TestDataStructures.cpp" />
+    <ClCompile Include="UnitTests\FunctionTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CppRefl\CppRefl.vcxproj">

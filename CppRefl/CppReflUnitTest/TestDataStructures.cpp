@@ -45,8 +45,8 @@ void TestClass::VoidFunctionInt(int)
 
 }
 
-REFL_BIND_FUNCTION(int, TestClass, IntFunctionInt,int);
-int TestClass::IntFunctionInt(int)
+REFL_BIND_FUNCTION(float, TestClass, FloatFunctionInt,int);
+float TestClass::FloatFunctionInt(int)
 {
 	return 4;
 }
