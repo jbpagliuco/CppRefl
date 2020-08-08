@@ -175,6 +175,9 @@ namespace refl
 		// Return value type of this function (only primitive data types are supported).
 		Type mReturnType = Type::VOID;
 
+		// Number of parameters that this function takes.
+		uint8_t mNumParameters;
+
 		// Function pointer
 		FunctionType mFunction = nullptr;
 		void* mFunctionInvoker = nullptr;

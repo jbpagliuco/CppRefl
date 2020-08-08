@@ -478,6 +478,7 @@ namespace refl
 				MAX_SUPPORTED_FUNCTION_PARAMETERS);
 			return false;
 		}
+		reflFunction.mNumParameters = numArgs;
 		//clang_Cursor_getArgument(cursor, i);
 
 		return true;
