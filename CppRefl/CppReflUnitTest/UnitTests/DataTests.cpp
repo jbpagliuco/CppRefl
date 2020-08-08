@@ -182,6 +182,50 @@ TEST_F(DataTest, TestFieldDataSizes)
 
 	// The size of an array is actually the element type
 	EXPECT_EQ(reflClass.GetField("mArrayOfInts").mSize, sizeof(int32_t));
+
+	EXPECT_EQ(reflClass.mSize, sizeof(TestStruct));
+}
+
+TEST_F(DataTest, TestFieldDataOffsets)
+{
+	const refl::Class& reflClass = mRegistry.GetClass("TestStruct");
+	EXPECT_NE(reflClass, refl::Class::INVALID);
+
+#define TEST_OFFSET(var) EXPECT_EQ(reflClass.GetField(#var).mOffset, offsetof(TestStruct, var));
+
+	TEST_OFFSET(mBool);
+
+	TEST_OFFSET(mUChar);
+	TEST_OFFSET(mChar);
+	TEST_OFFSET(mInt8);
+
+	TEST_OFFSET(mUInt16);
+	TEST_OFFSET(mInt16);
+
+	TEST_OFFSET(mUInt32);
+	TEST_OFFSET(mInt32);
+
+	TEST_OFFSET(mUInt64);
+	TEST_OFFSET(mInt64);
+
+	TEST_OFFSET(mFloat);
+	TEST_OFFSET(mDouble);
+	TEST_OFFSET(mLongDouble);
+
+	TEST_OFFSET(mTypedefInt);
+
+	TEST_OFFSET(mString);
+	TEST_OFFSET(mArrayOfInts);
+
+	TEST_OFFSET(mIntWithAttrs);
+
+	TEST_OFFSET(mIntPtr);
+
+	TEST_OFFSET(mNestableStruct);
+	TEST_OFFSET(mEnum);
+	TEST_OFFSET(mNamespacedStruct);
+
+#undef TEST_OFFSET
 }
 
 TEST_F(DataTest, TestAttrs)

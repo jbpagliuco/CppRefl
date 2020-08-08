@@ -29,7 +29,7 @@ namespace refl
 			CXDiagnostic diagnostic = clang_getDiagnosticInSet(diagnosticSet, i);
 
 			CXDiagnosticSeverity severity = clang_getDiagnosticSeverity(diagnostic);
-			if (severity >= CXDiagnosticSeverity::CXDiagnostic_Warning) {
+			if (severity > CXDiagnosticSeverity::CXDiagnostic_Warning) {
 				errors = true;
 			}
 
@@ -53,20 +53,57 @@ namespace refl
 
 	static CXTranslationUnit CreateTranslationUnit(CXIndex index, const std::string& inputFilepath, const std::vector<std::string>& clangArgs, const std::vector<std::string>& includePaths)
 	{
-		std::vector<std::string> includeArgs;
-		for (const auto& path : includePaths) {
-			includeArgs.push_back("-I" + path);
+		// See if there was a specified driver type
+		std::string driverMode;
+		for (const auto& arg : clangArgs) {
+			const std::string driverModeStr = "--driver-mode=";
+			if (arg.find(driverModeStr) != std::string::npos) {
+				driverMode = arg.substr(arg.find(driverModeStr) + driverModeStr.size());
+			}
 		}
 
-		std::vector<const char*> allArgs = {
-			"-DCPP_REFL_BUILD_REFLECTION", // Creates a CPP_REFL_BUILD_REFLECTION macro
+		////////////////////////////////////////////////////////////////////////////
+
+		std::map<std::string, std::string> INCLUDE_COMPILER_FLAGS = {
+			{ "", "-I" }, // default clang
+			{ "cl", "/I" }, // cl driver
 		};
 
+		std::map<std::string, std::string> DEFINE_COMPILER_FLAGS = {
+			{ "", "-D" }, // default clang
+			{ "cl", "/D" }, // cl driver
+		};
+
+		if (INCLUDE_COMPILER_FLAGS.find(driverMode) == INCLUDE_COMPILER_FLAGS.end()) {
+			REFL_RAISE_ERROR_INTERNAL("Unrecognized driver type: '%s'", driverMode.c_str());
+			return nullptr;
+		}
+
+		////////////////////////////////////////////////////////////////////////////
+
+		// Temp buffer of std::string args
+		std::vector<std::string> stringArgs;
+
+		// Add include paths
+		for (const auto& path : includePaths) {
+			stringArgs.push_back(INCLUDE_COMPILER_FLAGS[driverMode] + path);
+		}
+
+		// Add cpp refl flags
+		stringArgs.push_back(DEFINE_COMPILER_FLAGS[driverMode] + "CPP_REFL_BUILD_REFLECTION"); // Creates a CPP_REFL_BUILD_REFLECTION macro
+
+	   ////////////////////////////////////////////////////////////////////////////
+
+		// Final list of raw args
+		std::vector<const char*> allArgs;
+
+		// Add user-given clang args
 		for (const auto& arg : clangArgs) {
 			allArgs.push_back(const_cast<char*>(arg.c_str()));
 		}
 
-		for (const auto& arg : includeArgs) {
+		// Add our cpp refl args
+		for (const auto& arg : stringArgs) {
 			allArgs.push_back(const_cast<char*>(arg.c_str()));
 		}
 
@@ -296,7 +333,7 @@ namespace refl
 
 		field.mSize = clang_Type_getSizeOf(fieldType);
 		field.mOffset = clang_Type_getOffsetOf(parentType, field.mName.c_str()) / 8;
-
+		
 		field.mIsPointer = fieldType.kind == CXType_Pointer;
 		if (field.mIsPointer) {
 			// We want the size of the pointee
@@ -314,7 +351,6 @@ namespace refl
 		if (typeDeclarationQName == "std::string")
 		{
 			field.mIsString = true;
-			field.mSize = sizeof(std::string); // feels like I shouldn't have to do this, but for some reason there's a mismatch.
 			field.mClassType = typeDeclarationQName;
 			field.mType = Type::CLASS;
 		}
@@ -368,6 +404,8 @@ namespace refl
 
 		// Reflect common properties for any reflected element.
 		ReflectElement(reflClass, cursor);
+
+		reflClass.mSize = clang_Type_getSizeOf(clang_getCursorType(cursor));
 
 		// Collect all fields and functions in this class.
 		std::vector<CXCursor> children = CollectTopLevelChildren(cursor);

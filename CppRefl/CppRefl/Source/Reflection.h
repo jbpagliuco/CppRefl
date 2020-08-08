@@ -93,8 +93,10 @@ namespace refl
 		Type mType;
 
 		// Size of this field.
+		// NB: This is the size as defined by Clang. Sizes from other compilers may differ.
 		size_t mSize;
 		// Offset into the containing class.
+		// NB: This is the offset as defined by Clang. Sizes from other compilers may differ.
 		size_t mOffset;
 
 		// Underlying class type, if this field is a nested class.
@@ -202,6 +204,10 @@ namespace refl
 		std::vector<Field> mFields;
 		// List of all functions in this class.
 		std::vector<Function> mFunctions;
+
+		// This size of this class.
+		// NB: This is the size as defined by Clang. Sizes from other compilers may differ.
+		size_t mSize;
 	};
 
 	// Represents an individual enum value in a reflected enum type.
