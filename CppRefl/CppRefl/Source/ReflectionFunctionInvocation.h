@@ -79,7 +79,7 @@ namespace refl
 	template <typename ReturnType, typename ...ParamTypes, ReturnType (*FunctionPtr)(ParamTypes...)>
 	struct FunctionInvoker<ReturnType (*)(ParamTypes...), FunctionPtr>
 	{
-		ReturnType Invoke(ParamTypes&&... params)const
+		ReturnType Invoke(ParamTypes... params)const
 		{
 			return (*FunctionPtr)(std::forward<ParamTypes>(params)...);
 		}

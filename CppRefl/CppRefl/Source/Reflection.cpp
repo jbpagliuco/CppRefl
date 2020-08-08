@@ -14,8 +14,6 @@ namespace refl
 	// Helper Function Prototypes
 	///////////////////////////////////////////////////////////
 
-	static std::vector<FunctionRegistration*>& GetFunctionRegistrations();
-
 	static std::string BuildIndentString(int indent);
 	static std::string TypeToString(Type type);
 
@@ -33,6 +31,11 @@ namespace refl
 	bool Element::operator==(const Element& rhs)const
 	{
 		return mQualifiedName == rhs.mQualifiedName;
+	}
+
+	bool Element::operator!=(const Element& rhs)const
+	{
+		return mQualifiedName != rhs.mQualifiedName;
 	}
 
 	bool Element::HasAttribute(const std::string& attributeName)
@@ -149,48 +152,8 @@ namespace refl
 
 
 	///////////////////////////////////////////////////////////
-	// FunctionRegistration
-	///////////////////////////////////////////////////////////
-
-	static std::vector<FunctionRegistration*>& GetFunctionRegistrations()
-	{
-		// Must be wrapped in a function to make sure it's initialized before use.
-		static std::vector<FunctionRegistration*> FunctionRegistrations;
-		
-		return FunctionRegistrations;
-	}
-
-	FunctionRegistration::FunctionRegistration(const std::string& functionName, Function::FunctionType function, void* functionInvoker) :
-		mQualifiedClassName(""),
-		mFunctionName(functionName),
-		mFunction(function),
-		mFunctionInvoker(functionInvoker)
-	{
-		GetFunctionRegistrations().push_back(this);
-	}
-
-	FunctionRegistration::FunctionRegistration(const std::string& qualifiedClassName, const std::string& functionName, Function::FunctionType function, void* functionInvoker) :
-		mQualifiedClassName(qualifiedClassName),
-		mFunctionName(functionName),
-		mFunction(function),
-		mFunctionInvoker(functionInvoker)
-	{
-		GetFunctionRegistrations().push_back(this);
-	}
-
-	///////////////////////////////////////////////////////////
 	// Class
 	///////////////////////////////////////////////////////////
-
-	size_t Class::GetSize()const
-	{
-		size_t size = 0;
-		for (auto field : mFields) {
-			size += field.mSize;
-		}
-
-		return size;
-	}
 
 	const Field& Class::GetField(const std::string& fieldName)const
 	{

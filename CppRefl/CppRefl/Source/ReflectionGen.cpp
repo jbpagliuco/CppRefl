@@ -86,6 +86,7 @@ namespace refl
 	}
 
 	// Get a fully qualified name string (including namespaces) for a cursor.
+	// Strips the :: from global namespaces.
 	static std::string GetFullyQualifiedName(CXCursor cursor)
 	{
 		std::string name = GetCursorName(cursor);
@@ -141,7 +142,7 @@ namespace refl
 	}
 
 	// Maps clang cursor types to refl::Type.
-	static Type GetTypeFromClang(CXTypeKind type)
+	static Type GetTypeFromClang(CXType type)
 	{
 		static std::map<CXTypeKind, Type> Map = {
 			{ CXType_Bool,			Type::BOOL },
@@ -166,9 +167,15 @@ namespace refl
 			{ CXType_Void,			Type::VOID },
 		};
 
+		// Do typedef translation
+		if (type.kind == CXType_Typedef)
+		{
+			type = clang_getCanonicalType(type);
+		}
+
 		// Recognized type?
-		if (Map.find(type) != Map.end()) {
-			return Map[type];
+		if (Map.find(type.kind) != Map.end()) {
+			return Map[type.kind];
 		}
 
 		return Type::INVALID;
@@ -195,12 +202,6 @@ namespace refl
 				return Type::CLASS;
 			}
 
-			// Do typedef translation
-			if (cxType.kind == CXType_Typedef)
-			{
-				cxType = clang_getTypedefDeclUnderlyingType(translatedCursor);
-			}
-
 			// Do enum translation
 			if (cxType.kind == CXType_Enum)
 			{
@@ -208,7 +209,7 @@ namespace refl
 			}
 		}
 
-		return GetTypeFromClang(cxType.kind);
+		return GetTypeFromClang(cxType);
 	}
 
 	// Decides whether or not to reflect a cursor.
@@ -297,6 +298,11 @@ namespace refl
 		field.mOffset = clang_Type_getOffsetOf(parentType, field.mName.c_str()) / 8;
 
 		field.mIsPointer = fieldType.kind == CXType_Pointer;
+		if (field.mIsPointer) {
+			// We want the size of the pointee
+			field.mSize = clang_Type_getSizeOf(clang_getPointeeType(fieldType));
+		}
+
 		field.mIsConst = clang_isConstQualifiedType(fieldType);
 
 		const CXCursor typeDeclaration = clang_getTypeDeclaration(fieldType);
@@ -308,6 +314,7 @@ namespace refl
 		if (typeDeclarationQName == "std::string")
 		{
 			field.mIsString = true;
+			field.mSize = sizeof(std::string); // feels like I shouldn't have to do this, but for some reason there's a mismatch.
 			field.mClassType = typeDeclarationQName;
 			field.mType = Type::CLASS;
 		}
@@ -315,11 +322,10 @@ namespace refl
 		{
 			field.mIsArray = true;
 			field.mClassType = typeDeclarationQName;
-			field.mType = Type::CLASS;
 
 			// Get the vector element type
 			CXType elementType = clang_Type_getTemplateArgumentAsType(fieldType, 0);
-			field.mType = GetTypeFromClang(elementType.kind);
+			field.mType = GetTypeFromClang(elementType);
 			field.mSize = clang_Type_getSizeOf(elementType);
 		}
 
@@ -346,7 +352,7 @@ namespace refl
 		// Return type
 		const CXType methodType = clang_getCursorType(cursor);
 		const CXType returnType = clang_getResultType(methodType);
-		function.mReturnType = GetTypeFromClang(returnType.kind);
+		function.mReturnType = GetTypeFromClang(returnType);
 
 		// Arguments
 		int numArgs = clang_Cursor_getNumArguments(cursor);

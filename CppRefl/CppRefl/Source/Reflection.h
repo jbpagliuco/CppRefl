@@ -7,6 +7,7 @@
 
 #include "ReflectionBindings.h"
 #include "ReflectionFunctionInvocation.h"
+#include "ReflectionFunctionRegistration.h"
 #include "ReflectionMarkup.h"
 #include "ReflectionTypes.h"
 
@@ -23,6 +24,7 @@ namespace refl
 		Element();
 
 		virtual bool operator==(const Element& rhs)const;
+		virtual bool operator!=(const Element& rhs)const;
 
 		bool HasAttribute(const std::string& attributeName);
 		std::string GetAttribute(const std::string& attributeName);
@@ -167,10 +169,6 @@ namespace refl
 		// Invaild reference to a Function.
 		static Function INVALID;
 
-		// Function pointer type. This must include the maximum number of
-		// allowed parameters (any of which can be null depending on the real reflected function definition).
-		typedef void (*FunctionType)(void* functionInvoker, void* obj, void* returnValue, void* param1);
-
 	public:
 		// Return value type of this function (only primitive data types are supported).
 		Type mReturnType = Type::VOID;
@@ -180,35 +178,10 @@ namespace refl
 		void* mFunctionInvoker = nullptr;
 	};
 
-	// Registers a function with the reflection at runtime.
-	class FunctionRegistration
-	{
-	public:
-		// Registers a global function.
-		FunctionRegistration(const std::string& functionName, Function::FunctionType function, void* functionInvoker);
-
-		// Registers a class member function.
-		FunctionRegistration(const std::string& qualifiedClassName, const std::string& functionName, Function::FunctionType function, void* functionInvoker);
-
-	public:
-		// Fully qualified class name.
-		std::string mQualifiedClassName;
-
-		// Function name.
-		std::string mFunctionName;
-
-		// Pointer to the function invoker
-		Function::FunctionType mFunction;
-		void* mFunctionInvoker;
-	};
-
 	// Represents a reflected class or struct.
 	class Class : public Element
 	{
 	public:
-		// Returns the size of this class.
-		size_t GetSize()const;
-
 		// Get a field by name.
 		const Field& GetField(const std::string& fieldName)const;
 		Field& GetField(const std::string& fieldName);
