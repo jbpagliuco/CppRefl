@@ -186,7 +186,14 @@ TEST_F(DataTest, TestFieldDataSizes)
 
 TEST_F(DataTest, TestAttrs)
 {
+	const refl::Class& reflClass = mRegistry.GetClass("TestStruct");
+	EXPECT_NE(reflClass, refl::Class::INVALID);
 
+	const refl::Field& field = reflClass.GetField("mIntWithAttrs");
+	EXPECT_EQ(field.mAttributes.size(), 2);
+	EXPECT_TRUE(field.HasAttribute("tag"));
+	EXPECT_TRUE(field.HasAttribute("attr"));
+	EXPECT_EQ(field.GetAttribute("attr"), "value");
 }
 
 TEST_F(DataTest, TestClassInfo)

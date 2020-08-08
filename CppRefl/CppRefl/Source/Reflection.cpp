@@ -38,15 +38,15 @@ namespace refl
 		return mQualifiedName != rhs.mQualifiedName;
 	}
 
-	bool Element::HasAttribute(const std::string& attributeName)
+	bool Element::HasAttribute(const std::string& attributeName)const
 	{
 		return mAttributes.find(attributeName) != mAttributes.end();
 	}
 
-	std::string Element::GetAttribute(const std::string& attributeName)
+	std::string Element::GetAttribute(const std::string& attributeName)const
 	{
 		if (HasAttribute(attributeName)) {
-			return mAttributes[attributeName];
+			return mAttributes.at(attributeName);
 		}
 
 		return "";

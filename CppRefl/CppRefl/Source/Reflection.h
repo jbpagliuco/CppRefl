@@ -26,8 +26,8 @@ namespace refl
 		virtual bool operator==(const Element& rhs)const;
 		virtual bool operator!=(const Element& rhs)const;
 
-		bool HasAttribute(const std::string& attributeName);
-		std::string GetAttribute(const std::string& attributeName);
+		bool HasAttribute(const std::string& attributeName)const;
+		std::string GetAttribute(const std::string& attributeName)const;
 
 		// Creates a string representation of this element.
 		virtual std::string ToString(int indent = 0)const;
