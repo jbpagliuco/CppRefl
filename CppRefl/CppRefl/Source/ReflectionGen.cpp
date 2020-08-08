@@ -22,7 +22,7 @@ namespace refl
 		bool ReflectElement(Element& reflElement, CXCursor cursor);
 
 		bool ReflectField(Field& reflField, CXCursor cursor, CXCursor parent);
-		bool ReflectFunction(Function& reflFunction, CXCursor cursor);
+		bool ReflectFunction(Function& reflFunction, CXCursor cursor, bool isMemberFunction);
 
 		bool ReflectClass(Class& reflClass, CXCursor cursor);
 
@@ -456,7 +456,7 @@ namespace refl
 		return true;
 	}
 
-	bool RegistryGenerator::ReflectFunction(Function& reflFunction, CXCursor cursor)
+	bool RegistryGenerator::ReflectFunction(Function& reflFunction, CXCursor cursor, bool isMemberFunction)
 	{
 		// Reflect common properties for any reflected element.
 		if (!ReflectElement(reflFunction, cursor)) {
@@ -480,6 +480,8 @@ namespace refl
 		}
 		reflFunction.mNumParameters = numArgs;
 		//clang_Cursor_getArgument(cursor, i);
+
+		reflFunction.mIsMemberFunction = isMemberFunction;
 
 		return true;
 	}
@@ -512,7 +514,7 @@ namespace refl
 			}
 			else if (childCursor.kind == CXCursor_CXXMethod) {
 				Function reflFunction;
-				if (ReflectFunction(reflFunction, childCursor)) {
+				if (ReflectFunction(reflFunction, childCursor, true)) {
 					reflClass.mFunctions.push_back(reflFunction);
 				}
 			}
@@ -606,7 +608,7 @@ namespace refl
 			case CXCursorKind::CXCursor_FunctionDecl:
 			{
 				Function reflFunction;
-				if (ReflectFunction(reflFunction, child)) {
+				if (ReflectFunction(reflFunction, child, false)) {
 					mRegistry->RegisterFunction(reflFunction);
 				}
 				break;

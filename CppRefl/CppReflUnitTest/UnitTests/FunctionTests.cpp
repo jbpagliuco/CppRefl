@@ -32,6 +32,7 @@ TEST_F(FunctionTest, TestMemberFunctionDataTypes)
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::Type::VOID);
 		EXPECT_EQ(reflFunction.mNumParameters, 0);
+		EXPECT_TRUE(reflFunction.mIsMemberFunction);
 	}
 
 	{
@@ -39,6 +40,7 @@ TEST_F(FunctionTest, TestMemberFunctionDataTypes)
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::Type::INT32);
 		EXPECT_EQ(reflFunction.mNumParameters, 0);
+		EXPECT_TRUE(reflFunction.mIsMemberFunction);
 	}
 
 	{
@@ -46,6 +48,7 @@ TEST_F(FunctionTest, TestMemberFunctionDataTypes)
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::Type::VOID);
 		EXPECT_EQ(reflFunction.mNumParameters, 1);
+		EXPECT_TRUE(reflFunction.mIsMemberFunction);
 	}
 
 	{
@@ -53,6 +56,7 @@ TEST_F(FunctionTest, TestMemberFunctionDataTypes)
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::Type::FLOAT);
 		EXPECT_EQ(reflFunction.mNumParameters, 1);
+		EXPECT_TRUE(reflFunction.mIsMemberFunction);
 	}
 }
 
@@ -104,6 +108,7 @@ TEST_F(FunctionTest, TestGlobalFunctionDataTypes)
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::Type::VOID);
 		EXPECT_EQ(reflFunction.mNumParameters, 0);
+		EXPECT_FALSE(reflFunction.mIsMemberFunction);
 	}
 
 	{
@@ -111,6 +116,7 @@ TEST_F(FunctionTest, TestGlobalFunctionDataTypes)
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::Type::INT32);
 		EXPECT_EQ(reflFunction.mNumParameters, 0);
+		EXPECT_FALSE(reflFunction.mIsMemberFunction);
 	}
 
 	{
@@ -118,6 +124,7 @@ TEST_F(FunctionTest, TestGlobalFunctionDataTypes)
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::Type::VOID);
 		EXPECT_EQ(reflFunction.mNumParameters, 1);
+		EXPECT_FALSE(reflFunction.mIsMemberFunction);
 	}
 
 	{
@@ -125,6 +132,7 @@ TEST_F(FunctionTest, TestGlobalFunctionDataTypes)
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::Type::INT32);
 		EXPECT_EQ(reflFunction.mNumParameters, 1);
+		EXPECT_FALSE(reflFunction.mIsMemberFunction);
 	}
 }
 

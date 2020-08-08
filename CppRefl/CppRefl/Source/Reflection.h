@@ -179,6 +179,9 @@ namespace refl
 		// Number of parameters that this function takes.
 		uint8_t mNumParameters;
 
+		// Is this a member function or a global function?
+		bool mIsMemberFunction;
+
 		// Function pointer
 		FunctionType mFunction = nullptr;
 		void* mFunctionInvoker = nullptr;

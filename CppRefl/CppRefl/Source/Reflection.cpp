@@ -133,6 +133,14 @@ namespace refl
 			return;
 		}
 
+		// Make sure we have an object if this is a member function (and vice versa).
+		if ((obj_or_null != nullptr) != mIsMemberFunction) {
+			REFL_INTERNAL_RAISE_ERROR("Tried to invoke a %s function with %s.",
+				mIsMemberFunction ? "member" : "global",
+				mIsMemberFunction ? "no object" : "an object");
+			return;
+		}
+
 		mFunction(mFunctionInvoker, obj_or_null, nullptr, param1_or_null);
 	}
 
