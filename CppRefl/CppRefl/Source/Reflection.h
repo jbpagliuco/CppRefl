@@ -68,53 +68,33 @@ namespace refl
 		virtual std::string ToString(int indent = 0)const override;
 
 		// Is this field a class type?
-		bool IsClassType()const { return mClassType != ""; }
+		bool IsClassType()const { return mTypeInfo.mClassType != ""; }
 		// Is this field an enum type?
-		bool IsEnumType()const { return mEnumType != ""; }
+		bool IsEnumType()const { return mTypeInfo.mEnumType != ""; }
 		// Is this field a primitive type?
 		bool IsPrimitive()const { return !IsClassType() && !IsEnumType(); };
 
-		// Is this field a string?
-		bool IsString()const { return mIsString; }
-		// Is this field an array?
-		bool IsArray()const { return mIsArray; }
-
-		// Is this field a pointer?
-		bool IsPointer()const { return mIsPointer; }
 		// Is this field const?
-		bool IsConst()const { return mIsConst; }
+		bool IsConst()const { return mTypeInfo.mIsConst; }
+		// Is this field a pointer?
+		bool IsPointer()const { return mTypeInfo.mIsPointer; }
+
+		// Is this field a string?
+		bool IsString()const { return mTypeInfo.mIsString; }
+		// Is this field an array?
+		bool IsFixedSizeArray()const { return mTypeInfo.mIsFixedArray; }
 
 	public:
 		// Invaild reference to a Field.
 		static Field INVALID;
 
 	public:
-		// Field data type.
-		Type mType;
+		// Field type.
+		TypeInfo mTypeInfo;
 
-		// Size of this field.
-		// NB: This is the size as defined by Clang. Sizes from other compilers may differ.
-		size_t mSize;
 		// Offset into the containing class.
 		// NB: This is the offset as defined by Clang. Sizes from other compilers may differ.
 		size_t mOffset;
-
-		// Underlying class type, if this field is a nested class.
-		std::string mClassType;
-		// Underlying enum type, if this field is an enum.
-		std::string mEnumType;
-
-		struct {
-			// Is this field a string?
-			bool mIsString : 1;
-			// Is this field an array?
-			bool mIsArray : 1;
-
-			// Is thie field a pointer?
-			bool mIsPointer : 1;
-			// Is this field const?
-			bool mIsConst : 1;
-		};
 	};
 
 	// Represents a reflected function.
@@ -177,7 +157,7 @@ namespace refl
 
 	public:
 		// Return value type of this function (only primitive data types are supported).
-		Type mReturnType = Type::VOID;
+		DataType mReturnType = DataType::VOID;
 
 		// Number of parameters that this function takes.
 		uint8_t mNumParameters;

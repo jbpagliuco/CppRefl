@@ -82,7 +82,7 @@ namespace refl
 			ReturnType rv;
 			mFunction(mFunctionInvoker, obj_or_null, &rv, param1_or_null);
 
-			if (mReturnType != Type::VOID) {
+			if (mReturnType != DataType::VOID) {
 				return { rv };
 			}
 			else {

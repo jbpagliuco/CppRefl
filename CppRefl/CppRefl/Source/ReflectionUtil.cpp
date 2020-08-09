@@ -20,36 +20,36 @@ namespace refl
 		{
 			#define PRIMITIVE_TO_STRING(type) std::to_string(*reflField.GetDataPtr<type>(data))
 
-			switch (reflField.mType)
+			switch (reflField.mTypeInfo.mDataType)
 			{
-			case Type::BOOL:
+			case DataType::BOOL:
 				return reflField.GetDataPtr<bool>(data) ? "true" : "false";
 
-			case Type::UINT8:
+			case DataType::UINT8:
 				return PRIMITIVE_TO_STRING(uint8_t);
-			case Type::INT8:
+			case DataType::INT8:
 				return PRIMITIVE_TO_STRING(int8_t);
 
-			case Type::UINT16:
+			case DataType::UINT16:
 				return PRIMITIVE_TO_STRING(uint16_t);
-			case Type::INT16:
+			case DataType::INT16:
 				return PRIMITIVE_TO_STRING(int16_t);
 
-			case Type::UINT32:
+			case DataType::UINT32:
 				return PRIMITIVE_TO_STRING(uint32_t);
-			case Type::INT32:
+			case DataType::INT32:
 				return PRIMITIVE_TO_STRING(int32_t);
 
-			case Type::UINT64:
+			case DataType::UINT64:
 				return PRIMITIVE_TO_STRING(uint64_t);
-			case Type::INT64:
+			case DataType::INT64:
 				return PRIMITIVE_TO_STRING(int64_t);
 
-			case Type::FLOAT:
+			case DataType::FLOAT:
 				return PRIMITIVE_TO_STRING(float);
-			case Type::DOUBLE:
+			case DataType::DOUBLE:
 				return PRIMITIVE_TO_STRING(double);
-			case Type::LONG_DOUBLE:
+			case DataType::LONG_DOUBLE:
 				return PRIMITIVE_TO_STRING(long double);
 
 			default:
@@ -74,13 +74,13 @@ namespace refl
 			// Enum type?
 			if (reflField.IsEnumType()) {
 				const int * const enumValue = reflField.GetDataPtr<int>(data);
-				const std::string enumString = reflRegistry.GetEnum(reflField.mEnumType).GetValueString(*enumValue, true);
+				const std::string enumString = reflRegistry.GetEnum(reflField.mTypeInfo.mEnumType).GetValueString(*enumValue, true);
 				return enumString;
 			}
 
 			// Class type?
 			if (reflField.IsClassType()) {
-				const Class& reflClass = reflRegistry.GetClass(reflField.mClassType);
+				const Class& reflClass = reflRegistry.GetClass(reflField.mTypeInfo.mClassType);
 
 				std::string output = reflClass.mQualifiedName + "{\n";
 				output += SerializeInternal(reflRegistry, reflClass, reflField.GetRawDataPtr(data), indent);

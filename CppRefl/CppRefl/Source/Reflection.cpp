@@ -16,7 +16,7 @@ namespace refl
 	///////////////////////////////////////////////////////////
 
 	static std::string BuildIndentString(int indent);
-	static std::string TypeToString(Type type);
+	static std::string TypeToString(DataType type);
 
 	///////////////////////////////////////////////////////////
 	// Element
@@ -91,7 +91,7 @@ namespace refl
 
 	std::string* Field::GetString(void* obj)const
 	{
-		if (mIsString) {
+		if (mTypeInfo.mIsString) {
 			return GetDataPtr<std::string>(obj);
 		}
 
@@ -102,19 +102,14 @@ namespace refl
 	{
 		std::string s = BuildIndentString(indent);
 
-		if (mIsArray) {
-			s += "std::vector<";
-			s += TypeToString(mType);
-			s += ">";
-		}
-		else if (IsClassType()) {
-			s += mClassType;
+		if (IsClassType()) {
+			s += mTypeInfo.mClassType;
 		}
 		else if (IsEnumType()) {
-			s += mEnumType;
+			s += mTypeInfo.mEnumType;
 		}
 		else {
-			s += TypeToString(mType);
+			s += TypeToString(mTypeInfo.mDataType);
 		}
 
 		return s + " " + mName + " " + GetAttrString();
@@ -462,22 +457,22 @@ namespace refl
 		return s;
 	}
 
-	static std::string TypeToString(Type type)
+	static std::string TypeToString(DataType type)
 	{
-		static std::map<Type, std::string> Map = {
-			{ Type::BOOL,			"bool" },
-			{ Type::UINT8,			"uint8" },
-			{ Type::INT8,			"int8" },
-			{ Type::UINT16,			"uint16" },
-			{ Type::INT16,			"int16" },
-			{ Type::UINT32,			"uint32" },
-			{ Type::INT32,			"int32" },
-			{ Type::UINT64,			"uint64" },
-			{ Type::INT64,			"int64" },
-			{ Type::FLOAT,			"float" },
-			{ Type::DOUBLE,			"double" },
-			{ Type::LONG_DOUBLE,	"long double" },
-			{ Type::VOID,			"void" }
+		static std::map<DataType, std::string> Map = {
+			{ DataType::BOOL,			"bool" },
+			{ DataType::UINT8,			"uint8" },
+			{ DataType::INT8,			"int8" },
+			{ DataType::UINT16,			"uint16" },
+			{ DataType::INT16,			"int16" },
+			{ DataType::UINT32,			"uint32" },
+			{ DataType::INT32,			"int32" },
+			{ DataType::UINT64,			"uint64" },
+			{ DataType::INT64,			"int64" },
+			{ DataType::FLOAT,			"float" },
+			{ DataType::DOUBLE,			"double" },
+			{ DataType::LONG_DOUBLE,	"long double" },
+			{ DataType::VOID,			"void" }
 		};
 
 		if (Map.find(type) != Map.end()) {

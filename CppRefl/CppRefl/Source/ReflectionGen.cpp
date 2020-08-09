@@ -18,6 +18,7 @@ namespace refl
 		bool BuildReflection(CXCursor cursor);
 
 		bool ShouldReflectCursor(CXCursor cursor);
+		bool BuildTypeInfo(TypeInfo& typeInfo, CXCursor cursor);
 
 		bool ReflectElement(Element& reflElement, CXCursor cursor);
 
@@ -115,30 +116,30 @@ namespace refl
 		return children;
 	}
 
-	// Maps clang cursor types to refl::Type.
-	static Type GetTypeFromClang(CXType type)
+	// Maps clang cursor types to refl::DataType.
+	static DataType GetDataTypeFromClang(CXType type)
 	{
-		static std::map<CXTypeKind, Type> Map = {
-			{ CXType_Bool,			Type::BOOL },
-			{ CXType_Char_U,		Type::UINT8 },
-			{ CXType_UChar,			Type::UINT8 },
-			{ CXType_Char16,		Type::INT16 },
-			{ CXType_Char32,		Type::INT32 },
-			{ CXType_UShort,		Type::UINT16 },
-			{ CXType_UInt,			Type::UINT32 },
-			{ CXType_ULong,			Type::UINT32 },
-			{ CXType_ULongLong,		Type::UINT64 },
-			{ CXType_Char_S,		Type::INT8 },
-			{ CXType_SChar,			Type::INT8 },
-			{ CXType_WChar,			Type::INT16 },
-			{ CXType_Short,			Type::INT16},
-			{ CXType_Int,			Type::INT32 },
-			{ CXType_Long,			Type::INT32 },
-			{ CXType_LongLong,		Type::INT64 },
-			{ CXType_Float,			Type::FLOAT },
-			{ CXType_Double,		Type::DOUBLE },
-			{ CXType_LongDouble,	Type::LONG_DOUBLE },
-			{ CXType_Void,			Type::VOID },
+		static std::map<CXTypeKind, DataType> Map = {
+			{ CXType_Bool,			DataType::BOOL },
+			{ CXType_Char_U,		DataType::UINT8 },
+			{ CXType_UChar,			DataType::UINT8 },
+			{ CXType_Char16,		DataType::INT16 },
+			{ CXType_Char32,		DataType::INT32 },
+			{ CXType_UShort,		DataType::UINT16 },
+			{ CXType_UInt,			DataType::UINT32 },
+			{ CXType_ULong,			DataType::UINT32 },
+			{ CXType_ULongLong,		DataType::UINT64 },
+			{ CXType_Char_S,		DataType::INT8 },
+			{ CXType_SChar,			DataType::INT8 },
+			{ CXType_WChar,			DataType::INT16 },
+			{ CXType_Short,			DataType::INT16},
+			{ CXType_Int,			DataType::INT32 },
+			{ CXType_Long,			DataType::INT32 },
+			{ CXType_LongLong,		DataType::INT64 },
+			{ CXType_Float,			DataType::FLOAT },
+			{ CXType_Double,		DataType::DOUBLE },
+			{ CXType_LongDouble,	DataType::LONG_DOUBLE },
+			{ CXType_Void,			DataType::VOID },
 		};
 
 		// Do typedef translation
@@ -152,11 +153,11 @@ namespace refl
 			return Map[type.kind];
 		}
 
-		return Type::INVALID;
+		return DataType::INVALID;
 	}
 
 	// Maps clang cursor types to Type's.
-	static Type GetTypeFromClang(CXCursor cursor)
+	static DataType GetDataTypeFromClang(CXCursor cursor)
 	{
 		CXType cxType = clang_getCursorType(cursor);
 
@@ -173,7 +174,7 @@ namespace refl
 			// Is this a record decl?
 			if (translatedCursor.kind == CXCursor_StructDecl || translatedCursor.kind == CXCursor_ClassDecl)
 			{
-				return Type::CLASS;
+				return DataType::CLASS;
 			}
 
 			// Do enum translation
@@ -183,7 +184,7 @@ namespace refl
 			}
 		}
 
-		return GetTypeFromClang(cxType);
+		return GetDataTypeFromClang(cxType);
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
@@ -328,6 +329,72 @@ namespace refl
 
 		return false;
 	}
+	
+	bool RegistryGenerator::BuildTypeInfo(TypeInfo& typeInfo, CXCursor cursor)
+	{
+		CXType cursorType = clang_getCursorType(cursor);
+
+		// Type/Size
+		typeInfo.mDataType = GetDataTypeFromClang(cursor);
+		typeInfo.mSize = clang_Type_getSizeOf(cursorType);
+
+		// Const
+		typeInfo.mIsConst = clang_isConstQualifiedType(cursorType);
+
+		// Pointers
+		typeInfo.mIsPointer = cursorType.kind == CXType_Pointer;
+		if (typeInfo.mIsPointer) {
+			// We want the size of the pointee
+			typeInfo.mSize = clang_Type_getSizeOf(clang_getPointeeType(cursorType));
+		}
+
+		// Complex data types
+		const CXCursor typeDeclaration = clang_getTypeDeclaration(cursorType);
+		const std::string typeDeclarationQName = GetFullyQualifiedCursorName(typeDeclaration);
+		if (typeInfo.mDataType == DataType::CLASS)
+		{
+			typeInfo.mClassType = typeDeclarationQName;
+		}
+		else if (cursorType.kind == CXType_Enum)
+		{
+			typeInfo.mEnumType = typeDeclarationQName;
+		}
+
+		// Raise warnings when using std types, as the internal layouts of each class can differ between compilers.
+		if (typeDeclarationQName.rfind("std::", 0) == 0) {
+			if (!mParams.mDisableStdWarnings) {
+				REFL_INTERNAL_RAISE_WARNING(
+					"Tried to reflect a class in the std namespace [%s]. This is discouraged, as the implementations of these classes can differ between compilers.",
+					typeDeclarationQName.c_str());
+			}
+
+			// Special container types
+			if (typeDeclarationQName == "std::string")
+			{
+				typeInfo.mIsString = true;
+				typeInfo.mClassType = typeDeclarationQName;
+				typeInfo.mDataType = DataType::CLASS;
+			}
+			else if (typeDeclarationQName == "std::vector")
+			{
+				// typeInfo.mIsArray = true;
+				typeInfo.mClassType = typeDeclarationQName;
+
+				// Get the vector element type
+				CXType elementType = clang_Type_getTemplateArgumentAsType(cursorType, 0);
+				typeInfo.mDataType = GetDataTypeFromClang(elementType);
+				typeInfo.mSize = clang_Type_getSizeOf(elementType);
+			}
+			else
+			{
+				// Always raise warnings about these. Either they must be supported, or some other non-std class must be used.
+				REFL_INTERNAL_RAISE_ERROR("Unrecognized class type from the std namespace [%s].", typeDeclarationQName.c_str());
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	//////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////
@@ -382,9 +449,10 @@ namespace refl
 		const CXType parentType = clang_getCursorType(parent);
 		const CXType fieldType = clang_getCursorType(cursor);
 
-		// Type/Size
-		reflField.mType = GetTypeFromClang(cursor);
-		reflField.mSize = clang_Type_getSizeOf(fieldType);
+		// Build type info
+		if (!BuildTypeInfo(reflField.mTypeInfo, cursor)) {
+			return false;
+		}
 
 		// Field offset
 		const size_t offsetBits = clang_Type_getOffsetOf(parentType, reflField.mName.c_str());
@@ -394,64 +462,6 @@ namespace refl
 			return false;
 		}
 		reflField.mOffset = offsetBits / 8;
-
-		// Pointers
-		reflField.mIsPointer = fieldType.kind == CXType_Pointer;
-		if (reflField.mIsPointer) {
-			// We want the size of the pointee
-			reflField.mSize = clang_Type_getSizeOf(clang_getPointeeType(fieldType));
-		}
-
-		// Const
-		reflField.mIsConst = clang_isConstQualifiedType(fieldType);
-
-		// Complex data types (i.e. non primitives)
-		const CXCursor typeDeclaration = clang_getTypeDeclaration(fieldType);
-		const std::string typeDeclarationQName = GetFullyQualifiedCursorName(typeDeclaration);
-
-		// Raise warnings when using std types, as the internal layouts of each class can differ between compilers.
-		if (typeDeclarationQName.rfind("std::", 0) == 0) {
-			if (!mParams.mDisableStdWarnings) {
-				REFL_INTERNAL_RAISE_WARNING(
-					"Tried to reflect a class in the std namespace [%s] (see %s). This is discouraged, as the implementations of these classes can differ between compilers.",
-					typeDeclarationQName.c_str(),
-					reflField.mQualifiedName.c_str());
-			}
-
-			// Special container types
-			if (typeDeclarationQName == "std::string")
-			{
-				reflField.mIsString = true;
-				reflField.mClassType = typeDeclarationQName;
-				reflField.mType = Type::CLASS;
-			}
-			else if (typeDeclarationQName == "std::vector")
-			{
-				reflField.mIsArray = true;
-				reflField.mClassType = typeDeclarationQName;
-
-				// Get the vector element type
-				CXType elementType = clang_Type_getTemplateArgumentAsType(fieldType, 0);
-				reflField.mType = GetTypeFromClang(elementType);
-				reflField.mSize = clang_Type_getSizeOf(elementType);
-			}
-			else
-			{
-				// Always raise warnings about these. Either they must be supported, or some other non-std class must be used.
-				REFL_INTERNAL_RAISE_ERROR("Unrecognized class type from the std namespace [%s].", reflField.mQualifiedName.c_str());
-				return false;
-			}
-		}
-
-		// Non primitive types
-		if (reflField.mType == Type::CLASS)
-		{
-			reflField.mClassType = typeDeclarationQName;
-		}
-		else if (fieldType.kind == CXType_Enum)
-		{
-			reflField.mEnumType = typeDeclarationQName;
-		}
 
 		return true;
 	}
@@ -466,7 +476,7 @@ namespace refl
 		// Return type
 		const CXType methodType = clang_getCursorType(cursor);
 		const CXType returnType = clang_getResultType(methodType);
-		reflFunction.mReturnType = GetTypeFromClang(returnType);
+		reflFunction.mReturnType = GetDataTypeFromClang(returnType);
 
 		// Arguments
 		const int numArgs = clang_Cursor_getNumArguments(cursor);

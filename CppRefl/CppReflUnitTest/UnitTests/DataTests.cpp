@@ -28,23 +28,23 @@ TEST_F(DataTest, TestFieldDataTypes)
 	const refl::Class& reflClass = mRegistry.GetClass("TestStruct");
 	EXPECT_NE(reflClass, refl::Class::INVALID);
 
-	auto testCommon = [&](const refl::Field& field, refl::Type type)
+	auto testCommon = [&](const refl::Field& field, refl::DataType type)
 	{
 		EXPECT_NE(field, refl::Field::INVALID);
-		EXPECT_EQ(field.mType, type);
+		EXPECT_EQ(field.mTypeInfo.mDataType, type);
 		EXPECT_EQ(field.mQualifiedName, std::string("TestStruct::") + field.mName);
 		
-		if (type == refl::Type::CLASS) {
+		if (type == refl::DataType::CLASS) {
 			EXPECT_FALSE(field.IsPrimitive());
 			EXPECT_TRUE(field.IsClassType());
-			EXPECT_FALSE(field.IsArray());
+			EXPECT_FALSE(field.IsFixedSizeArray());
 		}
 		else {
 			EXPECT_FALSE(field.IsString());
 		}
 	};
 
-	auto testPrimitive = [&](const std::string& fieldName, refl::Type type)
+	auto testPrimitive = [&](const std::string& fieldName, refl::DataType type)
 	{
 		const refl::Field& field = reflClass.GetField(fieldName);
 		testCommon(field, type);
@@ -52,68 +52,68 @@ TEST_F(DataTest, TestFieldDataTypes)
 		EXPECT_TRUE(field.IsPrimitive());
 		EXPECT_FALSE(field.IsClassType());
 		EXPECT_FALSE(field.IsEnumType());
-		EXPECT_FALSE(field.IsArray());
+		EXPECT_FALSE(field.IsFixedSizeArray());
 		EXPECT_FALSE(field.IsConst());
 		EXPECT_FALSE(field.IsPointer());
 	};
 
-	testPrimitive("mBool", refl::Type::BOOL);
+	testPrimitive("mBool", refl::DataType::BOOL);
 
-	testPrimitive("mUChar", refl::Type::UINT8);
-	testPrimitive("mChar", refl::Type::INT8);
-	testPrimitive("mInt8", refl::Type::INT8);
+	testPrimitive("mUChar", refl::DataType::UINT8);
+	testPrimitive("mChar", refl::DataType::INT8);
+	testPrimitive("mInt8", refl::DataType::INT8);
 
-	testPrimitive("mUInt16", refl::Type::UINT16);
-	testPrimitive("mInt16", refl::Type::INT16);
+	testPrimitive("mUInt16", refl::DataType::UINT16);
+	testPrimitive("mInt16", refl::DataType::INT16);
 
-	testPrimitive("mUInt32", refl::Type::UINT32);
-	testPrimitive("mInt32", refl::Type::INT32);
+	testPrimitive("mUInt32", refl::DataType::UINT32);
+	testPrimitive("mInt32", refl::DataType::INT32);
 
-	testPrimitive("mUInt64", refl::Type::UINT64);
-	testPrimitive("mInt64", refl::Type::INT64);
+	testPrimitive("mUInt64", refl::DataType::UINT64);
+	testPrimitive("mInt64", refl::DataType::INT64);
 
-	testPrimitive("mFloat", refl::Type::FLOAT);
-	testPrimitive("mDouble", refl::Type::DOUBLE);
-	testPrimitive("mLongDouble", refl::Type::LONG_DOUBLE);
+	testPrimitive("mFloat", refl::DataType::FLOAT);
+	testPrimitive("mDouble", refl::DataType::DOUBLE);
+	testPrimitive("mLongDouble", refl::DataType::LONG_DOUBLE);
 
-	testPrimitive("mTypedefInt", refl::Type::INT32);
+	testPrimitive("mTypedefInt", refl::DataType::INT32);
 
 	{
 		const refl::Field& pointerField = reflClass.GetField("mIntPtr");
-		testCommon(pointerField, refl::Type::INT32);
+		testCommon(pointerField, refl::DataType::INT32);
 		EXPECT_FALSE(pointerField.IsEnumType());
-		EXPECT_FALSE(pointerField.IsArray());
+		EXPECT_FALSE(pointerField.IsFixedSizeArray());
 		EXPECT_FALSE(pointerField.IsConst());
 		EXPECT_TRUE(pointerField.IsPointer());
 	}
 
 	{
 		const refl::Field& nestableStructField = reflClass.GetField("mNestableStruct");
-		testCommon(nestableStructField, refl::Type::CLASS);
-		EXPECT_EQ(nestableStructField.mClassType, "NestableStruct");
+		testCommon(nestableStructField, refl::DataType::CLASS);
+		EXPECT_EQ(nestableStructField.mTypeInfo.mClassType, "NestableStruct");
 		EXPECT_FALSE(nestableStructField.IsEnumType());
-		EXPECT_FALSE(nestableStructField.IsArray());
+		EXPECT_FALSE(nestableStructField.IsFixedSizeArray());
 		EXPECT_FALSE(nestableStructField.IsConst());
 		EXPECT_FALSE(nestableStructField.IsPointer());
 	}
 
 	{
 		const refl::Field& enumField = reflClass.GetField("mEnum");
-		testCommon(enumField, refl::Type::INT32);
+		testCommon(enumField, refl::DataType::INT32);
 		EXPECT_TRUE(enumField.IsEnumType());
 		EXPECT_FALSE(enumField.IsClassType());
-		EXPECT_EQ(enumField.mEnumType, "TestEnum");
-		EXPECT_FALSE(enumField.IsArray());
+		EXPECT_EQ(enumField.mTypeInfo.mEnumType, "TestEnum");
+		EXPECT_FALSE(enumField.IsFixedSizeArray());
 		EXPECT_FALSE(enumField.IsConst());
 		EXPECT_FALSE(enumField.IsPointer());
 	}
 
 	{
 		const refl::Field& namespacedField = reflClass.GetField("mNamespacedStruct");
-		testCommon(namespacedField, refl::Type::CLASS);
-		EXPECT_EQ(namespacedField.mClassType, "testnamespace::NamespacedStruct");
+		testCommon(namespacedField, refl::DataType::CLASS);
+		EXPECT_EQ(namespacedField.mTypeInfo.mClassType, "testnamespace::NamespacedStruct");
 		EXPECT_FALSE(namespacedField.IsEnumType());
-		EXPECT_FALSE(namespacedField.IsArray());
+		EXPECT_FALSE(namespacedField.IsFixedSizeArray());
 		EXPECT_FALSE(namespacedField.IsConst());
 		EXPECT_FALSE(namespacedField.IsPointer());
 	}
@@ -124,7 +124,7 @@ TEST_F(DataTest, TestFieldDataSizes)
 	const refl::Class& reflClass = mRegistry.GetClass("TestStruct");
 	EXPECT_NE(reflClass, refl::Class::INVALID);
 
-	#define TEST_SIZE(var) EXPECT_EQ(reflClass.GetField(#var).mSize, sizeof(decltype(TestStruct::var)));
+	#define TEST_SIZE(var) EXPECT_EQ(reflClass.GetField(#var).mTypeInfo.mSize, sizeof(decltype(TestStruct::var)));
 
 	TEST_SIZE(mBool);
 
@@ -156,7 +156,7 @@ TEST_F(DataTest, TestFieldDataSizes)
 	#undef TEST_SIZE
 
 	// The size of a pointer is actually the pointee type
-	EXPECT_EQ(reflClass.GetField("mIntPtr").mSize, sizeof(int32_t));
+	EXPECT_EQ(reflClass.GetField("mIntPtr").mTypeInfo.mSize, sizeof(int32_t));
 
 	EXPECT_EQ(reflClass.mSize, sizeof(TestStruct));
 }
