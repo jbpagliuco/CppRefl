@@ -32,11 +32,14 @@ namespace refl
 	{
 	public:
 		// Data type.
-		DataType mDataType;
+		DataType mDataType = DataType::INVALID;
 		
 		// Size of the data type.
 		// NB: This is the size as defined by Clang. Sizes from other compilers may differ.
-		size_t mSize;
+		size_t mSize = -1;
+
+		// Number of elements in this array.
+		size_t mArraySize = -1;
 
 		// Underlying class type, if this type is a class.
 		std::string mClassType;

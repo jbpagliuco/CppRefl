@@ -102,6 +102,10 @@ namespace refl
 	{
 		std::string s = BuildIndentString(indent);
 
+		if (IsFixedSizeArray()) {
+			s += TypeToString(mTypeInfo.mDataType) + " " + mName + "[" + std::to_string(mTypeInfo.mArraySize) + "] " + GetAttrString();
+			return s;
+		}
 		if (IsClassType()) {
 			s += mTypeInfo.mClassType;
 		}

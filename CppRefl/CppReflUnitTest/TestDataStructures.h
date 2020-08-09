@@ -61,6 +61,8 @@ struct REFLECTED TestStruct
 	TestEnum mEnum						REFLECTED;
 	
 	testnamespace::NamespacedStruct mNamespacedStruct		REFLECTED;
+
+	int mFixedSizeArray[13]				REFLECTED;
 };
 
 class REFLECTED TestClass

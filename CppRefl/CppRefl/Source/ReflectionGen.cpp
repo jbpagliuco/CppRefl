@@ -116,6 +116,39 @@ namespace refl
 		return children;
 	}
 
+	// Get the underlying data type from a CXType.
+	// e.g. translate pointers to pointees, typedefs to underlying type, arrays to element types
+	static CXType GetRealDataType(CXType type)
+	{
+		// Do typedef translation
+		if (type.kind == CXType_Typedef) {
+			type = clang_getCanonicalType(type);
+		}
+
+		// Get pointee type for pointers
+		const CXType pointeeType = clang_getPointeeType(type);
+		if (pointeeType.kind != CXType_Invalid) {
+			type = pointeeType;
+		}
+
+		// Get array element type for fixed size arrays
+		const CXType arrayElementType = clang_getArrayElementType(type);
+		if (arrayElementType.kind != CXType_Invalid) {
+			type = arrayElementType;
+		}
+
+		// See if this cursor can be translated into a different decl
+		const CXCursor translatedCursor = clang_getTypeDeclaration(type);
+		if (translatedCursor.kind != CXCursor_NoDeclFound) {
+			// Do enum translation
+			if (type.kind == CXType_Enum) {
+				type = clang_getEnumDeclIntegerType(translatedCursor);
+			}
+		}
+
+		return type;
+	}
+
 	// Maps clang cursor types to refl::DataType.
 	static DataType GetDataTypeFromClang(CXType type)
 	{
@@ -142,11 +175,7 @@ namespace refl
 			{ CXType_Void,			DataType::VOID },
 		};
 
-		// Do typedef translation
-		if (type.kind == CXType_Typedef)
-		{
-			type = clang_getCanonicalType(type);
-		}
+		type = GetRealDataType(type);
 
 		// Recognized type?
 		if (Map.find(type.kind) != Map.end()) {
@@ -159,28 +188,14 @@ namespace refl
 	// Maps clang cursor types to Type's.
 	static DataType GetDataTypeFromClang(CXCursor cursor)
 	{
-		CXType cxType = clang_getCursorType(cursor);
-
-		CXType pointeeType = clang_getPointeeType(cxType);
-		if (pointeeType.kind != CXType_Invalid)
-		{
-			cxType = pointeeType;
-		}
+		const CXType cxType = GetRealDataType(clang_getCursorType(cursor));
 
 		// See if this cursor can be translated into a different decl
 		CXCursor translatedCursor = clang_getTypeDeclaration(cxType);
-		if (translatedCursor.kind != CXCursor_NoDeclFound)
-		{
+		if (translatedCursor.kind != CXCursor_NoDeclFound) {
 			// Is this a record decl?
-			if (translatedCursor.kind == CXCursor_StructDecl || translatedCursor.kind == CXCursor_ClassDecl)
-			{
+			if (translatedCursor.kind == CXCursor_StructDecl || translatedCursor.kind == CXCursor_ClassDecl) {
 				return DataType::CLASS;
-			}
-
-			// Do enum translation
-			if (cxType.kind == CXType_Enum)
-			{
-				cxType = clang_getEnumDeclIntegerType(translatedCursor);
 			}
 		}
 
@@ -333,10 +348,11 @@ namespace refl
 	bool RegistryGenerator::BuildTypeInfo(TypeInfo& typeInfo, CXCursor cursor)
 	{
 		CXType cursorType = clang_getCursorType(cursor);
+		const CXType realDataType = GetRealDataType(cursorType);
 
 		// Type/Size
 		typeInfo.mDataType = GetDataTypeFromClang(cursor);
-		typeInfo.mSize = clang_Type_getSizeOf(cursorType);
+		typeInfo.mSize = clang_Type_getSizeOf(realDataType);
 
 		// Const
 		typeInfo.mIsConst = clang_isConstQualifiedType(cursorType);
@@ -346,6 +362,12 @@ namespace refl
 		if (typeInfo.mIsPointer) {
 			// We want the size of the pointee
 			typeInfo.mSize = clang_Type_getSizeOf(clang_getPointeeType(cursorType));
+		}
+
+		// Fixed size arrays
+		typeInfo.mIsFixedArray = cursorType.kind == CXType_ConstantArray;
+		if (typeInfo.mIsFixedArray) {
+			typeInfo.mArraySize = clang_getArraySize(cursorType);
 		}
 
 		// Complex data types

@@ -117,6 +117,15 @@ TEST_F(DataTest, TestFieldDataTypes)
 		EXPECT_FALSE(namespacedField.IsConst());
 		EXPECT_FALSE(namespacedField.IsPointer());
 	}
+
+	{
+		const refl::Field& arrayField = reflClass.GetField("mFixedSizeArray");
+		testCommon(arrayField, refl::DataType::INT32);
+		EXPECT_FALSE(arrayField.IsEnumType());
+		EXPECT_FALSE(arrayField.IsConst());
+		EXPECT_FALSE(arrayField.IsPointer());
+		EXPECT_TRUE(arrayField.IsFixedSizeArray());
+	}
 }
 
 TEST_F(DataTest, TestFieldDataSizes)
@@ -158,6 +167,13 @@ TEST_F(DataTest, TestFieldDataSizes)
 	// The size of a pointer is actually the pointee type
 	EXPECT_EQ(reflClass.GetField("mIntPtr").mTypeInfo.mSize, sizeof(int32_t));
 
+	// The size of a fixed size array is the element type
+	EXPECT_EQ(reflClass.GetField("mFixedSizeArray").mTypeInfo.mSize, sizeof(int));
+
+	// The size of a fixed size array is the element type
+	EXPECT_EQ(reflClass.GetField("mFixedSizeArray").mTypeInfo.mSize, sizeof(int));
+	EXPECT_EQ(reflClass.GetField("mFixedSizeArray").mTypeInfo.mArraySize, 13);
+
 	EXPECT_EQ(reflClass.mSize, sizeof(TestStruct));
 }
 
@@ -197,6 +213,8 @@ TEST_F(DataTest, TestFieldDataOffsets)
 	TEST_OFFSET(mEnum);
 	TEST_OFFSET(mNamespacedStruct);
 
+	TEST_OFFSET(mFixedSizeArray);
+
 #undef TEST_OFFSET
 }
 
@@ -219,7 +237,7 @@ TEST_F(DataTest, TestClassInfo)
 
 	EXPECT_EQ(reflClass.mQualifiedName, "TestStruct");
 
-	EXPECT_EQ(reflClass.mFields.size(), 19);
+	EXPECT_EQ(reflClass.mFields.size(), 20);
 	EXPECT_EQ(reflClass.mFunctions.size(), 0);
 }
 
