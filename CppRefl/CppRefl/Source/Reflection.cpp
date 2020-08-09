@@ -89,6 +89,11 @@ namespace refl
 		return cobj + mOffset;
 	}
 
+	char* Field::GetString(void* obj)const
+	{
+		return GetDataPtr<char>(obj);
+	}
+
 
 	std::string Field::ToString(int indent)const
 	{

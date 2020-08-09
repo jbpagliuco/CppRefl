@@ -61,6 +61,10 @@ namespace refl
 		template <typename T>
 		T* GetDataPtr(void* obj)const;
 
+		// Returns a string pointer to the start of this field in a buffer of data.
+		// NB: This is equivalent to `char* str = GetDataPtr<char>(obj);`
+		char* GetString(void* obj)const;
+
 		// Creates a string representation of this field.
 		virtual std::string ToString(int indent = 0)const override;
 

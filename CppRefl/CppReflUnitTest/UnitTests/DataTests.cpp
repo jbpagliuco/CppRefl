@@ -357,7 +357,7 @@ TEST_F(DataTest, TestDataAccess)
 		const refl::Field& field = reflClass.GetField("mFixedSizeString");
 		EXPECT_NE(field, refl::Field::INVALID);
 
-		char* str = field.GetDataPtr<char>(&testData);
+		char* str = field.GetString(&testData);
 		EXPECT_EQ(strcmp(str, testData.mFixedSizeString), 0);
 		EXPECT_EQ(strlen(str), strlen(testData.mFixedSizeString));
 	}
