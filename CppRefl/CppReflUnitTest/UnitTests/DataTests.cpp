@@ -272,3 +272,81 @@ TEST_F(DataTest, TestEnumInfo)
 	EXPECT_EQ(reflEnum.GetValueString((int)TestEnum::VAL2, true), "TestEnum::VAL2");
 	EXPECT_EQ(reflEnum.GetValueString((int)TestEnum::VAL3, true), "TestEnum::VAL3");
 }
+
+TEST_F(DataTest, TestDataAccess)
+{
+	const refl::Class& reflClass = mRegistry.GetClass("TestStruct");
+	EXPECT_NE(reflClass, refl::Class::INVALID);
+
+	TestStruct testData;
+	testData.mBool = true;
+	testData.mUChar = 'u';
+	testData.mChar = 'c';
+	testData.mUInt16 = 16;
+	testData.mInt16 = -16;
+	testData.mUInt32 = 32;
+	testData.mInt32 = -32;
+	testData.mUInt64 = 64;
+	testData.mInt64 = -64;
+	testData.mFloat = 3.14f;
+	testData.mDouble = 6.28;
+	testData.mLongDouble = 628.01;
+	testData.mTypedefInt = 7;
+	testData.mIntWithAttrs = 8;
+	testData.mIntPtr = &testData.mIntWithAttrs;
+	testData.mNestableStruct.mBoolVal = true;
+	testData.mNestableStruct.mIntVal = 123;
+	testData.mNestableStruct.mFloatVal = 1.23f;
+	testData.mEnum = TestEnum::VAL2;
+	testData.mNamespacedStruct.mBool = true;
+	testData.mNamespacedStruct.mInt = 345;
+	for (int i = 0; i < sizeof(testData.mFixedSizeArray) / sizeof(testData.mFixedSizeArray[0]); ++i) {
+		testData.mFixedSizeArray[i] = i;
+	}
+	strncpy_s(testData.mFixedSizeString, "cool data smile", sizeof(testData.mFixedSizeString));
+
+	#define TEST_DATA(var) EXPECT_EQ(*(reflClass.GetField(#var).GetDataPtr<decltype(TestStruct::var)>(&testData)), testData.var)
+
+	TEST_DATA(mBool);
+	TEST_DATA(mUChar);
+	TEST_DATA(mChar);
+	TEST_DATA(mUInt16);
+	TEST_DATA(mInt16);
+	TEST_DATA(mUInt32);
+	TEST_DATA(mInt32);
+	TEST_DATA(mUInt64);
+	TEST_DATA(mInt64);
+	EXPECT_FLOAT_EQ(*(reflClass.GetField("mFloat").GetDataPtr<decltype(TestStruct::mFloat)>(&testData)), testData.mFloat);
+	EXPECT_DOUBLE_EQ(*(reflClass.GetField("mDouble").GetDataPtr<decltype(TestStruct::mDouble)>(&testData)), testData.mDouble);
+	EXPECT_DOUBLE_EQ(*(reflClass.GetField("mLongDouble").GetDataPtr<decltype(TestStruct::mLongDouble)>(&testData)), testData.mLongDouble);
+	TEST_DATA(mTypedefInt);
+	TEST_DATA(mIntWithAttrs);
+	TEST_DATA(mEnum);
+
+	#undef TEST_DATA
+
+	EXPECT_EQ(**reflClass.GetField("mIntPtr").GetDataPtr<int*>(&testData), *testData.mIntPtr);
+
+	{
+		const refl::Field& field = reflClass.GetField("mNestableStruct");
+		EXPECT_NE(field, refl::Field::INVALID);
+
+		void* nestedClassData = field.GetRawDataPtr(&testData);
+		
+		const refl::Class& nestedClass = mRegistry.GetClass(field.mTypeInfo.mClassType);
+		EXPECT_EQ(*nestedClass.GetField("mBoolVal").GetDataPtr<bool>(nestedClassData), testData.mNestableStruct.mBoolVal);
+		EXPECT_EQ(*nestedClass.GetField("mIntVal").GetDataPtr<int>(nestedClassData), testData.mNestableStruct.mIntVal);
+		EXPECT_FLOAT_EQ(*nestedClass.GetField("mFloatVal").GetDataPtr<float>(nestedClassData), testData.mNestableStruct.mFloatVal);
+	}
+
+	{
+		const refl::Field& field = reflClass.GetField("mNamespacedStruct");
+		EXPECT_NE(field, refl::Field::INVALID);
+
+		void* namespacedClassData = field.GetRawDataPtr(&testData);
+
+		const refl::Class& nestedClass = mRegistry.GetClass(field.mTypeInfo.mClassType);
+		EXPECT_EQ(*nestedClass.GetField("mBool").GetDataPtr<bool>(namespacedClassData), testData.mNamespacedStruct.mBool);
+		EXPECT_EQ(*nestedClass.GetField("mInt").GetDataPtr<int>(namespacedClassData), testData.mNamespacedStruct.mInt);
+	}
+}
