@@ -327,6 +327,7 @@ TEST_F(DataTest, TestDataAccess)
 
 	EXPECT_EQ(**reflClass.GetField("mIntPtr").GetDataPtr<int*>(&testData), *testData.mIntPtr);
 
+	// Nestable struct
 	{
 		const refl::Field& field = reflClass.GetField("mNestableStruct");
 		EXPECT_NE(field, refl::Field::INVALID);
@@ -339,6 +340,7 @@ TEST_F(DataTest, TestDataAccess)
 		EXPECT_FLOAT_EQ(*nestedClass.GetField("mFloatVal").GetDataPtr<float>(nestedClassData), testData.mNestableStruct.mFloatVal);
 	}
 
+	// Namespaced struct
 	{
 		const refl::Field& field = reflClass.GetField("mNamespacedStruct");
 		EXPECT_NE(field, refl::Field::INVALID);
@@ -348,5 +350,15 @@ TEST_F(DataTest, TestDataAccess)
 		const refl::Class& nestedClass = mRegistry.GetClass(field.mTypeInfo.mClassType);
 		EXPECT_EQ(*nestedClass.GetField("mBool").GetDataPtr<bool>(namespacedClassData), testData.mNamespacedStruct.mBool);
 		EXPECT_EQ(*nestedClass.GetField("mInt").GetDataPtr<int>(namespacedClassData), testData.mNamespacedStruct.mInt);
+	}
+
+	// String
+	{
+		const refl::Field& field = reflClass.GetField("mFixedSizeString");
+		EXPECT_NE(field, refl::Field::INVALID);
+
+		char* str = field.GetDataPtr<char>(&testData);
+		EXPECT_EQ(strcmp(str, testData.mFixedSizeString), 0);
+		EXPECT_EQ(strlen(str), strlen(testData.mFixedSizeString));
 	}
 }
