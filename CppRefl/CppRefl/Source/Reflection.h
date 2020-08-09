@@ -65,6 +65,9 @@ namespace refl
 		// NB: This is equivalent to `char* str = GetDataPtr<char>(obj);`
 		char* GetString(void* obj)const;
 
+		template <typename T>
+		T* GetArrayElement(void* obj, int index)const;
+
 		// Creates a string representation of this field.
 		virtual std::string ToString(int indent = 0)const override;
 

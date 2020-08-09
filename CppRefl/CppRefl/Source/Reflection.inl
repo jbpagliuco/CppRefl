@@ -11,6 +11,23 @@ namespace refl
 		return static_cast<T*>(GetRawDataPtr(obj));
 	}
 
+	template <typename T>
+	T* Field::GetArrayElement(void* obj, int index)const
+	{
+		if (!mTypeInfo.mIsFixedArray) {
+			REFL_INTERNAL_RAISE_ERROR("Tried to get array element from a non-array type.");
+			return nullptr;
+		}
+
+		if (index < 0 || index >= mTypeInfo.mArraySize) {
+			REFL_INTERNAL_RAISE_ERROR("Tried to get out-of-bounds array element (%d).", index);
+			return nullptr;
+		}
+
+		T* arrayStart = GetDataPtr<T>(obj);
+		return arrayStart + index;
+	}
+
 
 	///////////////////////////////////////////////////////////
 	// Function

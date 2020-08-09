@@ -352,6 +352,16 @@ TEST_F(DataTest, TestDataAccess)
 		EXPECT_EQ(*nestedClass.GetField("mInt").GetDataPtr<int>(namespacedClassData), testData.mNamespacedStruct.mInt);
 	}
 
+	// Array
+	{
+		const refl::Field& field = reflClass.GetField("mFixedSizeArray");
+		EXPECT_NE(field, refl::Field::INVALID);
+
+		for (int i = 0; i < sizeof(testData.mFixedSizeArray) / sizeof(testData.mFixedSizeArray[0]); ++i) {
+			EXPECT_EQ(*field.GetArrayElement<int>(&testData, i), i);
+		}
+	}
+
 	// String
 	{
 		const refl::Field& field = reflClass.GetField("mFixedSizeString");
