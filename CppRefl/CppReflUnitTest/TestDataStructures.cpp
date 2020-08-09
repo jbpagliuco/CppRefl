@@ -39,8 +39,8 @@ int TestClass::IntFunction()
 	return mValue;
 }
 
-REFL_BIND_VOID_FUNCTION(TestClass, VoidFunctionInt, int);
-void TestClass::VoidFunctionInt(int)
+REFL_BIND_VOID_FUNCTION(TestClass, VoidFunctionFloat, float);
+void TestClass::VoidFunctionFloat(float)
 {
 
 }

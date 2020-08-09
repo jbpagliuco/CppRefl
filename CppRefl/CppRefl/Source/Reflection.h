@@ -159,8 +159,8 @@ namespace refl
 		// Return value type of this function (only primitive data types are supported).
 		DataType mReturnType = DataType::VOID;
 
-		// Number of parameters that this function takes.
-		uint8_t mNumParameters;
+		// Parameter type information.
+		std::vector<TypeInfo> mParameterTypes;
 
 		// Is this a member function or a global function?
 		bool mIsMemberFunction;

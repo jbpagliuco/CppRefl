@@ -32,7 +32,7 @@ TEST_F(FunctionTest, TestMemberFunctionDataTypes)
 		const refl::Function& reflFunction = reflClass.GetFunction("VoidFunction");
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::DataType::VOID);
-		EXPECT_EQ(reflFunction.mNumParameters, 0);
+		EXPECT_EQ(reflFunction.mParameterTypes.size(), 0);
 		EXPECT_TRUE(reflFunction.mIsMemberFunction);
 	}
 
@@ -40,15 +40,16 @@ TEST_F(FunctionTest, TestMemberFunctionDataTypes)
 		const refl::Function& reflFunction = reflClass.GetFunction("IntFunction");
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::DataType::INT32);
-		EXPECT_EQ(reflFunction.mNumParameters, 0);
+		EXPECT_EQ(reflFunction.mParameterTypes.size(), 0);
 		EXPECT_TRUE(reflFunction.mIsMemberFunction);
 	}
 
 	{
-		const refl::Function& reflFunction = reflClass.GetFunction("VoidFunctionInt");
+		const refl::Function& reflFunction = reflClass.GetFunction("VoidFunctionFloat");
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::DataType::VOID);
-		EXPECT_EQ(reflFunction.mNumParameters, 1);
+		EXPECT_EQ(reflFunction.mParameterTypes.size(), 1);
+		EXPECT_EQ(reflFunction.mParameterTypes[0].mDataType, refl::DataType::FLOAT);
 		EXPECT_TRUE(reflFunction.mIsMemberFunction);
 	}
 
@@ -56,7 +57,8 @@ TEST_F(FunctionTest, TestMemberFunctionDataTypes)
 		const refl::Function& reflFunction = reflClass.GetFunction("FloatFunctionInt");
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::DataType::FLOAT);
-		EXPECT_EQ(reflFunction.mNumParameters, 1);
+		EXPECT_EQ(reflFunction.mParameterTypes.size(), 1);
+		EXPECT_EQ(reflFunction.mParameterTypes[0].mDataType, refl::DataType::INT32);
 		EXPECT_TRUE(reflFunction.mIsMemberFunction);
 	}
 }
@@ -87,9 +89,9 @@ TEST_F(FunctionTest, TestMemberFunctionInvocation)
 	}
 
 	{
-		const refl::Function& reflFunction = reflClass.GetFunction("VoidFunctionInt");
+		const refl::Function& reflFunction = reflClass.GetFunction("VoidFunctionFloat");
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
-		reflFunction.InvokeMember(obj, 1);
+		reflFunction.InvokeMember(obj, 1.0f);
 	}
 
 	{
@@ -110,7 +112,7 @@ TEST_F(FunctionTest, TestGlobalFunctionDataTypes)
 		const refl::Function& reflFunction = mRegistry.GetFunction("TestGlobalVoidFunction");
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::DataType::VOID);
-		EXPECT_EQ(reflFunction.mNumParameters, 0);
+		EXPECT_EQ(reflFunction.mParameterTypes.size(), 0);
 		EXPECT_FALSE(reflFunction.mIsMemberFunction);
 	}
 
@@ -118,7 +120,7 @@ TEST_F(FunctionTest, TestGlobalFunctionDataTypes)
 		const refl::Function& reflFunction = mRegistry.GetFunction("TestGlobalIntFunction");
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::DataType::INT32);
-		EXPECT_EQ(reflFunction.mNumParameters, 0);
+		EXPECT_EQ(reflFunction.mParameterTypes.size(), 0);
 		EXPECT_FALSE(reflFunction.mIsMemberFunction);
 	}
 
@@ -126,7 +128,8 @@ TEST_F(FunctionTest, TestGlobalFunctionDataTypes)
 		const refl::Function& reflFunction = mRegistry.GetFunction("TestGlobalVoidFunctionInt");
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::DataType::VOID);
-		EXPECT_EQ(reflFunction.mNumParameters, 1);
+		EXPECT_EQ(reflFunction.mParameterTypes.size(), 1);
+		EXPECT_EQ(reflFunction.mParameterTypes[0].mDataType, refl::DataType::INT32);
 		EXPECT_FALSE(reflFunction.mIsMemberFunction);
 	}
 
@@ -134,7 +137,8 @@ TEST_F(FunctionTest, TestGlobalFunctionDataTypes)
 		const refl::Function& reflFunction = mRegistry.GetFunction("TestGlobalIntFunctionInt");
 		EXPECT_NE(reflFunction, refl::Function::INVALID);
 		EXPECT_EQ(reflFunction.mReturnType, refl::DataType::INT32);
-		EXPECT_EQ(reflFunction.mNumParameters, 1);
+		EXPECT_EQ(reflFunction.mParameterTypes.size(), 1);
+		EXPECT_EQ(reflFunction.mParameterTypes[0].mDataType, refl::DataType::INT32);
 		EXPECT_FALSE(reflFunction.mIsMemberFunction);
 	}
 }

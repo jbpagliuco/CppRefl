@@ -149,11 +149,11 @@ namespace refl
 
 		// Make sure the number of parameters match.
 		const int numParams = (param1 == nullptr) ? 0 : 1;
-		if (numParams != mNumParameters) {
+		if (numParams != mParameterTypes.size()) {
 			REFL_INTERNAL_RAISE_ERROR("Tried to invoke function [%s] with (%d) parameters, when (%d) are required.",
 				mQualifiedName.c_str(),
 				numParams,
-				mNumParameters);
+				mParameterTypes.size());
 			return false;
 		}
 

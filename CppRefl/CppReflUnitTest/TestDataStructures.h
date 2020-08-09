@@ -73,7 +73,7 @@ public:
 	void VoidFunction()					REFLECTED;
 	int IntFunction()					REFLECTED;
 
-	void VoidFunctionInt(int)			REFLECTED;
+	void VoidFunctionFloat(float)		REFLECTED;
 	float FloatFunctionInt(int)			REFLECTED;
 };
 

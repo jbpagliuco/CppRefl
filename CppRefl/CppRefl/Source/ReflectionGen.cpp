@@ -478,18 +478,24 @@ namespace refl
 		const CXType returnType = clang_getResultType(methodType);
 		reflFunction.mReturnType = GetDataTypeFromClang(returnType);
 
-		// Arguments
-		const int numArgs = clang_Cursor_getNumArguments(cursor);
-		if (numArgs > MAX_SUPPORTED_FUNCTION_PARAMETERS) {
+		// Parameters
+		const int numParams = clang_Cursor_getNumArguments(cursor);
+		if (numParams > MAX_SUPPORTED_FUNCTION_PARAMETERS) {
 			REFL_INTERNAL_RAISE_ERROR(
 				"Tried to reflect function [%s] with (%d) parameters. Only a maximum of (%d) parameters are supported.",
 				reflFunction.mQualifiedName.c_str(),
-				numArgs,
+				numParams,
 				MAX_SUPPORTED_FUNCTION_PARAMETERS);
 			return false;
 		}
-		reflFunction.mNumParameters = numArgs;
-		//clang_Cursor_getArgument(cursor, i);
+		for (int i = 0; i < numParams; ++i) {
+			CXCursor paramCursor = clang_Cursor_getArgument(cursor, i);
+			
+			TypeInfo paramTypeInfo;
+			if (BuildTypeInfo(paramTypeInfo, paramCursor)) {
+				reflFunction.mParameterTypes.push_back(paramTypeInfo);
+			}
+		}
 
 		reflFunction.mIsMemberFunction = isMemberFunction;
 
