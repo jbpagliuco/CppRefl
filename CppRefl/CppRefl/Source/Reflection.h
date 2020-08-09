@@ -129,7 +129,7 @@ namespace refl
 		void InvokeGlobal(ParamTypes&&... params)const;
 
 		// Invoke a reflected global function that returns a value.
-		// NB: If you invoke this function, you must actually specify all parameter template arguments.
+		// NB: If you invoke this function, you must explicitly specify all parameter template arguments.
 		template <typename ReturnType, typename... ParamTypes>
 		std::optional<ReturnType> InvokeGlobal(ParamTypes&&... params)const;
 
