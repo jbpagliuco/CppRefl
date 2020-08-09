@@ -391,13 +391,7 @@ namespace refl
 			}
 
 			// Special container types
-			if (typeDeclarationQName == "std::string")
-			{
-				typeInfo.mIsString = true;
-				typeInfo.mClassType = typeDeclarationQName;
-				typeInfo.mDataType = DataType::CLASS;
-			}
-			else if (typeDeclarationQName == "std::vector")
+			if (typeDeclarationQName == "std::vector")
 			{
 				// typeInfo.mIsArray = true;
 				typeInfo.mClassType = typeDeclarationQName;

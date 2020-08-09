@@ -61,9 +61,6 @@ namespace refl
 		template <typename T>
 		T* GetDataPtr(void* obj)const;
 
-		// Returns a string pointer to the start of this field in a buffer of data.
-		std::string* GetString(void* obj)const;
-
 		// Creates a string representation of this field.
 		virtual std::string ToString(int indent = 0)const override;
 
@@ -80,7 +77,7 @@ namespace refl
 		bool IsPointer()const { return mTypeInfo.mIsPointer; }
 
 		// Is this field a string?
-		bool IsString()const { return mTypeInfo.mIsString; }
+		bool IsString()const { return mTypeInfo.IsString(); }
 		// Is this field an array?
 		bool IsFixedSizeArray()const { return mTypeInfo.mIsFixedArray; }
 

@@ -61,11 +61,6 @@ namespace refl
 
 		static std::string SerializeField(const Registry& reflRegistry, const Field& reflField, void* data, int indent)
 		{
-			// String?
-			if (reflField.IsString()) {
-				return "\"" + *reflField.GetString(data) + "\"";
-			}
-
 			// Primitive type?
 			if (reflField.IsPrimitive()) {
 				return SerializePrimitiveFieldValue(reflField, data);

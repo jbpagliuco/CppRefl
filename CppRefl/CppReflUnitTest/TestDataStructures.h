@@ -63,6 +63,7 @@ struct REFLECTED TestStruct
 	testnamespace::NamespacedStruct mNamespacedStruct		REFLECTED;
 
 	int mFixedSizeArray[13]				REFLECTED;
+	char mFixedSizeString[64]			REFLECTED;
 };
 
 class REFLECTED TestClass

@@ -39,9 +39,6 @@ TEST_F(DataTest, TestFieldDataTypes)
 			EXPECT_TRUE(field.IsClassType());
 			EXPECT_FALSE(field.IsFixedSizeArray());
 		}
-		else {
-			EXPECT_FALSE(field.IsString());
-		}
 	};
 
 	auto testPrimitive = [&](const std::string& fieldName, refl::DataType type)
@@ -55,6 +52,7 @@ TEST_F(DataTest, TestFieldDataTypes)
 		EXPECT_FALSE(field.IsFixedSizeArray());
 		EXPECT_FALSE(field.IsConst());
 		EXPECT_FALSE(field.IsPointer());
+		EXPECT_FALSE(field.IsString());
 	};
 
 	testPrimitive("mBool", refl::DataType::BOOL);
@@ -84,6 +82,7 @@ TEST_F(DataTest, TestFieldDataTypes)
 		EXPECT_FALSE(pointerField.IsEnumType());
 		EXPECT_FALSE(pointerField.IsFixedSizeArray());
 		EXPECT_FALSE(pointerField.IsConst());
+		EXPECT_FALSE(pointerField.IsString());
 		EXPECT_TRUE(pointerField.IsPointer());
 	}
 
@@ -95,6 +94,7 @@ TEST_F(DataTest, TestFieldDataTypes)
 		EXPECT_FALSE(nestableStructField.IsFixedSizeArray());
 		EXPECT_FALSE(nestableStructField.IsConst());
 		EXPECT_FALSE(nestableStructField.IsPointer());
+		EXPECT_FALSE(nestableStructField.IsString());
 	}
 
 	{
@@ -106,6 +106,7 @@ TEST_F(DataTest, TestFieldDataTypes)
 		EXPECT_FALSE(enumField.IsFixedSizeArray());
 		EXPECT_FALSE(enumField.IsConst());
 		EXPECT_FALSE(enumField.IsPointer());
+		EXPECT_FALSE(enumField.IsString());
 	}
 
 	{
@@ -116,6 +117,7 @@ TEST_F(DataTest, TestFieldDataTypes)
 		EXPECT_FALSE(namespacedField.IsFixedSizeArray());
 		EXPECT_FALSE(namespacedField.IsConst());
 		EXPECT_FALSE(namespacedField.IsPointer());
+		EXPECT_FALSE(namespacedField.IsString());
 	}
 
 	{
@@ -125,6 +127,17 @@ TEST_F(DataTest, TestFieldDataTypes)
 		EXPECT_FALSE(arrayField.IsConst());
 		EXPECT_FALSE(arrayField.IsPointer());
 		EXPECT_TRUE(arrayField.IsFixedSizeArray());
+		EXPECT_FALSE(arrayField.IsString());
+	}
+
+	{
+		const refl::Field& stringField = reflClass.GetField("mFixedSizeString");
+		testCommon(stringField, refl::DataType::INT8);
+		EXPECT_FALSE(stringField.IsEnumType());
+		EXPECT_FALSE(stringField.IsConst());
+		EXPECT_FALSE(stringField.IsPointer());
+		EXPECT_TRUE(stringField.IsFixedSizeArray());
+		EXPECT_TRUE(stringField.IsString());
 	}
 }
 
@@ -174,6 +187,10 @@ TEST_F(DataTest, TestFieldDataSizes)
 	EXPECT_EQ(reflClass.GetField("mFixedSizeArray").mTypeInfo.mSize, sizeof(int));
 	EXPECT_EQ(reflClass.GetField("mFixedSizeArray").mTypeInfo.mArraySize, 13);
 
+	// The size of a fixed size array is the element type
+	EXPECT_EQ(reflClass.GetField("mFixedSizeString").mTypeInfo.mSize, sizeof(char));
+	EXPECT_EQ(reflClass.GetField("mFixedSizeString").mTypeInfo.mArraySize, 64);
+
 	EXPECT_EQ(reflClass.mSize, sizeof(TestStruct));
 }
 
@@ -214,6 +231,7 @@ TEST_F(DataTest, TestFieldDataOffsets)
 	TEST_OFFSET(mNamespacedStruct);
 
 	TEST_OFFSET(mFixedSizeArray);
+	TEST_OFFSET(mFixedSizeString);
 
 #undef TEST_OFFSET
 }
@@ -237,7 +255,7 @@ TEST_F(DataTest, TestClassInfo)
 
 	EXPECT_EQ(reflClass.mQualifiedName, "TestStruct");
 
-	EXPECT_EQ(reflClass.mFields.size(), 20);
+	EXPECT_EQ(reflClass.mFields.size(), 21);
 	EXPECT_EQ(reflClass.mFunctions.size(), 0);
 }
 

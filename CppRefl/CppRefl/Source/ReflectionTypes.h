@@ -52,10 +52,12 @@ namespace refl
 			// Is thie field a pointer?
 			bool mIsPointer : 1;
 
-			// Is this field a string?
-			bool mIsString : 1;
 			// Is this field a fixed-sized array?
 			bool mIsFixedArray : 1;
 		};
+
+	public:
+		// Is this type a string?
+		bool IsString()const { return mIsFixedArray && mDataType == DataType::INT8; }
 	};
 }
