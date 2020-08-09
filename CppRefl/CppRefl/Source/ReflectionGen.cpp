@@ -103,7 +103,7 @@ namespace refl
 			// Collect all the annotations that contain our custom reflection markup
 			if (cursor.kind == CXCursor_AnnotateAttr) {
 				const std::string annotation = GetCursorName(cursor);
-				if (annotation.find(CPP_REFLECTION_ANNOTATION) != std::string::npos) {
+				if (annotation.find(REFL_INTERNAL_ANNOTATION) != std::string::npos) {
 					children->push_back(annotation);
 				}
 			}
@@ -413,7 +413,7 @@ namespace refl
 			// annotate(cpp_refl)
 			// annotate(cpp_refl,just_a_tag)
 			// annotate(cpp_ref,tag_with_a_value,the_value)
-			const size_t firstSeparator = annotation.find(CPP_REFLECTION_SEPARATOR);
+			const size_t firstSeparator = annotation.find(REFL_INTERNAL_ANNOTATION_SEPARATOR);
 
 			// Is this actually an attribute?
 			if (firstSeparator == std::string::npos) {
@@ -423,7 +423,7 @@ namespace refl
 			const std::string metadata = annotation.substr(firstSeparator + 1);
 
 			// If this separator doesn't exist, this is just a tag with no value
-			const size_t secondSeparator = metadata.find(CPP_REFLECTION_SEPARATOR);
+			const size_t secondSeparator = metadata.find(REFL_INTERNAL_ANNOTATION_SEPARATOR);
 			if (secondSeparator == std::string::npos) {
 				reflElement.mAttributes[metadata] = "";
 			}
