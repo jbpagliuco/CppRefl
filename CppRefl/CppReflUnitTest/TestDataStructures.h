@@ -85,3 +85,5 @@ int TestGlobalIntFunction()				REFLECTED;
 
 void TestGlobalVoidFunctionInt(int)		REFLECTED;
 int TestGlobalIntFunctionInt(int)		REFLECTED;
+
+int TestGlobalIntFunctionIntPtr(int*)	REFLECTED;

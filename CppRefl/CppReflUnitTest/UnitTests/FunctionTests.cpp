@@ -141,6 +141,16 @@ TEST_F(FunctionTest, TestGlobalFunctionDataTypes)
 		EXPECT_EQ(reflFunction.mParameterTypes[0].mDataType, refl::DataType::INT32);
 		EXPECT_FALSE(reflFunction.mIsMemberFunction);
 	}
+
+	{
+		const refl::Function& reflFunction = mRegistry.GetFunction("TestGlobalIntFunctionIntPtr");
+		EXPECT_NE(reflFunction, refl::Function::INVALID);
+		EXPECT_EQ(reflFunction.mReturnType, refl::DataType::INT32);
+		EXPECT_EQ(reflFunction.mParameterTypes.size(), 1);
+		EXPECT_EQ(reflFunction.mParameterTypes[0].mDataType, refl::DataType::INT32);
+		EXPECT_TRUE(reflFunction.mParameterTypes[0].mIsPointer);
+		EXPECT_FALSE(reflFunction.mIsMemberFunction);
+	}
 }
 
 // Test invoking global functions.
@@ -175,6 +185,31 @@ TEST_F(FunctionTest, TestGlobalFunctionInvocation)
 		EXPECT_TRUE(rv);
 		if (rv) {
 			EXPECT_EQ(*rv, 2);
+		}
+	}
+
+	{
+		const refl::Function& reflFunction = mRegistry.GetFunction("TestGlobalIntFunctionIntPtr");
+		EXPECT_NE(reflFunction, refl::Function::INVALID);
+		int p = 1234;
+		auto rv = reflFunction.InvokeGlobal<int, int*>(&p);
+		EXPECT_TRUE(rv);
+		if (rv) {
+			EXPECT_EQ(*rv, p);
+		}
+	}
+}
+
+// Test invoking function with nullptr parameter.
+TEST_F(FunctionTest, TestFunctionInvocationNullParam)
+{
+	{
+		const refl::Function& reflFunction = mRegistry.GetFunction("TestGlobalIntFunctionIntPtr");
+		EXPECT_NE(reflFunction, refl::Function::INVALID);
+		auto rv = reflFunction.InvokeGlobal<int, int*>(nullptr);
+		EXPECT_TRUE(rv);
+		if (rv) {
+			EXPECT_EQ(*rv, -1);
 		}
 	}
 }

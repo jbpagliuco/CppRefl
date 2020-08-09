@@ -26,6 +26,19 @@ int TestGlobalIntFunctionInt(int)
 	return 2;
 }
 
+REFL_BIND_GLOBAL_FUNCTION(int, TestGlobalIntFunctionIntPtr, int*);
+int TestGlobalIntFunctionIntPtr(int* p)
+{
+	if (p == nullptr) {
+		return -1;
+	}
+
+	return *p;
+}
+
+
+
+
 
 REFL_BIND_VOID_FUNCTION(TestClass, VoidFunction);
 void TestClass::VoidFunction()
