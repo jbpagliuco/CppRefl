@@ -182,15 +182,13 @@ TEST_F(DataTest, TestFieldDataSizes)
 
 	// The size of a fixed size array is the element type
 	EXPECT_EQ(reflClass.GetField("mFixedSizeArray").mTypeInfo.mSize, sizeof(int));
-
-	// The size of a fixed size array is the element type
-	EXPECT_EQ(reflClass.GetField("mFixedSizeArray").mTypeInfo.mSize, sizeof(int));
 	EXPECT_EQ(reflClass.GetField("mFixedSizeArray").mTypeInfo.mArraySize, 13);
 
 	// The size of a fixed size array is the element type
 	EXPECT_EQ(reflClass.GetField("mFixedSizeString").mTypeInfo.mSize, sizeof(char));
 	EXPECT_EQ(reflClass.GetField("mFixedSizeString").mTypeInfo.mArraySize, 64);
 
+	// Test the size of the whole class
 	EXPECT_EQ(reflClass.mSize, sizeof(TestStruct));
 }
 
