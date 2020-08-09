@@ -22,6 +22,7 @@ protected:
 	refl::Registry mRegistry;
 };
 
+// Tests member function reflection information.s
 TEST_F(FunctionTest, TestMemberFunctionDataTypes)
 {
 	const refl::Class& reflClass = mRegistry.GetClass("TestClass");
@@ -60,6 +61,7 @@ TEST_F(FunctionTest, TestMemberFunctionDataTypes)
 	}
 }
 
+// Tests invoking member functions.
 TEST_F(FunctionTest, TestMemberFunctionInvocation)
 {
 	TestClass obj;
@@ -101,6 +103,7 @@ TEST_F(FunctionTest, TestMemberFunctionInvocation)
 	}
 }
 
+// Test global function reflection information.
 TEST_F(FunctionTest, TestGlobalFunctionDataTypes)
 {
 	{
@@ -136,6 +139,7 @@ TEST_F(FunctionTest, TestGlobalFunctionDataTypes)
 	}
 }
 
+// Test invoking global functions.
 TEST_F(FunctionTest, TestGlobalFunctionInvocation)
 {
 	{
@@ -169,4 +173,67 @@ TEST_F(FunctionTest, TestGlobalFunctionInvocation)
 			EXPECT_EQ(*rv, 2);
 		}
 	}
+}
+
+// Ensure that's improperly invoked functions don't get executed.
+static int TestBadFunctionInvocation_NumErrors = 0;
+TEST_F(FunctionTest, TestBadFunctionInvocation)
+{
+	TestBadFunctionInvocation_NumErrors = 0;
+
+	TestClass obj;
+	obj.mValue = 1234;
+
+	const refl::Class& reflClass = mRegistry.GetClass("TestClass");
+	EXPECT_NE(reflClass, refl::Class::INVALID);
+
+	// Count the number of errors we get.
+	int expectedErrors = 0;
+	auto errorHandler = [](refl::ErrorType, const char*, const char*, int)
+	{
+		++TestBadFunctionInvocation_NumErrors;
+	};
+	refl::SetErrorHandler(errorHandler);
+
+	// Bad return value
+	{
+		const refl::Function& reflFunction = reflClass.GetFunction("VoidFunction");
+		EXPECT_NE(reflFunction, refl::Function::INVALID);
+
+		// Function does not return a value, so badRV should not exist.
+		auto badRV = reflFunction.InvokeMember<int>(obj);
+		EXPECT_FALSE(badRV);
+		++expectedErrors;
+	}
+
+
+
+	// Too many arguments
+	{
+		const refl::Function& reflFunction = reflClass.GetFunction("IntFunction");
+		EXPECT_NE(reflFunction, refl::Function::INVALID);
+		auto rv = reflFunction.InvokeMember<int>(obj, 2);
+		EXPECT_FALSE(rv);
+		++expectedErrors;
+	}
+
+	// Too few arguments
+	{
+		const refl::Function& reflFunction = reflClass.GetFunction("FloatFunctionInt");
+		EXPECT_NE(reflFunction, refl::Function::INVALID);
+		auto rv = reflFunction.InvokeMember<int>(obj);
+		EXPECT_FALSE(rv);
+		++expectedErrors;
+	}
+
+	// No object for a member function
+	{
+		const refl::Function& reflFunction = reflClass.GetFunction("FloatFunctionInt");
+		EXPECT_NE(reflFunction, refl::Function::INVALID);
+		auto rv = reflFunction.InvokeMember<int>(nullptr);
+		EXPECT_FALSE(rv);
+		++expectedErrors;
+	}
+
+	EXPECT_EQ(TestBadFunctionInvocation_NumErrors, expectedErrors);
 }
