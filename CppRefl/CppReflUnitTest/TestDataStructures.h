@@ -64,6 +64,10 @@ struct REFLECTED TestStruct
 
 	int mFixedSizeArray[13]				REFLECTED;
 	char mFixedSizeString[64]			REFLECTED;
+
+	struct {
+		bool mBoolInUnamedStruct		REFLECTED;
+	};
 };
 
 class REFLECTED TestClass

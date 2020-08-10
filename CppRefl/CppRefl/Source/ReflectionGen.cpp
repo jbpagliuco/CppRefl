@@ -25,6 +25,7 @@ namespace refl
 		bool ReflectField(Field& reflField, CXCursor cursor, CXCursor parent);
 		bool ReflectFunction(Function& reflFunction, CXCursor cursor, bool isMemberFunction);
 
+		bool ReflectClassMembers(Class& reflClass, CXCursor classCursor, std::vector<CXCursor> memberCursors);
 		bool ReflectClass(Class& reflClass, CXCursor cursor);
 
 		bool ReflectEnumValue(EnumValue& reflEnumValue, CXCursor cursor);
@@ -69,7 +70,11 @@ namespace refl
 		cursor = clang_getCursorSemanticParent(cursor);
 		while (cursor.kind != CXCursor_FirstInvalid && cursor.kind != CXCursor_TranslationUnit)
 		{
-			name = GetCursorName(cursor) + "::" + name;
+			const std::string curName = GetCursorName(cursor);
+			if (curName != "") {
+				name = curName + "::" + name;
+			}
+
 			cursor = clang_getCursorSemanticParent(cursor);
 		}
 
@@ -519,6 +524,49 @@ namespace refl
 	}
 
 	// Reflects a class/struct/record.
+	bool RegistryGenerator::ReflectClassMembers(Class& reflClass, CXCursor classCursor, std::vector<CXCursor> memberCursors)
+	{
+		// Collect all fields and functions in this class.
+		for (auto memberCursor : memberCursors)
+		{
+			// Check for nested definitions
+			if (memberCursor.kind == CXCursor_StructDecl) {
+				const std::string name = GetCursorName(memberCursor);
+				if (name == "") {
+					// This is an un-named struct. Reflect everything as-is.
+					if (!ReflectClassMembers(reflClass, classCursor, CollectTopLevelChildren(memberCursor))) {
+						return false;
+					}
+				}
+				else {
+					REFL_INTERNAL_RAISE_ERROR("TODO: Cannot reflect nested named structs.");
+					return false;
+				}
+			}
+
+			// Don't reflect stuff we're not supposed to.
+			if (!ShouldReflectCursor(memberCursor)) {
+				continue;
+			}
+
+			if (memberCursor.kind == CXCursor_FieldDecl) {
+				Field reflField;
+				if (ReflectField(reflField, memberCursor, classCursor)) {
+					reflClass.mFields.push_back(reflField);
+				}
+			}
+			else if (memberCursor.kind == CXCursor_CXXMethod) {
+				Function reflFunction;
+				if (ReflectFunction(reflFunction, memberCursor, true)) {
+					reflClass.mFunctions.push_back(reflFunction);
+				}
+			}
+		}
+
+		return true;
+	}
+
+	// Reflects a class/struct/record.
 	bool RegistryGenerator::ReflectClass(Class& reflClass, CXCursor cursor)
 	{
 		// Reflect common properties for any reflected element.
@@ -530,29 +578,7 @@ namespace refl
 		reflClass.mSize = clang_Type_getSizeOf(clang_getCursorType(cursor));
 
 		// Collect all fields and functions in this class.
-		std::vector<CXCursor> children = CollectTopLevelChildren(cursor);
-		for (auto childCursor : children)
-		{
-			// Don't reflect stuff we're not supposed to.
-			if (!ShouldReflectCursor(childCursor)) {
-				continue;
-			}
-
-			if (childCursor.kind == CXCursor_FieldDecl) {
-				Field reflField;
-				if (ReflectField(reflField, childCursor, cursor)) {
-					reflClass.mFields.push_back(reflField);
-				}
-			}
-			else if (childCursor.kind == CXCursor_CXXMethod) {
-				Function reflFunction;
-				if (ReflectFunction(reflFunction, childCursor, true)) {
-					reflClass.mFunctions.push_back(reflFunction);
-				}
-			}
-		}
-
-		return true;
+		return ReflectClassMembers(reflClass, cursor, CollectTopLevelChildren(cursor));
 	}
 
 	bool RegistryGenerator::ReflectEnumValue(EnumValue& reflEnumValue, CXCursor cursor)

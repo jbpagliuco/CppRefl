@@ -75,6 +75,7 @@ TEST_F(DataTest, TestFieldDataTypes)
 	testPrimitive("mLongDouble", refl::DataType::LONG_DOUBLE);
 
 	testPrimitive("mTypedefInt", refl::DataType::INT32);
+	testPrimitive("mBoolInUnamedStruct", refl::DataType::BOOL);
 
 	{
 		const refl::Field& pointerField = reflClass.GetField("mIntPtr");
@@ -175,6 +176,8 @@ TEST_F(DataTest, TestFieldDataSizes)
 	TEST_SIZE(mEnum);
 	TEST_SIZE(mNamespacedStruct);
 
+	TEST_SIZE(mBoolInUnamedStruct);
+
 	#undef TEST_SIZE
 
 	// The size of a pointer is actually the pointee type
@@ -231,6 +234,8 @@ TEST_F(DataTest, TestFieldDataOffsets)
 	TEST_OFFSET(mFixedSizeArray);
 	TEST_OFFSET(mFixedSizeString);
 
+	TEST_OFFSET(mBoolInUnamedStruct);
+
 #undef TEST_OFFSET
 }
 
@@ -253,7 +258,7 @@ TEST_F(DataTest, TestClassInfo)
 
 	EXPECT_EQ(reflClass.mQualifiedName, "TestStruct");
 
-	EXPECT_EQ(reflClass.mFields.size(), 21);
+	EXPECT_EQ(reflClass.mFields.size(), 22);
 	EXPECT_EQ(reflClass.mFunctions.size(), 0);
 }
 
@@ -304,6 +309,7 @@ TEST_F(DataTest, TestDataAccess)
 		testData.mFixedSizeArray[i] = i;
 	}
 	strncpy_s(testData.mFixedSizeString, "cool data smile", sizeof(testData.mFixedSizeString));
+	testData.mBoolInUnamedStruct = true;
 
 	#define TEST_DATA(var) EXPECT_EQ(*(reflClass.GetField(#var).GetDataPtr<decltype(TestStruct::var)>(&testData)), testData.var)
 
@@ -322,6 +328,7 @@ TEST_F(DataTest, TestDataAccess)
 	TEST_DATA(mTypedefInt);
 	TEST_DATA(mIntWithAttrs);
 	TEST_DATA(mEnum);
+	TEST_DATA(mBoolInUnamedStruct);
 
 	#undef TEST_DATA
 
