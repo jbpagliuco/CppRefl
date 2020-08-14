@@ -104,10 +104,15 @@ namespace refl
 		// Is this field a pointer?
 		bool IsPointer()const { return mTypeInfo.mIsPointer; }
 
-		// Is this field a string?
-		bool IsString()const { return mTypeInfo.IsString(); }
-		// Is this field an array?
-		bool IsArray()const { return mTypeInfo.IsArray(); }
+		// Is this field a fixed size array?
+		bool IsFixedArray()const { return mTypeInfo.IsFixedArray(); }
+		// Is this field a dynamic array? (i.e. std::vector)
+		bool IsDynamicArray()const { return mTypeInfo.IsDynamicArray(); }
+
+		// Is this field a fixed size string?
+		bool IsFixedString()const { return mTypeInfo.IsFixedString(); }
+		// Is this field a dynamic string? (i.e. std::string)
+		bool IsDynamicString()const { return mTypeInfo.IsDynamicString(); }
 
 	public:
 		// Invaild reference to a Field.

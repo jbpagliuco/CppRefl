@@ -56,18 +56,26 @@ namespace refl
 		std::string mEnumType;
 
 		// Is this field const?
-		bool mIsConst;
+		bool mIsConst = false;
 		// Is thie field a pointer?
-		bool mIsPointer;
+		bool mIsPointer = false;
+
+		// Is this type a dynamic array/string?
+		bool IsDynamic = false;
 
 	public:
 		// Checks for equality among every aspect of this element.
 		// NB: This is really only necessary for testing purposes.
 		bool DeepEquals(const TypeInfo& rhs)const;
 
-		bool IsArray()const { return mArraySize != -1; }
+		// Is this type a fixed sized array?
+		bool IsFixedArray()const { return mArraySize != -1; }
+		// Is this type a dynamic array?
+		bool IsDynamicArray()const { return IsDynamic; }
 
-		// Is this type a string?
-		bool IsString()const { return IsArray() && mDataType == DataType::INT8; }
+		// Is this type a fixed sized string?
+		bool IsFixedString()const { return IsFixedArray() && mDataType == DataType::INT8; }
+		// Is this type a dynamic string?
+		bool IsDynamicString()const { return IsDynamicArray() && mDataType == DataType::INT8; }
 	};
 }

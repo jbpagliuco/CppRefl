@@ -14,7 +14,7 @@ namespace refl
 	template <typename T>
 	T* Field::GetArrayElement(void* obj, int index)const
 	{
-		if (!mTypeInfo.IsArray()) {
+		if (!mTypeInfo.IsFixedArray()) {
 			REFL_INTERNAL_RAISE_ERROR("Tried to get array element from a non-array type.");
 			return nullptr;
 		}

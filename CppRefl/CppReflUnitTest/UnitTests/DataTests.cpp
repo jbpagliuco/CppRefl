@@ -37,7 +37,7 @@ TEST_F(DataTest, TestFieldDataTypes)
 		if (type == refl::DataType::CLASS) {
 			EXPECT_FALSE(field.IsPrimitive());
 			EXPECT_TRUE(field.IsClassType());
-			EXPECT_FALSE(field.IsFixedSizeArray());
+			EXPECT_FALSE(field.IsFixedArray());
 		}
 	};
 
@@ -49,10 +49,10 @@ TEST_F(DataTest, TestFieldDataTypes)
 		EXPECT_TRUE(field.IsPrimitive());
 		EXPECT_FALSE(field.IsClassType());
 		EXPECT_FALSE(field.IsEnumType());
-		EXPECT_FALSE(field.IsFixedSizeArray());
+		EXPECT_FALSE(field.IsFixedArray());
 		EXPECT_FALSE(field.IsConst());
 		EXPECT_FALSE(field.IsPointer());
-		EXPECT_FALSE(field.IsString());
+		EXPECT_FALSE(field.IsFixedString());
 	};
 
 	testPrimitive("mBool", refl::DataType::BOOL);
@@ -81,9 +81,9 @@ TEST_F(DataTest, TestFieldDataTypes)
 		const refl::Field& pointerField = reflClass.GetField("mIntPtr");
 		testCommon(pointerField, refl::DataType::INT32);
 		EXPECT_FALSE(pointerField.IsEnumType());
-		EXPECT_FALSE(pointerField.IsFixedSizeArray());
+		EXPECT_FALSE(pointerField.IsFixedArray());
 		EXPECT_FALSE(pointerField.IsConst());
-		EXPECT_FALSE(pointerField.IsString());
+		EXPECT_FALSE(pointerField.IsFixedString());
 		EXPECT_TRUE(pointerField.IsPointer());
 	}
 
@@ -92,10 +92,10 @@ TEST_F(DataTest, TestFieldDataTypes)
 		testCommon(nestableStructField, refl::DataType::CLASS);
 		EXPECT_EQ(nestableStructField.mTypeInfo.mClassType, "NestableStruct");
 		EXPECT_FALSE(nestableStructField.IsEnumType());
-		EXPECT_FALSE(nestableStructField.IsFixedSizeArray());
+		EXPECT_FALSE(nestableStructField.IsFixedArray());
 		EXPECT_FALSE(nestableStructField.IsConst());
 		EXPECT_FALSE(nestableStructField.IsPointer());
-		EXPECT_FALSE(nestableStructField.IsString());
+		EXPECT_FALSE(nestableStructField.IsFixedString());
 	}
 
 	{
@@ -104,10 +104,10 @@ TEST_F(DataTest, TestFieldDataTypes)
 		EXPECT_TRUE(enumField.IsEnumType());
 		EXPECT_FALSE(enumField.IsClassType());
 		EXPECT_EQ(enumField.mTypeInfo.mEnumType, "TestEnum");
-		EXPECT_FALSE(enumField.IsFixedSizeArray());
+		EXPECT_FALSE(enumField.IsFixedArray());
 		EXPECT_FALSE(enumField.IsConst());
 		EXPECT_FALSE(enumField.IsPointer());
-		EXPECT_FALSE(enumField.IsString());
+		EXPECT_FALSE(enumField.IsFixedString());
 	}
 
 	{
@@ -115,10 +115,10 @@ TEST_F(DataTest, TestFieldDataTypes)
 		testCommon(namespacedField, refl::DataType::CLASS);
 		EXPECT_EQ(namespacedField.mTypeInfo.mClassType, "testnamespace::NamespacedStruct");
 		EXPECT_FALSE(namespacedField.IsEnumType());
-		EXPECT_FALSE(namespacedField.IsFixedSizeArray());
+		EXPECT_FALSE(namespacedField.IsFixedArray());
 		EXPECT_FALSE(namespacedField.IsConst());
 		EXPECT_FALSE(namespacedField.IsPointer());
-		EXPECT_FALSE(namespacedField.IsString());
+		EXPECT_FALSE(namespacedField.IsFixedString());
 	}
 
 	{
@@ -127,8 +127,11 @@ TEST_F(DataTest, TestFieldDataTypes)
 		EXPECT_FALSE(arrayField.IsEnumType());
 		EXPECT_FALSE(arrayField.IsConst());
 		EXPECT_FALSE(arrayField.IsPointer());
-		EXPECT_TRUE(arrayField.IsFixedSizeArray());
-		EXPECT_FALSE(arrayField.IsString());
+
+		EXPECT_TRUE(arrayField.IsFixedArray());
+		EXPECT_FALSE(arrayField.IsDynamicArray());
+		EXPECT_FALSE(arrayField.IsFixedString());
+		EXPECT_FALSE(arrayField.IsDynamicString());
 	}
 
 	{
@@ -137,8 +140,11 @@ TEST_F(DataTest, TestFieldDataTypes)
 		EXPECT_FALSE(stringField.IsEnumType());
 		EXPECT_FALSE(stringField.IsConst());
 		EXPECT_FALSE(stringField.IsPointer());
-		EXPECT_TRUE(stringField.IsFixedSizeArray());
-		EXPECT_TRUE(stringField.IsString());
+
+		EXPECT_TRUE(stringField.IsFixedArray());
+		EXPECT_FALSE(stringField.IsDynamicArray());
+		EXPECT_TRUE(stringField.IsFixedString());
+		EXPECT_FALSE(stringField.IsDynamicString());
 	}
 
 	// Nested named struct
