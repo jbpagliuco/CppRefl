@@ -108,6 +108,7 @@
   <ItemGroup>
     <ClInclude Include="Include\Reflection.h" />
     <ClInclude Include="Source\ErrorHandling.h" />
+    <ClInclude Include="Source\ReflectionDefs.h" />
     <ClInclude Include="Source\ReflectionFunctionRegistration.h" />
     <ClInclude Include="Source\ReflectionBindingsInternal.h" />
     <ClInclude Include="Include\ReflectionGen.h" />

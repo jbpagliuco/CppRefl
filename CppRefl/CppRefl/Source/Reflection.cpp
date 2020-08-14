@@ -63,6 +63,7 @@ namespace refl
 		return "";
 	}
 
+#if defined(REFL_DEBUG)
 	std::string Element::ToString(int indent)const
 	{
 		return BuildIndentString(indent) + mName;
@@ -87,6 +88,7 @@ namespace refl
 
 		return output;
 	}
+#endif
 
 
 	///////////////////////////////////////////////////////////
@@ -134,7 +136,7 @@ namespace refl
 		return mRegistry->GetEnum(mTypeInfo.mEnumType);
 	}
 
-
+#if defined(REFL_DEBUG)
 	std::string Field::ToString(int indent)const
 	{
 		std::string s = BuildIndentString(indent);
@@ -155,6 +157,7 @@ namespace refl
 
 		return s + " " + mName + " " + GetAttrString();
 	}
+#endif
 
 
 	///////////////////////////////////////////////////////////
@@ -220,6 +223,7 @@ namespace refl
 		return true;
 	}
 
+#if defined(REFL_DEBUG)
 	std::string Function::ToString(int indent)const
 	{
 		std::string s = BuildIndentString(indent);
@@ -234,6 +238,7 @@ namespace refl
 
 		return s;
 	}
+#endif
 
 
 	///////////////////////////////////////////////////////////
@@ -311,6 +316,7 @@ namespace refl
 		return Function::INVALID;
 	}
 
+#if defined(REFL_DEBUG)
 	std::string Class::ToString(int indent)const
 	{
 		std::string s = "";
@@ -331,6 +337,7 @@ namespace refl
 
 		return s;
 	}
+#endif
 
 
 	///////////////////////////////////////////////////////////
@@ -346,10 +353,12 @@ namespace refl
 		return mValue == rhs.mValue;
 	}
 
+#if defined(REFL_DEBUG)
 	std::string EnumValue::ToString(int indent)const
 	{
 		return BuildIndentString(indent) + mName + " = " + std::to_string(mValue) + " " + GetAttrString();
 	}
+#endif
 
 
 	///////////////////////////////////////////////////////////
@@ -391,6 +400,7 @@ namespace refl
 		return "";
 	}
 
+#if defined(REFL_DEBUG)
 	std::string Enum::ToString(int indent)const
 	{
 		std::string s = "";
@@ -405,6 +415,7 @@ namespace refl
 
 		return s;
 	}
+#endif
 
 
 	///////////////////////////////////////////////////////////
@@ -575,6 +586,7 @@ namespace refl
 
 
 
+#if defined(REFL_DEBUG)
 	static std::string BuildIndentString(int indent)
 	{
 		std::string s = "";
@@ -609,4 +621,5 @@ namespace refl
 
 		return "";
 	}
+#endif
 }

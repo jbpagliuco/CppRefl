@@ -1,9 +1,12 @@
 #pragma once
 
+#include "ReflectionDefs.h"
+
 #include <map>
-#include <optional>
 #include <string>
 #include <vector>
+
+#include <optional>
 
 #include "ReflectionBindings.h"
 #include "ReflectionFunctionInvocation.h"
@@ -34,12 +37,14 @@ namespace refl
 		bool HasAttribute(const std::string& attributeName)const;
 		std::string GetAttribute(const std::string& attributeName)const;
 
+#if defined(REFL_DEBUG)
 		// Creates a string representation of this element.
 		virtual std::string ToString(int indent = 0)const;
 
 	protected:
 		// A human-readable string containing all of our attributes.
 		std::string GetAttrString()const;
+#endif
 
 	public:
 		// Reflected name of this element.
@@ -77,8 +82,10 @@ namespace refl
 		template <typename T>
 		T* GetArrayElement(void* obj, int index)const;
 
+#if defined(REFL_DEBUG)
 		// Creates a string representation of this field.
 		virtual std::string ToString(int indent = 0)const override;
+#endif
 
 		// Is this field a class type?
 		bool IsClassType()const { return mTypeInfo.mClassType != ""; }
@@ -158,8 +165,10 @@ namespace refl
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#if defined(REFL_DEBUG)
 		// Creates a string representation of this class.
 		virtual std::string ToString(int indent = 0)const override;
+#endif
 
 	private:
 		//////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,8 +217,10 @@ namespace refl
 		const Function& GetFunction(const std::string& functionName)const;
 		Function& GetFunction(const std::string& functionName);
 
+#if defined(REFL_DEBUG)
 		// Creates a string representation of this class.
 		virtual std::string ToString(int indent = 0)const override;
+#endif
 
 	public:
 		// Invaild reference to a Class.
@@ -234,8 +245,10 @@ namespace refl
 		// NB: This is really only necessary for testing purposes.
 		virtual bool DeepEquals(const EnumValue& rhs)const;
 
+#if defined(REFL_DEBUG)
 		// Creates a string representation of this enum value.
 		virtual std::string ToString(int indent = 0)const override;
+#endif
 
 	public:
 		// The integer value of this enum value.
@@ -253,8 +266,10 @@ namespace refl
 		// Returns the name of an enum value.
 		std::string GetValueString(int enumValue, bool qualified = false)const;
 
+#if defined(REFL_DEBUG)
 		// Creates a string representation of this enum.
 		virtual std::string ToString(int indent = 0)const override;
+#endif
 
 	public:
 		// Invaild reference to a Enum.
