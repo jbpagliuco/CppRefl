@@ -177,10 +177,15 @@ namespace refl
 			{ CXType_Float,			DataType::FLOAT },
 			{ CXType_Double,		DataType::DOUBLE },
 			{ CXType_LongDouble,	DataType::LONG_DOUBLE },
-			{ CXType_Void,			DataType::VOID },
+			{ CXType_Void,			DataType::VOID }
 		};
 
 		type = GetRealDataType(type);
+
+		// Unions would show up as a record type, so let's make extra sure that we're dealing with a union here.
+		if (clang_getTypeDeclaration(type).kind == CXCursor_UnionDecl) {
+			return DataType::UNION;
+		}
 
 		// Recognized type?
 		if (Map.find(type.kind) != Map.end()) {
@@ -571,6 +576,10 @@ namespace refl
 				if (ReflectFunction(reflFunction, memberCursor, true)) {
 					reflClass.mFunctions.push_back(reflFunction);
 				}
+			}
+			else if (memberCursor.kind == CXCursor_UnionDecl) {
+				// nothing special needs to be done for named unions.
+				// we're not going to actually reflect the union definition, we'll just reflect the actual union as a primitive blob type.
 			}
 			else {
 				REFL_INTERNAL_RAISE_ERROR("Unhandled cursor type: %d", (int)memberCursor.kind);

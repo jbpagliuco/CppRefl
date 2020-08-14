@@ -66,7 +66,7 @@ struct REFLECTED TestStruct
 	char mFixedSizeString[64]			REFLECTED;
 
 	struct {
-		bool mBoolInUnamedStruct		REFLECTED;
+		bool mBoolInAnonymousStruct		REFLECTED;
 	};
 
 	struct REFLECTED NestedStructDefinition {
@@ -79,6 +79,12 @@ struct REFLECTED TestStruct
 		NV2 REFLECTED
 	};
 	NestedEnumDefinition mNestedEnum	REFLECTED;
+
+	union REFLECTED NestedUnionDefinition {
+		bool mBool;
+		int mInt;
+	};
+	NestedUnionDefinition mUnion		REFLECTED;
 };
 
 class REFLECTED TestClass

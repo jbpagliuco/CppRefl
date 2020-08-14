@@ -75,7 +75,7 @@ TEST_F(DataTest, TestFieldDataTypes)
 	testPrimitive("mLongDouble", refl::DataType::LONG_DOUBLE);
 
 	testPrimitive("mTypedefInt", refl::DataType::INT32);
-	testPrimitive("mBoolInUnamedStruct", refl::DataType::BOOL);
+	testPrimitive("mBoolInAnonymousStruct", refl::DataType::BOOL);
 
 	{
 		const refl::Field& pointerField = reflClass.GetField("mIntPtr");
@@ -162,6 +162,12 @@ TEST_F(DataTest, TestFieldDataTypes)
 
 		EXPECT_EQ(enumField.GetEnum().mValueTable.size(), 2);
 	}
+
+	// Nested union
+	{
+		const refl::Field& unionField = reflClass.GetField("mUnion");
+		testCommon(unionField, refl::DataType::UNION);
+	}
 }
 
 TEST_F(DataTest, TestFieldDataSizes)
@@ -198,10 +204,12 @@ TEST_F(DataTest, TestFieldDataSizes)
 	TEST_SIZE(mEnum);
 	TEST_SIZE(mNamespacedStruct);
 
-	TEST_SIZE(mBoolInUnamedStruct);
+	TEST_SIZE(mBoolInAnonymousStruct);
 
 	TEST_SIZE(mNestedNamedStruct);
 	TEST_SIZE(mNestedEnum);
+
+	TEST_SIZE(mUnion);
 
 	#undef TEST_SIZE
 
@@ -259,10 +267,12 @@ TEST_F(DataTest, TestFieldDataOffsets)
 	TEST_OFFSET(mFixedSizeArray);
 	TEST_OFFSET(mFixedSizeString);
 
-	TEST_OFFSET(mBoolInUnamedStruct);
+	TEST_OFFSET(mBoolInAnonymousStruct);
 
 	TEST_OFFSET(mNestedNamedStruct);
 	TEST_OFFSET(mNestedEnum);
+
+	TEST_OFFSET(mUnion);
 
 #undef TEST_OFFSET
 }
@@ -286,7 +296,7 @@ TEST_F(DataTest, TestClassInfo)
 
 	EXPECT_EQ(reflClass.mQualifiedName, "TestStruct");
 
-	EXPECT_EQ(reflClass.mFields.size(), 24);
+	EXPECT_EQ(reflClass.mFields.size(), 25);
 	EXPECT_EQ(reflClass.mFunctions.size(), 0);
 }
 
@@ -337,9 +347,10 @@ TEST_F(DataTest, TestDataAccess)
 		testData.mFixedSizeArray[i] = i;
 	}
 	strncpy_s(testData.mFixedSizeString, "cool data smile", sizeof(testData.mFixedSizeString));
-	testData.mBoolInUnamedStruct = true;
+	testData.mBoolInAnonymousStruct = true;
 	testData.mNestedNamedStruct.mIntInNamedStruct = 34;
 	testData.mNestedEnum = TestStruct::NestedEnumDefinition::NV2;
+	testData.mUnion.mInt = 1;
 
 	#define TEST_DATA(var) EXPECT_EQ(*(reflClass.GetField(#var).GetDataPtr<decltype(TestStruct::var)>(&testData)), testData.var)
 
@@ -358,7 +369,7 @@ TEST_F(DataTest, TestDataAccess)
 	TEST_DATA(mTypedefInt);
 	TEST_DATA(mIntWithAttrs);
 	TEST_DATA(mEnum);
-	TEST_DATA(mBoolInUnamedStruct);
+	TEST_DATA(mBoolInAnonymousStruct);
 	TEST_DATA(mNestedEnum);
 
 	#undef TEST_DATA
@@ -419,5 +430,17 @@ TEST_F(DataTest, TestDataAccess)
 
 		const refl::Class& nestedClass = field.GetClass();
 		EXPECT_EQ(*nestedClass.GetField("mIntInNamedStruct").GetDataPtr<int>(nestedClassData), testData.mNestedNamedStruct.mIntInNamedStruct);
+	}
+
+	// Union
+	{
+		const refl::Field& field = reflClass.GetField("mUnion");
+		EXPECT_NE(field, refl::Field::INVALID);
+
+		int* unionDataAsInt = field.GetDataPtr<int>(&testData);
+		EXPECT_EQ(*unionDataAsInt, testData.mUnion.mInt);
+
+		bool* unionDataAsBool = field.GetDataPtr<bool>(&testData);
+		EXPECT_EQ(*unionDataAsBool, testData.mUnion.mBool);
 	}
 }

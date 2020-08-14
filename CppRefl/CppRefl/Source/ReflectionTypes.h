@@ -22,6 +22,8 @@ namespace refl
 		DOUBLE,
 		LONG_DOUBLE,
 
+		UNION,
+
 		CLASS, // struct, class, record, whatever
 
 		VOID, // for function return values
