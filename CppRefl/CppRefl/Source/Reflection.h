@@ -23,8 +23,13 @@ namespace refl
 	public:
 		Element();
 
+		// Shallow check for equality/inequality.
 		virtual bool operator==(const Element& rhs)const;
 		virtual bool operator!=(const Element& rhs)const;
+
+		// Checks for equality among every aspect of this element.
+		// NB: This is really only necessary for testing purposes.
+		virtual bool DeepEquals(const Element& rhs)const;
 
 		bool HasAttribute(const std::string& attributeName)const;
 		std::string GetAttribute(const std::string& attributeName)const;
@@ -54,6 +59,10 @@ namespace refl
 	class Field : public Element
 	{
 	public:
+		// Checks for equality among every aspect of this element.
+		// NB: This is really only necessary for testing purposes.
+		virtual bool DeepEquals(const Field& rhs)const;
+
 		// Returns a pointer to the start of this field in a buffer of data.
 		void* GetRawDataPtr(void* obj)const;
 
@@ -110,6 +119,10 @@ namespace refl
 	class Function : public Element
 	{
 	public:
+		// Checks for equality among every aspect of this element.
+		// NB: This is really only necessary for testing purposes.
+		virtual bool DeepEquals(const Function& rhs)const;
+
 		//////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Global functions
 
@@ -183,6 +196,10 @@ namespace refl
 	class Class : public Element
 	{
 	public:
+		// Checks for equality among every aspect of this element.
+		// NB: This is really only necessary for testing purposes.
+		virtual bool DeepEquals(const Class& rhs)const;
+
 		// Get a field by name.
 		const Field& GetField(const std::string& fieldName)const;
 		Field& GetField(const std::string& fieldName);
@@ -213,6 +230,10 @@ namespace refl
 	class EnumValue : public Element
 	{
 	public:
+		// Checks for equality among every aspect of this element.
+		// NB: This is really only necessary for testing purposes.
+		virtual bool DeepEquals(const EnumValue& rhs)const;
+
 		// Creates a string representation of this enum value.
 		virtual std::string ToString(int indent = 0)const override;
 
@@ -225,6 +246,10 @@ namespace refl
 	class Enum : public Element
 	{
 	public:
+		// Checks for equality among every aspect of this element.
+		// NB: This is really only necessary for testing purposes.
+		virtual bool DeepEquals(const Enum& rhs)const;
+
 		// Returns the name of an enum value.
 		std::string GetValueString(int enumValue, bool qualified = false)const;
 
@@ -268,6 +293,11 @@ namespace refl
 		// Adds a reflected function to this registry.
 		bool RegisterFunction(Function reflFunction);
 
+		// Serialize this registry to a file.
+		bool Export(const std::string& filename)const;
+		// Import registry data from a file.
+		bool Import(const std::string& filename);
+
 	public:
 		// Invaild reference to a Enum.
 		static Registry INVALID;
@@ -276,7 +306,7 @@ namespace refl
 		// Resolve function pointers for all Function's.
 		void ResolveFunctions();
 
-	private:
+	public:
 		// List of classes defined in this registry.
 		std::map<std::string, Class> mClasses;
 		// List of enums defined in this registry.

@@ -11,6 +11,9 @@ namespace refl
 	Enum Enum::INVALID;
 	Registry Registry::INVALID;
 
+	// Serialization version number.
+	constexpr int REFLECTION_VERSION_NUMBER = 1;
+
 	///////////////////////////////////////////////////////////
 	// Helper Function Prototypes
 	///////////////////////////////////////////////////////////
@@ -37,6 +40,13 @@ namespace refl
 	bool Element::operator!=(const Element& rhs)const
 	{
 		return mQualifiedName != rhs.mQualifiedName;
+	}
+
+	bool Element::DeepEquals(const Element& rhs)const
+	{
+		return mName == rhs.mName &&
+			mQualifiedName == rhs.mQualifiedName &&
+			mAttributes == rhs.mAttributes;
 	}
 
 	bool Element::HasAttribute(const std::string& attributeName)const
@@ -82,6 +92,16 @@ namespace refl
 	///////////////////////////////////////////////////////////
 	// Field
 	///////////////////////////////////////////////////////////
+
+	bool Field::DeepEquals(const Field& rhs)const
+	{
+		if (!Element::DeepEquals(rhs)) {
+			return false;
+		}
+
+		return mTypeInfo.DeepEquals(rhs.mTypeInfo) &&
+			mOffset == rhs.mOffset;
+	}
 
 	void* Field::GetRawDataPtr(void* obj)const
 	{
@@ -140,6 +160,25 @@ namespace refl
 	///////////////////////////////////////////////////////////
 	// Function
 	///////////////////////////////////////////////////////////
+
+	bool Function::DeepEquals(const Function& rhs)const
+	{
+		if (!Element::DeepEquals(rhs)) {
+			return false;
+		}
+
+		if (mParameterTypes.size() != rhs.mParameterTypes.size()) {
+			return false;
+		}
+		for (int i = 0; i < mParameterTypes.size(); ++i) {
+			if (!mParameterTypes[i].DeepEquals(rhs.mParameterTypes[i])) {
+				return false;
+			}
+		}
+
+		return mReturnType == rhs.mReturnType &&
+			mIsMemberFunction == rhs.mIsMemberFunction;
+	}
 
 	// The real invoker.
 	void Function::InvokeInternal(void* obj_or_null, void* param1_or_null)const
@@ -200,6 +239,33 @@ namespace refl
 	///////////////////////////////////////////////////////////
 	// Class
 	///////////////////////////////////////////////////////////
+
+	bool Class::DeepEquals(const Class& rhs)const
+	{
+		if (!Element::DeepEquals(rhs)) {
+			return false;
+		}
+
+		if (mFields.size() != rhs.mFields.size()) {
+			return false;
+		}
+		for (int i = 0; i < mFields.size(); ++i) {
+			if (!mFields[i].DeepEquals(rhs.mFields[i])) {
+				return false;
+			}
+		}
+
+		if (mFunctions.size() != rhs.mFunctions.size()) {
+			return false;
+		}
+		for (int i = 0; i < mFunctions.size(); ++i) {
+			if (!mFunctions[i].DeepEquals(rhs.mFunctions[i])) {
+				return false;
+			}
+		}
+
+		return mSize == rhs.mSize;
+	}
 
 	const Field& Class::GetField(const std::string& fieldName)const
 	{
@@ -271,6 +337,15 @@ namespace refl
 	// EnumValue
 	///////////////////////////////////////////////////////////
 
+	bool EnumValue::DeepEquals(const EnumValue& rhs)const
+	{
+		if (!Element::DeepEquals(rhs)) {
+			return false;
+		}
+
+		return mValue == rhs.mValue;
+	}
+
 	std::string EnumValue::ToString(int indent)const
 	{
 		return BuildIndentString(indent) + mName + " = " + std::to_string(mValue) + " " + GetAttrString();
@@ -280,6 +355,29 @@ namespace refl
 	///////////////////////////////////////////////////////////
 	// Enum
 	///////////////////////////////////////////////////////////
+	
+	bool Enum::DeepEquals(const Enum& rhs)const
+	{
+		if (!Element::DeepEquals(rhs)) {
+			return false;
+		}
+
+		if (mValueTable.size() != rhs.mValueTable.size()) {
+			return false;
+		}
+
+		for (auto& value : mValueTable) {
+			if (rhs.mValueTable.find(value.first) == rhs.mValueTable.end()) {
+				return false;
+			}
+
+			if (value.second.DeepEquals(rhs.mValueTable.at(value.first))) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	std::string Enum::GetValueString(int enumValue, bool qualified)const
 	{
@@ -464,6 +562,15 @@ namespace refl
 		}
 	}
 
+	bool Registry::Export(const std::string& filename)const
+	{
+		return true;
+	}
+
+	bool Registry::Import(const std::string& filename)
+	{
+		return true;
+	}
 
 
 

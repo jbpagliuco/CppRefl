@@ -124,6 +124,7 @@
     <ClCompile Include="Source\Reflection.cpp" />
     <ClCompile Include="Source\ReflectionFunctionRegistration.cpp" />
     <ClCompile Include="Source\ReflectionGen.cpp" />
+    <ClCompile Include="Source\ReflectionTypes.cpp" />
     <ClCompile Include="Source\ReflectionUtil.cpp" />
   </ItemGroup>
   <ItemGroup>

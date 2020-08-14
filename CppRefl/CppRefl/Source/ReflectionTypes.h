@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace refl
 {
 	// All supported data types.
@@ -59,6 +61,10 @@ namespace refl
 		};
 
 	public:
+		// Checks for equality among every aspect of this element.
+		// NB: This is really only necessary for testing purposes.
+		bool DeepEquals(const TypeInfo& rhs)const;
+
 		// Is this type a string?
 		bool IsString()const { return mIsFixedArray && mDataType == DataType::INT8; }
 	};

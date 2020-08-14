@@ -76,6 +76,9 @@
     <ClCompile Include="Source\ReflectionFunctionRegistration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\ReflectionTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Vendor\libClang\Lib\libclang.lib" />
