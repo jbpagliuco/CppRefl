@@ -2,10 +2,12 @@
 
 #include <string>
 
+#include "ReflectionMarkup.h"
+
 namespace refl
 {
 	// All supported data types.
-	enum class DataType
+	enum class REFLECTED DataType
 	{
 		INVALID = 0,
 
@@ -35,6 +37,9 @@ namespace refl
 	class TypeInfo
 	{
 	public:
+		static TypeInfo INVALID;
+
+	public:
 		// Data type.
 		DataType mDataType = DataType::INVALID;
 		
@@ -50,22 +55,19 @@ namespace refl
 		// Underlying enum type, if this type is an enum.
 		std::string mEnumType;
 
-		struct {
-			// Is this field const?
-			bool mIsConst : 1;
-			// Is thie field a pointer?
-			bool mIsPointer : 1;
-
-			// Is this field a fixed-sized array?
-			bool mIsFixedArray : 1;
-		};
+		// Is this field const?
+		bool mIsConst;
+		// Is thie field a pointer?
+		bool mIsPointer;
 
 	public:
 		// Checks for equality among every aspect of this element.
 		// NB: This is really only necessary for testing purposes.
 		bool DeepEquals(const TypeInfo& rhs)const;
 
+		bool IsArray()const { return mArraySize != -1; }
+
 		// Is this type a string?
-		bool IsString()const { return mIsFixedArray && mDataType == DataType::INT8; }
+		bool IsString()const { return IsArray() && mDataType == DataType::INT8; }
 	};
 }

@@ -2,6 +2,8 @@
 
 namespace refl
 {
+	TypeInfo TypeInfo::INVALID;
+
 	bool TypeInfo::DeepEquals(const TypeInfo& rhs)const
 	{
 		return mDataType == rhs.mDataType &&
@@ -10,7 +12,6 @@ namespace refl
 			mClassType == rhs.mClassType &&
 			mEnumType == rhs.mEnumType &&
 			mIsConst == rhs.mIsConst &&
-			mIsPointer == rhs.mIsPointer &&
-			mIsFixedArray == rhs.mIsFixedArray;
+			mIsPointer == rhs.mIsPointer;
 	}
 }

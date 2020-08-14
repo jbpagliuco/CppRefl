@@ -100,7 +100,7 @@ namespace refl
 		// Is this field a string?
 		bool IsString()const { return mTypeInfo.IsString(); }
 		// Is this field an array?
-		bool IsFixedSizeArray()const { return mTypeInfo.mIsFixedArray; }
+		bool IsArray()const { return mTypeInfo.IsArray(); }
 
 	public:
 		// Invaild reference to a Field.

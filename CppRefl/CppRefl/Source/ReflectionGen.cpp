@@ -375,8 +375,7 @@ namespace refl
 		}
 
 		// Fixed size arrays
-		typeInfo.mIsFixedArray = cursorType.kind == CXType_ConstantArray;
-		if (typeInfo.mIsFixedArray) {
+		if (cursorType.kind == CXType_ConstantArray) {
 			typeInfo.mArraySize = clang_getArraySize(cursorType);
 		}
 
