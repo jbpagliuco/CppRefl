@@ -10,6 +10,7 @@ namespace refl
 	void RaiseErrorInternal(ErrorType errorType, const char* file, int line, const char* fmt, ...)
 	{
 		if (CustomErrorHandler == nullptr) {
+			__debugbreak();
 			return;
 		}
 

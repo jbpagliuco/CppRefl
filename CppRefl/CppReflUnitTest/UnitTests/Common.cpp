@@ -8,6 +8,7 @@
 
 static void CppReflErrorHandler(refl::ErrorType errorType, const char* message, const char* file, int line)
 {
+	__debugbreak();
 	EXPECT_TRUE(false);
 	printf("CppRefl Error: %s (%d)\n", file, line);
 	printf("\t%s\n\n", message);

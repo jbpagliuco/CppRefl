@@ -78,6 +78,11 @@ namespace refl
 		// Is this field a primitive type?
 		bool IsPrimitive()const { return !IsClassType() && !IsEnumType(); };
 
+		// Returns this field's class type, if it is a class.
+		const class Class& GetClass()const;
+		// Returns this field's enum type, if it is a class.
+		const class Enum& GetEnum()const;
+
 		// Is this field const?
 		bool IsConst()const { return mTypeInfo.mIsConst; }
 		// Is this field a pointer?

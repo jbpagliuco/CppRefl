@@ -68,6 +68,17 @@ struct REFLECTED TestStruct
 	struct {
 		bool mBoolInUnamedStruct		REFLECTED;
 	};
+
+	struct REFLECTED NestedStructDefinition {
+		int mIntInNamedStruct			REFLECTED;
+	};
+	NestedStructDefinition mNestedNamedStruct REFLECTED;
+
+	enum class REFLECTED NestedEnumDefinition : int8_t {
+		NV1 REFLECTED,
+		NV2 REFLECTED
+	};
+	NestedEnumDefinition mNestedEnum	REFLECTED;
 };
 
 class REFLECTED TestClass

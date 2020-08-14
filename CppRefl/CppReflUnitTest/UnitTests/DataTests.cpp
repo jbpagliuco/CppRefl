@@ -140,6 +140,28 @@ TEST_F(DataTest, TestFieldDataTypes)
 		EXPECT_TRUE(stringField.IsFixedSizeArray());
 		EXPECT_TRUE(stringField.IsString());
 	}
+
+	// Nested named struct
+	{
+		const refl::Field& structField = reflClass.GetField("mNestedNamedStruct");
+		testCommon(structField, refl::DataType::CLASS);
+		EXPECT_FALSE(structField.IsEnumType());
+
+		const refl::Class& structClass = structField.GetClass();
+		const refl::Field& innerField = structClass.GetField("mIntInNamedStruct");
+		EXPECT_NE(innerField, refl::Field::INVALID);
+		EXPECT_EQ(innerField.mTypeInfo.mDataType, refl::DataType::INT32);
+		EXPECT_EQ(innerField.mQualifiedName, std::string("TestStruct::NestedStructDefinition::") + innerField.mName);
+	}
+
+	// Nested enum
+	{
+		const refl::Field& enumField = reflClass.GetField("mNestedEnum");
+		testCommon(enumField, refl::DataType::INT8);
+		EXPECT_TRUE(enumField.IsEnumType());
+
+		EXPECT_EQ(enumField.GetEnum().mValueTable.size(), 2);
+	}
 }
 
 TEST_F(DataTest, TestFieldDataSizes)
@@ -177,6 +199,9 @@ TEST_F(DataTest, TestFieldDataSizes)
 	TEST_SIZE(mNamespacedStruct);
 
 	TEST_SIZE(mBoolInUnamedStruct);
+
+	TEST_SIZE(mNestedNamedStruct);
+	TEST_SIZE(mNestedEnum);
 
 	#undef TEST_SIZE
 
@@ -236,6 +261,9 @@ TEST_F(DataTest, TestFieldDataOffsets)
 
 	TEST_OFFSET(mBoolInUnamedStruct);
 
+	TEST_OFFSET(mNestedNamedStruct);
+	TEST_OFFSET(mNestedEnum);
+
 #undef TEST_OFFSET
 }
 
@@ -258,7 +286,7 @@ TEST_F(DataTest, TestClassInfo)
 
 	EXPECT_EQ(reflClass.mQualifiedName, "TestStruct");
 
-	EXPECT_EQ(reflClass.mFields.size(), 22);
+	EXPECT_EQ(reflClass.mFields.size(), 24);
 	EXPECT_EQ(reflClass.mFunctions.size(), 0);
 }
 
@@ -310,6 +338,8 @@ TEST_F(DataTest, TestDataAccess)
 	}
 	strncpy_s(testData.mFixedSizeString, "cool data smile", sizeof(testData.mFixedSizeString));
 	testData.mBoolInUnamedStruct = true;
+	testData.mNestedNamedStruct.mIntInNamedStruct = 34;
+	testData.mNestedEnum = TestStruct::NestedEnumDefinition::NV2;
 
 	#define TEST_DATA(var) EXPECT_EQ(*(reflClass.GetField(#var).GetDataPtr<decltype(TestStruct::var)>(&testData)), testData.var)
 
@@ -329,6 +359,7 @@ TEST_F(DataTest, TestDataAccess)
 	TEST_DATA(mIntWithAttrs);
 	TEST_DATA(mEnum);
 	TEST_DATA(mBoolInUnamedStruct);
+	TEST_DATA(mNestedEnum);
 
 	#undef TEST_DATA
 
@@ -377,5 +408,16 @@ TEST_F(DataTest, TestDataAccess)
 		char* str = field.GetString(&testData);
 		EXPECT_EQ(strcmp(str, testData.mFixedSizeString), 0);
 		EXPECT_EQ(strlen(str), strlen(testData.mFixedSizeString));
+	}
+
+	// Named nested struct
+	{
+		const refl::Field& field = reflClass.GetField("mNestedNamedStruct");
+		EXPECT_NE(field, refl::Field::INVALID);
+
+		void* nestedClassData = field.GetRawDataPtr(&testData);
+
+		const refl::Class& nestedClass = field.GetClass();
+		EXPECT_EQ(*nestedClass.GetField("mIntInNamedStruct").GetDataPtr<int>(nestedClassData), testData.mNestedNamedStruct.mIntInNamedStruct);
 	}
 }

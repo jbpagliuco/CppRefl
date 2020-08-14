@@ -26,10 +26,10 @@ namespace refl
 		bool ReflectFunction(Function& reflFunction, CXCursor cursor, bool isMemberFunction);
 
 		bool ReflectClassMembers(Class& reflClass, CXCursor classCursor, std::vector<CXCursor> memberCursors);
-		bool ReflectClass(Class& reflClass, CXCursor cursor);
+		Class ReflectClass(CXCursor cursor);
 
 		bool ReflectEnumValue(EnumValue& reflEnumValue, CXCursor cursor);
-		bool ReflectEnum(Enum& reflEnum, CXCursor cursor);
+		Enum ReflectEnum(CXCursor cursor);
 
 	private:
 		GenerationParameters mParams;
@@ -537,11 +537,22 @@ namespace refl
 					if (!ReflectClassMembers(reflClass, classCursor, CollectTopLevelChildren(memberCursor))) {
 						return false;
 					}
+					continue;
 				}
 				else {
-					REFL_INTERNAL_RAISE_ERROR("TODO: Cannot reflect nested named structs.");
+					Class nestedClassDefinition = ReflectClass(memberCursor);
+					if (nestedClassDefinition == Class::INVALID) {
+						return false;
+					}
+					continue;
+				}
+			}
+			else if (memberCursor.kind == CXCursor_EnumDecl) {
+				Enum reflEnum = ReflectEnum(memberCursor);
+				if (reflEnum == Enum::INVALID) {
 					return false;
 				}
+				continue;
 			}
 
 			// Don't reflect stuff we're not supposed to.
@@ -561,24 +572,35 @@ namespace refl
 					reflClass.mFunctions.push_back(reflFunction);
 				}
 			}
+			else {
+				REFL_INTERNAL_RAISE_ERROR("Unhandled cursor type: %d", (int)memberCursor.kind);
+			}
 		}
 
 		return true;
 	}
 
 	// Reflects a class/struct/record.
-	bool RegistryGenerator::ReflectClass(Class& reflClass, CXCursor cursor)
+	Class RegistryGenerator::ReflectClass(CXCursor cursor)
 	{
+		Class reflClass;
+
 		// Reflect common properties for any reflected element.
 		if (!ReflectElement(reflClass, cursor)) {
-			return false;
+			return Class::INVALID;
 		}
 
 		// Class size
 		reflClass.mSize = clang_Type_getSizeOf(clang_getCursorType(cursor));
 
 		// Collect all fields and functions in this class.
-		return ReflectClassMembers(reflClass, cursor, CollectTopLevelChildren(cursor));
+		if (!ReflectClassMembers(reflClass, cursor, CollectTopLevelChildren(cursor))) {
+			return Class::INVALID;
+		}
+
+		mRegistry->RegisterClass(reflClass);
+
+		return reflClass;
 	}
 
 	bool RegistryGenerator::ReflectEnumValue(EnumValue& reflEnumValue, CXCursor cursor)
@@ -594,11 +616,13 @@ namespace refl
 	}
 
 	// Reflects an enum.
-	bool RegistryGenerator::ReflectEnum(Enum& reflEnum, CXCursor cursor)
+	Enum RegistryGenerator::ReflectEnum(CXCursor cursor)
 	{
+		Enum reflEnum;
+
 		// Reflect common properties for any reflected element.
 		if (!ReflectElement(reflEnum, cursor)) {
-			return false;
+			return Enum::INVALID;
 		}
 
 		// Gather info about each value in this enum.
@@ -611,7 +635,9 @@ namespace refl
 			}
 		}
 
-		return true;
+		mRegistry->RegisterEnum(reflEnum);
+
+		return reflEnum;
 	}
 
 	bool RegistryGenerator::BuildReflection(CXCursor cursor)
@@ -647,19 +673,13 @@ namespace refl
 			case CXCursorKind::CXCursor_ClassDecl:
 			case CXCursorKind::CXCursor_StructDecl:
 			{
-				Class reflClass;
-				if (ReflectClass(reflClass, child)) {
-					mRegistry->RegisterClass(reflClass);
-				}
+				ReflectClass(child);
 				break;
 			}
 
 			case CXCursorKind::CXCursor_EnumDecl:
 			{
-				Enum reflEnum;
-				if (ReflectEnum(reflEnum, child)) {
-					mRegistry->RegisterEnum(reflEnum);
-				}
+				ReflectEnum(child);
 				break;
 			}
 

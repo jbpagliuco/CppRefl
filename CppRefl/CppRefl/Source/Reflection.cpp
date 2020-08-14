@@ -94,6 +94,26 @@ namespace refl
 		return GetDataPtr<char>(obj);
 	}
 
+	const Class& Field::GetClass()const
+	{
+		if (!IsClassType()) {
+			REFL_INTERNAL_RAISE_ERROR("Tried to get class type of a non-class field [%s].", mQualifiedName);
+			return Class::INVALID;
+		}
+
+		return mRegistry->GetClass(mTypeInfo.mClassType);
+	}
+
+	const Enum& Field::GetEnum()const
+	{
+		if (!IsEnumType()) {
+			REFL_INTERNAL_RAISE_ERROR("Tried to get enum type of a non-enum field [%s].", mQualifiedName);
+			return Enum::INVALID;
+		}
+
+		return mRegistry->GetEnum(mTypeInfo.mEnumType);
+	}
+
 
 	std::string Field::ToString(int indent)const
 	{
