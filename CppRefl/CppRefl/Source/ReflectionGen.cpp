@@ -18,7 +18,7 @@ namespace refl
 		bool BuildReflection(CXCursor cursor);
 
 		bool ShouldReflectCursor(CXCursor cursor);
-		bool BuildTypeInfo(TypeInfo& typeInfo, int &stdOffset, CXCursor cursor);
+		bool BuildTypeInfo(TypeInfo& typeInfo, int &stdOffset, CXType cursorType);
 
 		bool ReflectElement(Element& reflElement, CXCursor cursor);
 
@@ -125,11 +125,6 @@ namespace refl
 	// e.g. translate pointers to pointees, typedefs to underlying type, arrays to element types
 	static CXType GetRealDataType(CXType type)
 	{
-		// Do typedef translation
-		if (type.kind == CXType_Typedef) {
-			type = clang_getCanonicalType(type);
-		}
-
 		// Get pointee type for pointers
 		const CXType pointeeType = clang_getPointeeType(type);
 		if (pointeeType.kind != CXType_Invalid) {
@@ -140,6 +135,11 @@ namespace refl
 		const CXType arrayElementType = clang_getArrayElementType(type);
 		if (arrayElementType.kind != CXType_Invalid) {
 			type = arrayElementType;
+		}
+
+		// Do typedef translation
+		if (type.kind == CXType_Typedef) {
+			type = clang_getCanonicalType(type);
 		}
 
 		// See if this cursor can be translated into a different decl
@@ -177,14 +177,22 @@ namespace refl
 			{ CXType_Float,			DataType::FLOAT },
 			{ CXType_Double,		DataType::DOUBLE },
 			{ CXType_LongDouble,	DataType::LONG_DOUBLE },
-			{ CXType_Void,			DataType::VOID }
+			{ CXType_Void,			DataType::VOID },
+			{ CXType_Record,		DataType::CLASS },
 		};
 
 		type = GetRealDataType(type);
 
+		const CXCursor typeDeclaration = clang_getTypeDeclaration(type);
+
 		// Unions would show up as a record type, so let's make extra sure that we're dealing with a union here.
-		if (clang_getTypeDeclaration(type).kind == CXCursor_UnionDecl) {
-			return DataType::UNION;
+		if (typeDeclaration.kind != CXCursor_NoDeclFound) {
+			if (typeDeclaration.kind == CXCursor_UnionDecl) {
+				return DataType::UNION;
+			}
+			else if (typeDeclaration.kind == CXCursor_StructDecl || typeDeclaration.kind == CXCursor_ClassDecl) {
+				return DataType::CLASS;
+			}
 		}
 
 		// Recognized type?
@@ -198,18 +206,7 @@ namespace refl
 	// Maps clang cursor types to Type's.
 	static DataType GetDataTypeFromClang(CXCursor cursor)
 	{
-		const CXType cxType = GetRealDataType(clang_getCursorType(cursor));
-
-		// See if this cursor can be translated into a different decl
-		CXCursor translatedCursor = clang_getTypeDeclaration(cxType);
-		if (translatedCursor.kind != CXCursor_NoDeclFound) {
-			// Is this a record decl?
-			if (translatedCursor.kind == CXCursor_StructDecl || translatedCursor.kind == CXCursor_ClassDecl) {
-				return DataType::CLASS;
-			}
-		}
-
-		return GetDataTypeFromClang(cxType);
+		return GetDataTypeFromClang(clang_getCursorType(cursor));
 	}
 
 	static size_t GetStdClassSize(CXCursor cursor, CompilerType target)
@@ -224,7 +221,8 @@ namespace refl
 		};
 
 		const SizeMap msvcSizes = {
-			{ "std::string", 40 }
+			{ "std::string", 40 },
+			{ "std::vector", 32 }
 		};
 
 		const std::map<CompilerType, SizeMap> compilerSizes = {
@@ -390,13 +388,12 @@ namespace refl
 		return false;
 	}
 	
-	bool RegistryGenerator::BuildTypeInfo(TypeInfo& typeInfo, int& stdOffset, CXCursor cursor)
+	bool RegistryGenerator::BuildTypeInfo(TypeInfo& typeInfo, int& stdOffset, CXType cursorType)
 	{
-		const CXType cursorType = clang_getCursorType(cursor);
 		const CXType realDataType = GetRealDataType(cursorType);
 
 		// Type/Size
-		typeInfo.mDataType = GetDataTypeFromClang(cursor);
+		typeInfo.mDataType = GetDataTypeFromClang(realDataType);
 		typeInfo.mSize = clang_Type_getSizeOf(realDataType);
 
 		// Const
@@ -438,14 +435,14 @@ namespace refl
 
 			// Special container types
 			bool handled = false;
-			if (typeDeclarationQName == "std::string")
-			{
+			if (typeDeclarationQName == "std::string") {
 				handled = true;
-
-				typeInfo.mDataType = DataType::CLASS;
 				typeInfo.IsDynamic = true;
 			}
-
+			else {
+				handled = true;
+				typeInfo.IsDynamic = true;
+			}
 
 			if (handled) {
 				// Fill out some common fields
@@ -454,6 +451,7 @@ namespace refl
 				stdOffset = (int)realSize - (int)clangSize;
 				typeInfo.mSize = realSize;
 
+				typeInfo.mDataType = DataType::CLASS;
 				typeInfo.mClassType = typeDeclarationQName;
 			}
 			else {
@@ -461,17 +459,26 @@ namespace refl
 				REFL_INTERNAL_RAISE_ERROR("Unrecognized class type from the std namespace [%s].", typeDeclarationQName.c_str());
 				return false;
 			}
+		}
 
-			//if (typeDeclarationQName == "std::vector")
-			//{
-			//	// typeInfo.mIsArray = true;
-			//	typeInfo.mClassType = typeDeclarationQName;
+		// Gather all templated types
+		for (int i = 0; i < clang_Type_getNumTemplateArguments(cursorType); ++i) {
+			const CXType templateType = clang_Type_getTemplateArgumentAsType(cursorType, i);
+			const CXCursor templateCursor = clang_getTypeDeclaration(templateType);
 
-			//	// Get the vector element type
-			//	CXType elementType = clang_Type_getTemplateArgumentAsType(cursorType, 0);
-			//	typeInfo.mDataType = GetDataTypeFromClang(elementType);
-			//	typeInfo.mSize = clang_Type_getSizeOf(elementType);
-			//}
+			// Don't reflect built-in std templated types.
+			if (GetFullyQualifiedCursorName(templateCursor).rfind("std::") == 0) {
+				continue;
+			}
+			
+			TypeInfo templateTypeInfo;
+			int temp;
+			if (BuildTypeInfo(templateTypeInfo, temp, templateType)) {
+				typeInfo.mTemplateTypes.push_back(templateTypeInfo);
+			}
+			else {
+				return false;
+			}
 		}
 
 		return true;
@@ -532,7 +539,7 @@ namespace refl
 
 		// Build type info
 		int compilerOffset = 0;
-		if (!BuildTypeInfo(reflField.mTypeInfo, compilerOffset, cursor)) {
+		if (!BuildTypeInfo(reflField.mTypeInfo, compilerOffset, fieldType)) {
 			return false;
 		}
 
@@ -572,11 +579,12 @@ namespace refl
 			return false;
 		}
 		for (int i = 0; i < numParams; ++i) {
-			CXCursor paramCursor = clang_Cursor_getArgument(cursor, i);
-			
+			const CXCursor paramCursor = clang_Cursor_getArgument(cursor, i);
+			const CXType paramType = clang_getCursorType(paramCursor);
+
 			TypeInfo paramTypeInfo;
 			int nudge;
-			if (BuildTypeInfo(paramTypeInfo, nudge, paramCursor)) {
+			if (BuildTypeInfo(paramTypeInfo, nudge, paramType)) {
 				reflFunction.mParameterTypes.push_back(paramTypeInfo);
 			}
 		}

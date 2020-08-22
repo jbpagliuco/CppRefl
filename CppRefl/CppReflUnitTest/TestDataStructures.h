@@ -87,6 +87,7 @@ struct REFLECTED TestStruct
 	NestedUnionDefinition mUnion		REFLECTED;
 
 	std::string mStdString				REFLECTED;
+	std::vector<int> mVectorOfInts		REFLECTED;
 };
 
 class REFLECTED TestClass

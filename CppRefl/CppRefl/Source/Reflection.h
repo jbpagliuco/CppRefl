@@ -114,6 +114,9 @@ namespace refl
 		// Is this field a dynamic string? (i.e. std::string)
 		bool IsDynamicString()const { return mTypeInfo.IsDynamicString(); }
 
+		// Is this field templated?
+		bool IsTemplated()const { return mTypeInfo.IsTemplated(); }
+
 	public:
 		// Invaild reference to a Field.
 		static Field INVALID;

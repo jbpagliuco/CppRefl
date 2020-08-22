@@ -182,6 +182,17 @@ TEST_F(DataTest, TestFieldDataTypes)
 		EXPECT_EQ(field.mTypeInfo.mClassType, "std::string");
 		EXPECT_TRUE(field.IsDynamicString());
 	}
+
+	// std::vector
+	{
+		const refl::Field& field = reflClass.GetField("mVectorOfInts");
+		testCommon(field, refl::DataType::CLASS);
+		EXPECT_EQ(field.mTypeInfo.mClassType, "std::vector");
+		EXPECT_TRUE(field.IsDynamicArray());
+		EXPECT_TRUE(field.IsTemplated());
+		EXPECT_EQ(field.mTypeInfo.mTemplateTypes.size(), 1);
+		EXPECT_EQ(field.mTypeInfo.mTemplateTypes[0].mDataType, refl::DataType::INT32);
+	}
 }
 
 TEST_F(DataTest, TestFieldDataSizes)
@@ -226,6 +237,7 @@ TEST_F(DataTest, TestFieldDataSizes)
 	TEST_SIZE(mUnion);
 
 	TEST_SIZE(mStdString);
+	TEST_SIZE(mVectorOfInts);
 
 	#undef TEST_SIZE
 
@@ -291,6 +303,7 @@ TEST_F(DataTest, TestFieldDataOffsets)
 	TEST_OFFSET(mUnion);
 
 	TEST_OFFSET(mStdString);
+	TEST_OFFSET(mVectorOfInts);
 
 #undef TEST_OFFSET
 }
@@ -314,7 +327,7 @@ TEST_F(DataTest, TestClassInfo)
 
 	EXPECT_EQ(reflClass.mQualifiedName, "TestStruct");
 
-	EXPECT_EQ(reflClass.mFields.size(), 26);
+	EXPECT_EQ(reflClass.mFields.size(), 27);
 	EXPECT_EQ(reflClass.mFunctions.size(), 0);
 }
 
@@ -370,6 +383,7 @@ TEST_F(DataTest, TestDataAccess)
 	testData.mNestedEnum = TestStruct::NestedEnumDefinition::NV2;
 	testData.mUnion.mInt = 1;
 	testData.mStdString = "i am an std::string";
+	testData.mVectorOfInts = { 1, 3, 5, 7 };
 
 	#define TEST_DATA(var) EXPECT_EQ(*(reflClass.GetField(#var).GetDataPtr<decltype(TestStruct::var)>(&testData)), testData.var)
 
@@ -470,5 +484,15 @@ TEST_F(DataTest, TestDataAccess)
 		
 		std::string* string = field.GetDataPtr<std::string>(&testData);
 		EXPECT_EQ(*string, testData.mStdString);
+	}
+
+	// std::vector
+	{
+		const refl::Field& field = reflClass.GetField("mVectorOfInts");
+		EXPECT_NE(field, refl::Field::INVALID);
+
+		std::vector<int>* vector = field.GetDataPtr<std::vector<int>>(&testData);
+		EXPECT_EQ(vector->size(), testData.mVectorOfInts.size());
+		EXPECT_TRUE(std::equal(vector->begin(), vector->end(), testData.mVectorOfInts.begin()));
 	}
 }

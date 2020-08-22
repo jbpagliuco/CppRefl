@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "ReflectionMarkup.h"
 
@@ -63,6 +64,9 @@ namespace refl
 		// Is this type a dynamic array/string?
 		bool IsDynamic = false;
 
+		// All templated types
+		std::vector<TypeInfo> mTemplateTypes;
+
 	public:
 		// Checks for equality among every aspect of this element.
 		// NB: This is really only necessary for testing purposes.
@@ -71,11 +75,14 @@ namespace refl
 		// Is this type a fixed sized array?
 		bool IsFixedArray()const { return mArraySize != -1; }
 		// Is this type a dynamic array?
-		bool IsDynamicArray()const { return IsDynamic; }
+		bool IsDynamicArray()const { return mClassType == "std::vector"; }
 
 		// Is this type a fixed sized string?
 		bool IsFixedString()const { return IsFixedArray() && mDataType == DataType::INT8; }
 		// Is this type a dynamic string?
 		bool IsDynamicString()const { return mClassType == "std::string"; }
+
+		// Is this type a templated type?
+		bool IsTemplated()const { return !mTemplateTypes.empty(); }
 	};
 }
