@@ -61,9 +61,11 @@ void CreateRegistry(refl::Registry &registry)
 
 	refl::GenerationParameters params;
 	params.mInputFilepath = entryPointPath.string();
+	params.mTargetCompiler = refl::CompilerType::MSVC;
 	params.mClangArgs = GetClangArgs();
 	params.mIncludePaths.push_back(reflIncludePath.string());
 	params.mProjectPath = projectPath.string();
+	params.mDisableStdWarnings = true;
 
 	const bool success = refl::GenerateReflectionRegistry(registry, params);
 	ASSERT_TRUE(success);

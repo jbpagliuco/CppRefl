@@ -85,6 +85,8 @@ struct REFLECTED TestStruct
 		int mInt;
 	};
 	NestedUnionDefinition mUnion		REFLECTED;
+
+	std::string mStdString				REFLECTED;
 };
 
 class REFLECTED TestClass

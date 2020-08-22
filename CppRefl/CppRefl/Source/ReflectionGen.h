@@ -4,10 +4,22 @@
 
 namespace refl
 {
+	// List of compilers types.
+	// NB: This is mainly used for reflecting classes in the std namespace.
+	enum class CompilerType
+	{
+		INVALID = -1,
+		CLANG = 0,
+		MSVC
+	};
+
 	struct GenerationParameters
 	{
 		// .CPP file used to compile reflection.
 		std::string mInputFilepath;
+
+		// Target compiler (needed when reflected classes in the std namespace).
+		CompilerType mTargetCompiler = CompilerType::INVALID;
 
 		// [Optional] Command-line arguments to pass to clang.
 		std::vector<std::string> mClangArgs;

@@ -18,14 +18,14 @@ namespace refl
 		bool BuildReflection(CXCursor cursor);
 
 		bool ShouldReflectCursor(CXCursor cursor);
-		bool BuildTypeInfo(TypeInfo& typeInfo, CXCursor cursor);
+		bool BuildTypeInfo(TypeInfo& typeInfo, int &compilerOffset, CXCursor cursor);
 
 		bool ReflectElement(Element& reflElement, CXCursor cursor);
 
-		bool ReflectField(Field& reflField, CXCursor cursor, CXCursor parent);
+		bool ReflectField(Field& reflField, int& internalFieldOffset, CXCursor cursor, CXCursor parent);
 		bool ReflectFunction(Function& reflFunction, CXCursor cursor, bool isMemberFunction);
 
-		bool ReflectClassMembers(Class& reflClass, CXCursor classCursor, std::vector<CXCursor> memberCursors);
+		bool ReflectClassMembers(Class& reflClass, int& internalFieldOffset, CXCursor classCursor, std::vector<CXCursor> memberCursors);
 		Class ReflectClass(CXCursor cursor);
 
 		bool ReflectEnumValue(EnumValue& reflEnumValue, CXCursor cursor);
@@ -212,6 +212,41 @@ namespace refl
 		return GetDataTypeFromClang(cxType);
 	}
 
+	static size_t GetStdClassSize(CXCursor cursor, CompilerType target)
+	{
+		const std::string className = GetFullyQualifiedCursorName(cursor);
+		
+		typedef std::map<std::string, size_t> SizeMap;
+		
+		// Don't actually have to hardcode clang
+		const SizeMap clangSizes = {
+			{ className, clang_Type_getSizeOf(clang_getCursorType(cursor)) }
+		};
+
+		const SizeMap msvcSizes = {
+			{ "std::string", 40 }
+		};
+
+		const std::map<CompilerType, SizeMap> compilerSizes = {
+			{ CompilerType::CLANG, clangSizes },
+			{ CompilerType::MSVC, msvcSizes }
+		};
+
+		//////////////////////////////////////////////////////////////////
+
+		if (compilerSizes.find(target) == compilerSizes.end()) {
+			REFL_INTERNAL_RAISE_ERROR("Unknown compiler type (%d) found when determining size of class [%s]", (int)target, className.c_str());
+			return -1;
+		}
+
+		if (compilerSizes.at(target).find(className) == compilerSizes.at(target).end()) {
+			REFL_INTERNAL_RAISE_ERROR("Unhandled class type [%s] for compiler (%d)", className.c_str(), (int)target);
+			return -1;
+		}
+
+		return compilerSizes.at(target).at(className);
+	}
+
 	//////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////
@@ -355,9 +390,9 @@ namespace refl
 		return false;
 	}
 	
-	bool RegistryGenerator::BuildTypeInfo(TypeInfo& typeInfo, CXCursor cursor)
+	bool RegistryGenerator::BuildTypeInfo(TypeInfo& typeInfo, int& compilerOffset, CXCursor cursor)
 	{
-		CXType cursorType = clang_getCursorType(cursor);
+		const CXType cursorType = clang_getCursorType(cursor);
 		const CXType realDataType = GetRealDataType(cursorType);
 
 		// Type/Size
@@ -399,23 +434,44 @@ namespace refl
 					typeDeclarationQName.c_str());
 			}
 
-			// Special container types
-			if (typeDeclarationQName == "std::vector")
-			{
-				// typeInfo.mIsArray = true;
-				typeInfo.mClassType = typeDeclarationQName;
+			// Nevertheless, try to support std classes when possible.
 
-				// Get the vector element type
-				CXType elementType = clang_Type_getTemplateArgumentAsType(cursorType, 0);
-				typeInfo.mDataType = GetDataTypeFromClang(elementType);
-				typeInfo.mSize = clang_Type_getSizeOf(elementType);
-			}
-			else
+			// Special container types
+			bool handled = false;
+			if (typeDeclarationQName == "std::string")
 			{
+				handled = true;
+
+				typeInfo.mDataType = DataType::CLASS;
+				typeInfo.IsDynamic = true;
+			}
+
+
+			if (handled) {
+				// Fill out some common fields
+				const size_t clangSize = GetStdClassSize(typeDeclaration, CompilerType::CLANG);
+				const size_t realSize = GetStdClassSize(typeDeclaration, mParams.mTargetCompiler);
+				compilerOffset = (int)realSize - (int)clangSize;
+				typeInfo.mSize = realSize;
+
+				typeInfo.mClassType = typeDeclarationQName;
+			}
+			else {
 				// Always raise warnings about these. Either they must be supported, or some other non-std class must be used.
 				REFL_INTERNAL_RAISE_ERROR("Unrecognized class type from the std namespace [%s].", typeDeclarationQName.c_str());
 				return false;
 			}
+
+			//if (typeDeclarationQName == "std::vector")
+			//{
+			//	// typeInfo.mIsArray = true;
+			//	typeInfo.mClassType = typeDeclarationQName;
+
+			//	// Get the vector element type
+			//	CXType elementType = clang_Type_getTemplateArgumentAsType(cursorType, 0);
+			//	typeInfo.mDataType = GetDataTypeFromClang(elementType);
+			//	typeInfo.mSize = clang_Type_getSizeOf(elementType);
+			//}
 		}
 
 		return true;
@@ -464,7 +520,7 @@ namespace refl
 	}
 
 	// Reflects a field within a record.
-	bool RegistryGenerator::ReflectField(Field& reflField, CXCursor cursor, CXCursor parent)
+	bool RegistryGenerator::ReflectField(Field& reflField, int& internalFieldOffset, CXCursor cursor, CXCursor parent)
 	{
 		// Reflect common properties for any reflected element.
 		if (!ReflectElement(reflField, cursor)) {
@@ -475,7 +531,8 @@ namespace refl
 		const CXType fieldType = clang_getCursorType(cursor);
 
 		// Build type info
-		if (!BuildTypeInfo(reflField.mTypeInfo, cursor)) {
+		int compilerOffset = 0;
+		if (!BuildTypeInfo(reflField.mTypeInfo, compilerOffset, cursor)) {
 			return false;
 		}
 
@@ -486,7 +543,8 @@ namespace refl
 			REFL_INTERNAL_RAISE_ERROR("Field [%s] has a bit offset not divisible by 8. This must be resolved internally.", reflField.mQualifiedName.c_str());
 			return false;
 		}
-		reflField.mOffset = offsetBits / 8;
+		reflField.mOffset = (offsetBits / 8) + internalFieldOffset;
+		internalFieldOffset += compilerOffset;
 
 		return true;
 	}
@@ -517,7 +575,8 @@ namespace refl
 			CXCursor paramCursor = clang_Cursor_getArgument(cursor, i);
 			
 			TypeInfo paramTypeInfo;
-			if (BuildTypeInfo(paramTypeInfo, paramCursor)) {
+			int nudge;
+			if (BuildTypeInfo(paramTypeInfo, nudge, paramCursor)) {
 				reflFunction.mParameterTypes.push_back(paramTypeInfo);
 			}
 		}
@@ -528,7 +587,7 @@ namespace refl
 	}
 
 	// Reflects a class/struct/record.
-	bool RegistryGenerator::ReflectClassMembers(Class& reflClass, CXCursor classCursor, std::vector<CXCursor> memberCursors)
+	bool RegistryGenerator::ReflectClassMembers(Class& reflClass,int& internalFieldOffset,  CXCursor classCursor, std::vector<CXCursor> memberCursors)
 	{
 		// Collect all fields and functions in this class.
 		for (auto memberCursor : memberCursors)
@@ -538,7 +597,7 @@ namespace refl
 				const std::string name = GetCursorName(memberCursor);
 				if (name == "") {
 					// This is an un-named struct. Reflect everything as-is.
-					if (!ReflectClassMembers(reflClass, classCursor, CollectTopLevelChildren(memberCursor))) {
+					if (!ReflectClassMembers(reflClass, internalFieldOffset, classCursor, CollectTopLevelChildren(memberCursor))) {
 						return false;
 					}
 					continue;
@@ -566,7 +625,7 @@ namespace refl
 
 			if (memberCursor.kind == CXCursor_FieldDecl) {
 				Field reflField;
-				if (ReflectField(reflField, memberCursor, classCursor)) {
+				if (ReflectField(reflField, internalFieldOffset, memberCursor, classCursor)) {
 					reflClass.mFields.push_back(reflField);
 				}
 			}
@@ -598,13 +657,14 @@ namespace refl
 			return Class::INVALID;
 		}
 
-		// Class size
-		reflClass.mSize = clang_Type_getSizeOf(clang_getCursorType(cursor));
-
 		// Collect all fields and functions in this class.
-		if (!ReflectClassMembers(reflClass, cursor, CollectTopLevelChildren(cursor))) {
+		int internalFieldOffset = 0;
+		if (!ReflectClassMembers(reflClass, internalFieldOffset, cursor, CollectTopLevelChildren(cursor))) {
 			return Class::INVALID;
 		}
+
+		// Class size
+		reflClass.mSize = clang_Type_getSizeOf(clang_getCursorType(cursor)) + internalFieldOffset;
 
 		mRegistry->RegisterClass(reflClass);
 

@@ -76,6 +76,6 @@ namespace refl
 		// Is this type a fixed sized string?
 		bool IsFixedString()const { return IsFixedArray() && mDataType == DataType::INT8; }
 		// Is this type a dynamic string?
-		bool IsDynamicString()const { return IsDynamicArray() && mDataType == DataType::INT8; }
+		bool IsDynamicString()const { return mClassType == "std::string"; }
 	};
 }

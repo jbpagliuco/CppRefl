@@ -174,6 +174,14 @@ TEST_F(DataTest, TestFieldDataTypes)
 		const refl::Field& unionField = reflClass.GetField("mUnion");
 		testCommon(unionField, refl::DataType::UNION);
 	}
+
+	// std::string
+	{
+		const refl::Field& field = reflClass.GetField("mStdString");
+		testCommon(field, refl::DataType::CLASS);
+		EXPECT_EQ(field.mTypeInfo.mClassType, "std::string");
+		EXPECT_TRUE(field.IsDynamicString());
+	}
 }
 
 TEST_F(DataTest, TestFieldDataSizes)
@@ -216,6 +224,8 @@ TEST_F(DataTest, TestFieldDataSizes)
 	TEST_SIZE(mNestedEnum);
 
 	TEST_SIZE(mUnion);
+
+	TEST_SIZE(mStdString);
 
 	#undef TEST_SIZE
 
@@ -280,6 +290,8 @@ TEST_F(DataTest, TestFieldDataOffsets)
 
 	TEST_OFFSET(mUnion);
 
+	TEST_OFFSET(mStdString);
+
 #undef TEST_OFFSET
 }
 
@@ -302,7 +314,7 @@ TEST_F(DataTest, TestClassInfo)
 
 	EXPECT_EQ(reflClass.mQualifiedName, "TestStruct");
 
-	EXPECT_EQ(reflClass.mFields.size(), 25);
+	EXPECT_EQ(reflClass.mFields.size(), 26);
 	EXPECT_EQ(reflClass.mFunctions.size(), 0);
 }
 
@@ -357,6 +369,7 @@ TEST_F(DataTest, TestDataAccess)
 	testData.mNestedNamedStruct.mIntInNamedStruct = 34;
 	testData.mNestedEnum = TestStruct::NestedEnumDefinition::NV2;
 	testData.mUnion.mInt = 1;
+	testData.mStdString = "i am an std::string";
 
 	#define TEST_DATA(var) EXPECT_EQ(*(reflClass.GetField(#var).GetDataPtr<decltype(TestStruct::var)>(&testData)), testData.var)
 
@@ -448,5 +461,14 @@ TEST_F(DataTest, TestDataAccess)
 
 		bool* unionDataAsBool = field.GetDataPtr<bool>(&testData);
 		EXPECT_EQ(*unionDataAsBool, testData.mUnion.mBool);
+	}
+
+	// std::string
+	{
+		const refl::Field& field = reflClass.GetField("mStdString");
+		EXPECT_NE(field, refl::Field::INVALID);
+		
+		std::string* string = field.GetDataPtr<std::string>(&testData);
+		EXPECT_EQ(*string, testData.mStdString);
 	}
 }
