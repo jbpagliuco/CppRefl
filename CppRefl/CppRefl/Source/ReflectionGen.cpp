@@ -31,6 +31,9 @@ namespace refl
 		bool ReflectEnumValue(EnumValue& reflEnumValue, CXCursor cursor);
 		Enum ReflectEnum(CXCursor cursor);
 
+		bool IsSupportedStdType(const std::string& className);
+		size_t GetStdClassSize(CXCursor cursor, bool targetSize);
+
 	private:
 		GenerationParameters mParams;
 		Registry* mRegistry = nullptr;
@@ -209,55 +212,6 @@ namespace refl
 		return GetDataTypeFromClang(clang_getCursorType(cursor));
 	}
 
-	static bool IsSupportedStdType(const std::string& className)
-	{
-		return 
-			className == "std::map" ||
-			className == "std::string" ||
-			className == "std::vector";
-	}
-
-	static size_t GetStdClassSize(CXCursor cursor, CompilerType target)
-	{
-		const std::string className = GetFullyQualifiedCursorName(cursor);
-		if (!IsSupportedStdType(className)) {
-			REFL_INTERNAL_RAISE_ERROR("Tried to reflect unsupported std class type [%s]", className.c_str());
-			return -1;
-		}
-		
-		typedef std::map<std::string, size_t> SizeMap;
-		
-		// Don't actually have to hardcode clang
-		const SizeMap clangSizes = {
-			{ className, clang_Type_getSizeOf(clang_getCursorType(cursor)) }
-		};
-
-		const SizeMap msvcSizes = {
-			{ "std::map", 24 },
-			{ "std::string", 40 },
-			{ "std::vector", 32 },
-		};
-
-		const std::map<CompilerType, SizeMap> compilerSizes = {
-			{ CompilerType::CLANG, clangSizes },
-			{ CompilerType::MSVC, msvcSizes }
-		};
-
-		//////////////////////////////////////////////////////////////////
-
-		if (compilerSizes.find(target) == compilerSizes.end()) {
-			REFL_INTERNAL_RAISE_ERROR("Unknown compiler type (%d) found when determining size of class [%s]", (int)target, className.c_str());
-			return -1;
-		}
-
-		if (compilerSizes.at(target).find(className) == compilerSizes.at(target).end()) {
-			REFL_INTERNAL_RAISE_ERROR("Unhandled class type [%s] for compiler (%d)", className.c_str(), (int)target);
-			return -1;
-		}
-
-		return compilerSizes.at(target).at(className);
-	}
-
 	//////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////
@@ -368,6 +322,29 @@ namespace refl
 	//////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////
+	
+	bool RegistryGenerator::IsSupportedStdType(const std::string& className)
+	{
+		return mParams.mStdClassSizes.find(className) != mParams.mStdClassSizes.end();
+	}
+
+	size_t RegistryGenerator::GetStdClassSize(CXCursor cursor, bool targetSize)
+	{
+		const std::string className = GetFullyQualifiedCursorName(cursor);
+		if (!IsSupportedStdType(className)) {
+			REFL_INTERNAL_RAISE_ERROR("Tried to reflect unsupported std class type [%s]", className.c_str());
+			return -1;
+		}
+
+		if (targetSize) {
+			// Return the size for the target compiler
+			return mParams.mStdClassSizes[className];
+		}
+		else {
+			// Return clang's size
+			return clang_Type_getSizeOf(clang_getCursorType(cursor));
+		}
+	}
 
 	bool RegistryGenerator::ShouldReflectCursor(CXCursor cursor)
 	{
@@ -459,8 +436,8 @@ namespace refl
 
 			if (handled) {
 				// Fill out some common fields
-				const size_t clangSize = GetStdClassSize(typeDeclaration, CompilerType::CLANG);
-				const size_t realSize = GetStdClassSize(typeDeclaration, mParams.mTargetCompiler);
+				const size_t clangSize = GetStdClassSize(typeDeclaration, false);
+				const size_t realSize = GetStdClassSize(typeDeclaration, true);
 				stdOffset = (int)realSize - (int)clangSize;
 				typeInfo.mSize = realSize;
 

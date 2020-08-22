@@ -61,11 +61,13 @@ void CreateRegistry(refl::Registry &registry)
 
 	refl::GenerationParameters params;
 	params.mInputFilepath = entryPointPath.string();
-	params.mTargetCompiler = refl::CompilerType::MSVC;
 	params.mClangArgs = GetClangArgs();
 	params.mIncludePaths.push_back(reflIncludePath.string());
 	params.mProjectPath = projectPath.string();
 	params.mDisableStdWarnings = true;
+	params.mStdClassSizes["std::map"] = sizeof(std::map<int, int>);
+	params.mStdClassSizes["std::string"] = sizeof(std::string);
+	params.mStdClassSizes["std::vector"] = sizeof(std::vector<int>);
 
 	const bool success = refl::GenerateReflectionRegistry(registry, params);
 	ASSERT_TRUE(success);
