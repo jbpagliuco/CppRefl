@@ -193,6 +193,18 @@ TEST_F(DataTest, TestFieldDataTypes)
 		EXPECT_EQ(field.mTypeInfo.mTemplateTypes.size(), 1);
 		EXPECT_EQ(field.mTypeInfo.mTemplateTypes[0].mDataType, refl::DataType::INT32);
 	}
+
+	// std::map
+	{
+		const refl::Field& field = reflClass.GetField("mMap");
+		testCommon(field, refl::DataType::CLASS);
+		EXPECT_EQ(field.mTypeInfo.mClassType, "std::map");
+		EXPECT_TRUE(field.IsTemplated());
+		EXPECT_EQ(field.mTypeInfo.mTemplateTypes.size(), 2);
+		EXPECT_EQ(field.mTypeInfo.mTemplateTypes[0].mDataType, refl::DataType::CLASS);
+		EXPECT_TRUE(field.mTypeInfo.mTemplateTypes[0].IsDynamicString());
+		EXPECT_EQ(field.mTypeInfo.mTemplateTypes[1].mDataType, refl::DataType::INT32);
+	}
 }
 
 TEST_F(DataTest, TestFieldDataSizes)
@@ -238,6 +250,7 @@ TEST_F(DataTest, TestFieldDataSizes)
 
 	TEST_SIZE(mStdString);
 	TEST_SIZE(mVectorOfInts);
+	TEST_SIZE(mMap);
 
 	#undef TEST_SIZE
 
@@ -304,6 +317,7 @@ TEST_F(DataTest, TestFieldDataOffsets)
 
 	TEST_OFFSET(mStdString);
 	TEST_OFFSET(mVectorOfInts);
+	TEST_OFFSET(mMap);
 
 #undef TEST_OFFSET
 }
@@ -327,7 +341,7 @@ TEST_F(DataTest, TestClassInfo)
 
 	EXPECT_EQ(reflClass.mQualifiedName, "TestStruct");
 
-	EXPECT_EQ(reflClass.mFields.size(), 27);
+	EXPECT_EQ(reflClass.mFields.size(), 28);
 	EXPECT_EQ(reflClass.mFunctions.size(), 0);
 }
 
@@ -384,6 +398,11 @@ TEST_F(DataTest, TestDataAccess)
 	testData.mUnion.mInt = 1;
 	testData.mStdString = "i am an std::string";
 	testData.mVectorOfInts = { 1, 3, 5, 7 };
+	testData.mMap = { 
+		{ "one", 1 },
+		{ "two", 2 },
+		{ "three", 3 }
+	};
 
 	#define TEST_DATA(var) EXPECT_EQ(*(reflClass.GetField(#var).GetDataPtr<decltype(TestStruct::var)>(&testData)), testData.var)
 
@@ -494,5 +513,15 @@ TEST_F(DataTest, TestDataAccess)
 		std::vector<int>* vector = field.GetDataPtr<std::vector<int>>(&testData);
 		EXPECT_EQ(vector->size(), testData.mVectorOfInts.size());
 		EXPECT_TRUE(std::equal(vector->begin(), vector->end(), testData.mVectorOfInts.begin()));
+	}
+
+	// std::vector
+	{
+		const refl::Field& field = reflClass.GetField("mMap");
+		EXPECT_NE(field, refl::Field::INVALID);
+
+		std::map<std::string, int>* map = field.GetDataPtr<std::map<std::string, int>>(&testData);
+		EXPECT_EQ(map->size(), testData.mMap.size());
+		EXPECT_TRUE(std::equal(map->begin(), map->end(), testData.mMap.begin()));
 	}
 }

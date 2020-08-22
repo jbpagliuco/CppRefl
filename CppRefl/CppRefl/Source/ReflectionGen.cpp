@@ -209,9 +209,21 @@ namespace refl
 		return GetDataTypeFromClang(clang_getCursorType(cursor));
 	}
 
+	static bool IsSupportedStdType(const std::string& className)
+	{
+		return 
+			className == "std::map" ||
+			className == "std::string" ||
+			className == "std::vector";
+	}
+
 	static size_t GetStdClassSize(CXCursor cursor, CompilerType target)
 	{
 		const std::string className = GetFullyQualifiedCursorName(cursor);
+		if (!IsSupportedStdType(className)) {
+			REFL_INTERNAL_RAISE_ERROR("Tried to reflect unsupported std class type [%s]", className.c_str());
+			return -1;
+		}
 		
 		typedef std::map<std::string, size_t> SizeMap;
 		
@@ -221,8 +233,9 @@ namespace refl
 		};
 
 		const SizeMap msvcSizes = {
+			{ "std::map", 24 },
 			{ "std::string", 40 },
-			{ "std::vector", 32 }
+			{ "std::vector", 32 },
 		};
 
 		const std::map<CompilerType, SizeMap> compilerSizes = {
@@ -467,7 +480,8 @@ namespace refl
 			const CXCursor templateCursor = clang_getTypeDeclaration(templateType);
 
 			// Don't reflect built-in std templated types.
-			if (GetFullyQualifiedCursorName(templateCursor).rfind("std::") == 0) {
+			const std::string name = GetFullyQualifiedCursorName(templateCursor);
+			if (name.rfind("std::") == 0 && !IsSupportedStdType(name)) {
 				continue;
 			}
 			

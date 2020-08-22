@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -88,6 +89,7 @@ struct REFLECTED TestStruct
 
 	std::string mStdString				REFLECTED;
 	std::vector<int> mVectorOfInts		REFLECTED;
+	std::map<std::string, int> mMap		REFLECTED;
 };
 
 class REFLECTED TestClass
