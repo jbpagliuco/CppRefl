@@ -18,14 +18,14 @@ namespace refl
 		bool BuildReflection(CXCursor cursor);
 
 		bool ShouldReflectCursor(CXCursor cursor);
-		bool BuildTypeInfo(TypeInfo& typeInfo, int &compilerOffset, CXCursor cursor);
+		bool BuildTypeInfo(TypeInfo& typeInfo, int &stdOffset, CXCursor cursor);
 
 		bool ReflectElement(Element& reflElement, CXCursor cursor);
 
-		bool ReflectField(Field& reflField, int& internalFieldOffset, CXCursor cursor, CXCursor parent);
+		bool ReflectField(Field& reflField, int& stdFieldOffset, CXCursor cursor, CXCursor parent);
 		bool ReflectFunction(Function& reflFunction, CXCursor cursor, bool isMemberFunction);
 
-		bool ReflectClassMembers(Class& reflClass, int& internalFieldOffset, CXCursor classCursor, std::vector<CXCursor> memberCursors);
+		bool ReflectClassMembers(Class& reflClass, int& stdFieldOffset, CXCursor classCursor, std::vector<CXCursor> memberCursors);
 		Class ReflectClass(CXCursor cursor);
 
 		bool ReflectEnumValue(EnumValue& reflEnumValue, CXCursor cursor);
@@ -390,7 +390,7 @@ namespace refl
 		return false;
 	}
 	
-	bool RegistryGenerator::BuildTypeInfo(TypeInfo& typeInfo, int& compilerOffset, CXCursor cursor)
+	bool RegistryGenerator::BuildTypeInfo(TypeInfo& typeInfo, int& stdOffset, CXCursor cursor)
 	{
 		const CXType cursorType = clang_getCursorType(cursor);
 		const CXType realDataType = GetRealDataType(cursorType);
@@ -451,7 +451,7 @@ namespace refl
 				// Fill out some common fields
 				const size_t clangSize = GetStdClassSize(typeDeclaration, CompilerType::CLANG);
 				const size_t realSize = GetStdClassSize(typeDeclaration, mParams.mTargetCompiler);
-				compilerOffset = (int)realSize - (int)clangSize;
+				stdOffset = (int)realSize - (int)clangSize;
 				typeInfo.mSize = realSize;
 
 				typeInfo.mClassType = typeDeclarationQName;
@@ -520,7 +520,7 @@ namespace refl
 	}
 
 	// Reflects a field within a record.
-	bool RegistryGenerator::ReflectField(Field& reflField, int& internalFieldOffset, CXCursor cursor, CXCursor parent)
+	bool RegistryGenerator::ReflectField(Field& reflField, int& stdFieldOffset, CXCursor cursor, CXCursor parent)
 	{
 		// Reflect common properties for any reflected element.
 		if (!ReflectElement(reflField, cursor)) {
@@ -543,8 +543,8 @@ namespace refl
 			REFL_INTERNAL_RAISE_ERROR("Field [%s] has a bit offset not divisible by 8. This must be resolved internally.", reflField.mQualifiedName.c_str());
 			return false;
 		}
-		reflField.mOffset = (offsetBits / 8) + internalFieldOffset;
-		internalFieldOffset += compilerOffset;
+		reflField.mOffset = (offsetBits / 8) + stdFieldOffset;
+		stdFieldOffset += compilerOffset;
 
 		return true;
 	}
@@ -587,7 +587,7 @@ namespace refl
 	}
 
 	// Reflects a class/struct/record.
-	bool RegistryGenerator::ReflectClassMembers(Class& reflClass,int& internalFieldOffset,  CXCursor classCursor, std::vector<CXCursor> memberCursors)
+	bool RegistryGenerator::ReflectClassMembers(Class& reflClass,int& stdFieldOffset,  CXCursor classCursor, std::vector<CXCursor> memberCursors)
 	{
 		// Collect all fields and functions in this class.
 		for (auto memberCursor : memberCursors)
@@ -597,7 +597,7 @@ namespace refl
 				const std::string name = GetCursorName(memberCursor);
 				if (name == "") {
 					// This is an un-named struct. Reflect everything as-is.
-					if (!ReflectClassMembers(reflClass, internalFieldOffset, classCursor, CollectTopLevelChildren(memberCursor))) {
+					if (!ReflectClassMembers(reflClass, stdFieldOffset, classCursor, CollectTopLevelChildren(memberCursor))) {
 						return false;
 					}
 					continue;
@@ -625,7 +625,7 @@ namespace refl
 
 			if (memberCursor.kind == CXCursor_FieldDecl) {
 				Field reflField;
-				if (ReflectField(reflField, internalFieldOffset, memberCursor, classCursor)) {
+				if (ReflectField(reflField, stdFieldOffset, memberCursor, classCursor)) {
 					reflClass.mFields.push_back(reflField);
 				}
 			}
@@ -658,13 +658,13 @@ namespace refl
 		}
 
 		// Collect all fields and functions in this class.
-		int internalFieldOffset = 0;
-		if (!ReflectClassMembers(reflClass, internalFieldOffset, cursor, CollectTopLevelChildren(cursor))) {
+		int stdFieldOffset = 0;
+		if (!ReflectClassMembers(reflClass, stdFieldOffset, cursor, CollectTopLevelChildren(cursor))) {
 			return Class::INVALID;
 		}
 
 		// Class size
-		reflClass.mSize = clang_Type_getSizeOf(clang_getCursorType(cursor)) + internalFieldOffset;
+		reflClass.mSize = clang_Type_getSizeOf(clang_getCursorType(cursor)) + stdFieldOffset;
 
 		mRegistry->RegisterClass(reflClass);
 
