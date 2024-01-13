@@ -3,7 +3,7 @@
 namespace CppRefl.CodeGeneration.CodeGenerators
 {
 	/// <summary>
-	/// Generates Class::StaticType, Class::StaticClass.
+	/// Generates Class::GetReflectedType, Class::StaticClass.
 	/// </summary>
 	internal class ClassStaticGenerator : ICodeGeneratorExtension
 	{
@@ -20,7 +20,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		/// <param name="registry"></param>
 		public void WriteClassDeclaration(CodeWriter writer, ClassInfo classInfo, Registry registry)
 		{
-			writer.WriteLine($"friend const cpprefl::TypeInfo& cpprefl::StaticType<{classInfo.Type.Name}>();");
+			writer.WriteLine($"friend const cpprefl::TypeInfo& cpprefl::GetReflectedType<{classInfo.Type.Name}>();");
 			writer.WriteLine($"friend const cpprefl::ClassInfo& cpprefl::StaticClass<{classInfo.Type.Name}>();");
 
 			if (classInfo.Type.IsInstantiable)
@@ -28,7 +28,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 				using (writer.WithPublic())
 				{
 					writer.WriteLine($$"""
-					                   static inline const cpprefl::TypeInfo& StaticType() { return cpprefl::StaticType<{{classInfo.Type.Name}}>(); }
+					                   static inline const cpprefl::TypeInfo& GetReflectedType() { return cpprefl::GetReflectedType<{{classInfo.Type.Name}}>(); }
 					                   static inline const cpprefl::ClassInfo& StaticClass() { return cpprefl::StaticClass<{{classInfo.Type.Name}}>(); }
 					                   static inline const char* StaticClassName() { return cpprefl::GetTypeName<{{classInfo.Type.Name}}>(); }
 					                   """);
@@ -37,7 +37,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 					if (classInfo.ClassType == ClassType.Class)
 					{
 						writer.WriteLine($$"""
-						                   virtual const cpprefl::TypeInfo& GetType()const { return cpprefl::StaticType<{{classInfo.Type.Name}}>(); }
+						                   virtual const cpprefl::TypeInfo& GetType()const { return cpprefl::GetReflectedType<{{classInfo.Type.Name}}>(); }
 						                   virtual const cpprefl::ClassInfo& GetClass()const { return cpprefl::StaticClass<{{classInfo.Type.Name}}>(); }
 						                   virtual const char* GetClassName()const { return cpprefl::GetTypeName<{{classInfo.Type.Name}}>(); }
 						                   """);
@@ -60,7 +60,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			{
 				// Static type
 				writer.WriteLine("template <>");
-				writer.WriteLine($"const TypeInfo& StaticType<{name}>();");
+				writer.WriteLine($"const TypeInfo& GetReflectedType<{name}>();");
 
 				writer.WriteLine();
 
@@ -106,7 +106,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			{
 				// Static type
 				writer.WriteLine("template <>");
-				using (writer.WithFunction($"const TypeInfo& StaticType<{name}>()"))
+				using (writer.WithFunction($"const TypeInfo& GetReflectedType<{name}>()"))
 				{
 					writer.WriteLine(
 						$"static auto& type = cpprefl::Registry::GetSystemRegistry().AddType(cpprefl::TypeInfo(\"{name}\", cpprefl::TypeKind::Class, sizeof({name})));");
@@ -145,7 +145,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 							{
 								writer.WriteLine($"""
 									                  cpprefl::FieldInfo(
-									                  	cpprefl::MakeTypeInstance<decltype({name}::{field.Name})>({CodeGeneratorUtil.MaybeCreateStaticType(field.Type)}),
+									                  	cpprefl::MakeTypeInstance<decltype({name}::{field.Name})>({CodeGeneratorUtil.MaybeCreateReflectedType(field.Type)}),
 									                  	offsetof({name}, {field.Name}),
 									                  	"{field.Name}",
 									                  	{fieldTags[field]},
@@ -171,7 +171,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 							var ctor = classInfo.IsAbstract ? "nullptr" : $"[](void * obj) {{ new(obj) {name}(); }}";
 							var dtor = classInfo.IsAbstract ? "nullptr" : $"[](void * obj) {{ (({name}*)obj)->~{classInfo.Type.Name}(); }}";
 
-							writer.WriteLine($"StaticType<{name}>()");
+							writer.WriteLine($"GetReflectedType<{name}>()");
 							writer.WriteLine(
 								baseClass != null && baseClass.Metadata.IsReflected && !baseClass.Type.IsTemplated
 									? $"&StaticClass<{baseClass.Type.GloballyQualifiedName}>()"

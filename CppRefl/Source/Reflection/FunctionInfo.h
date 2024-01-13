@@ -50,7 +50,7 @@ namespace cpprefl
 			// Validate types of function arguments.
 			std::array<const TypeInfo*, sizeof...(ArgTypes)> argTypes;
 			int i = 0;
-			((argTypes[i++] = &StaticType<decltype(args)>()), ...);
+			((argTypes[i++] = &GetReflectedType<decltype(args)>()), ...);
 			for (int i = 0; i < mArgumentTypes.size(); ++i)
 			{
 				assert(argTypes[i] == mArgumentTypes[i]);

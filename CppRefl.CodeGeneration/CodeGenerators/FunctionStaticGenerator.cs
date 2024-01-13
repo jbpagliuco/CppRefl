@@ -40,7 +40,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 							using var _ = writer.WithPostfix(",");
 							foreach (var arg in functionInfo.ArgumentTypes)
 							{
-								writer.WriteLine($"&{CodeGeneratorUtil.MaybeCreateStaticType(arg.Type)}");
+								writer.WriteLine($"&{CodeGeneratorUtil.MaybeCreateReflectedType(arg.Type)}");
 							}
 						}
 					}
@@ -54,7 +54,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 							{
 								writer.WriteLine($"\"{functionInfo.QualifiedName}\"");
 								writer.WriteLine($"(void*){functionInfo.QualifiedName}");
-								writer.WriteLine($"{CodeGeneratorUtil.MaybeCreateStaticType(functionInfo.ReturnType.Type)}");
+								writer.WriteLine($"{CodeGeneratorUtil.MaybeCreateReflectedType(functionInfo.ReturnType.Type)}");
 								writer.WriteLine(functionInfo.ArgumentTypes.Any()
 									? "FunctionArgTypesView(functionArgs)"
 									: "FunctionArgTypesView()");

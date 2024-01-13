@@ -13,19 +13,19 @@
 
 namespace CppReflPrivate
 {
-	// Helper to figure out if a template parameter has a member variable named "StaticType".
+	// Helper to figure out if a template parameter has a member variable named "GetReflectedType".
 	template <typename T, typename = int>
-	struct HasStaticType : std::false_type { };
+	struct HasGetReflectedType : std::false_type { };
 
-	// Helper to figure out if a template parameter has a member variable named "StaticType".
+	// Helper to figure out if a template parameter has a member variable named "GetReflectedType".
 	template <typename T>
-	struct HasStaticType<T, decltype((void)T::StaticType, 0)> : std::true_type { };
+	struct HasGetReflectedType<T, decltype((void)T::StaticType, 0)> : std::true_type { };
 
 	// Creates a static type if it doesn't already exist.
 	template <typename T>
-	const cpprefl::TypeInfo& MaybeCreateStaticType(const char* typeName)
+	const cpprefl::TypeInfo& MaybeCreateReflectedType(const char* typeName)
 	{
-		if constexpr (std::is_class_v<T> && HasStaticType<T>::value)
+		if constexpr (std::is_class_v<T> && HasGetReflectedType<T>::value)
 		{
 			return T::StaticType();
 		}
@@ -49,40 +49,40 @@ namespace cpprefl
 
 	// Returns a static type known at compile time.
 	template <typename T>
-	const TypeInfo& StaticType();
+	const TypeInfo& GetReflectedType();
 
 	// Returns a static type known at compile-time.
 	template <typename T>
-	const TypeInfo& StaticType()
+	const TypeInfo& GetReflectedType()
 	{
 		if constexpr (!std::is_class_v<T> && !std::is_enum_v<T>)
 		{
-			const TypeInfo& type = CppReflPrivate::MaybeCreateStaticType<T>("");
+			const TypeInfo& type = CppReflPrivate::MaybeCreateReflectedType<T>("");
 			assert(type.mName[0] != 0 && "Type info was never created. This is illegal.");
 
 			return type;
 		}
 
-		static_assert(!std::is_class_v<T>, "This class doesn't implement StaticType<>()");
+		static_assert(!std::is_class_v<T>, "This class doesn't implement GetReflectedType<>()");
 		static_assert(!std::is_enum_v<T>, "This enum doesn't implement StaticEnum<>()");
 	}
 
 	// Static types for primitive types.
-	template <> inline const TypeInfo& StaticType<bool>()				{ return CppReflPrivate::MaybeCreateStaticType<bool>("bool"); }
-	template <> inline const TypeInfo& StaticType<unsigned char>()		{ return CppReflPrivate::MaybeCreateStaticType<unsigned char>("unsigned char"); }
-	template <> inline const TypeInfo& StaticType<char>()				{ return CppReflPrivate::MaybeCreateStaticType<char>("char"); }
-	template <> inline const TypeInfo& StaticType<unsigned short>()		{ return CppReflPrivate::MaybeCreateStaticType<unsigned short>("unsigned short"); }
-	template <> inline const TypeInfo& StaticType<short>()				{ return CppReflPrivate::MaybeCreateStaticType<short>("short"); }
-	template <> inline const TypeInfo& StaticType<unsigned int>()		{ return CppReflPrivate::MaybeCreateStaticType<unsigned int>("unsigned int"); }
-	template <> inline const TypeInfo& StaticType<int>()				{ return CppReflPrivate::MaybeCreateStaticType<int>("int"); }
-	template <> inline const TypeInfo& StaticType<unsigned long>()		{ return CppReflPrivate::MaybeCreateStaticType<unsigned long>("unsigned long"); }
-	template <> inline const TypeInfo& StaticType<long>()				{ return CppReflPrivate::MaybeCreateStaticType<long>("long"); }
-	template <> inline const TypeInfo& StaticType<unsigned long long>() { return CppReflPrivate::MaybeCreateStaticType<unsigned long long>("unsigned long long"); }
-	template <> inline const TypeInfo& StaticType<long long>()			{ return CppReflPrivate::MaybeCreateStaticType<long long>("long long"); }
-	template <> inline const TypeInfo& StaticType<float>()				{ return CppReflPrivate::MaybeCreateStaticType<float>("float"); }
-	template <> inline const TypeInfo& StaticType<double>()				{ return CppReflPrivate::MaybeCreateStaticType<double>("double"); }
-	template <> inline const TypeInfo& StaticType<long double>()		{ return CppReflPrivate::MaybeCreateStaticType<long double>("long double"); }
-	template <> inline const TypeInfo& StaticType<void>()				{ return CppReflPrivate::MaybeCreateStaticType<void>("void"); }
+	template <> inline const TypeInfo& GetReflectedType<bool>()					{ return CppReflPrivate::MaybeCreateReflectedType<bool>("bool"); }
+	template <> inline const TypeInfo& GetReflectedType<unsigned char>()		{ return CppReflPrivate::MaybeCreateReflectedType<unsigned char>("unsigned char"); }
+	template <> inline const TypeInfo& GetReflectedType<char>()					{ return CppReflPrivate::MaybeCreateReflectedType<char>("char"); }
+	template <> inline const TypeInfo& GetReflectedType<unsigned short>()		{ return CppReflPrivate::MaybeCreateReflectedType<unsigned short>("unsigned short"); }
+	template <> inline const TypeInfo& GetReflectedType<short>()				{ return CppReflPrivate::MaybeCreateReflectedType<short>("short"); }
+	template <> inline const TypeInfo& GetReflectedType<unsigned int>()			{ return CppReflPrivate::MaybeCreateReflectedType<unsigned int>("unsigned int"); }
+	template <> inline const TypeInfo& GetReflectedType<int>()					{ return CppReflPrivate::MaybeCreateReflectedType<int>("int"); }
+	template <> inline const TypeInfo& GetReflectedType<unsigned long>()		{ return CppReflPrivate::MaybeCreateReflectedType<unsigned long>("unsigned long"); }
+	template <> inline const TypeInfo& GetReflectedType<long>()					{ return CppReflPrivate::MaybeCreateReflectedType<long>("long"); }
+	template <> inline const TypeInfo& GetReflectedType<unsigned long long>()	{ return CppReflPrivate::MaybeCreateReflectedType<unsigned long long>("unsigned long long"); }
+	template <> inline const TypeInfo& GetReflectedType<long long>()			{ return CppReflPrivate::MaybeCreateReflectedType<long long>("long long"); }
+	template <> inline const TypeInfo& GetReflectedType<float>()				{ return CppReflPrivate::MaybeCreateReflectedType<float>("float"); }
+	template <> inline const TypeInfo& GetReflectedType<double>()				{ return CppReflPrivate::MaybeCreateReflectedType<double>("double"); }
+	template <> inline const TypeInfo& GetReflectedType<long double>()			{ return CppReflPrivate::MaybeCreateReflectedType<long double>("long double"); }
+	template <> inline const TypeInfo& GetReflectedType<void>()					{ return CppReflPrivate::MaybeCreateReflectedType<void>("void"); }
 
 	// Returns a static enum known at compile time.
 	template <typename T>
@@ -101,20 +101,20 @@ namespace cpprefl
 	template <typename T>
 	const char* GetTypeName()
 	{
-		return StaticType<T>().mName;
+		return GetReflectedType<T>().mName;
 	}
 
 	template <typename T>
 	bool IsSameType(const TypeInfo& type)
 	{
-		return &type == &StaticType<T>();
+		return &type == &GetReflectedType<T>();
 	}
 
 #if CPPREFL_CONCEPTS()
 	template <typename T>
 	concept ReflectedType = requires(T v)
 	{
-		{ cpprefl::StaticType<T>() } -> std::convertible_to<const cpprefl::TypeInfo&>;
+		{ cpprefl::GetReflectedType<T>() } -> std::convertible_to<const cpprefl::TypeInfo&>;
 	};
 
 	template <typename T>

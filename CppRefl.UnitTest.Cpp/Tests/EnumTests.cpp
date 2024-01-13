@@ -5,8 +5,8 @@
 
 TEST(EnumTests, EnumTypes)
 {
-	EXPECT_STREQ(cpprefl::StaticType<ReflectedEnum>().mName, "ReflectedEnum");
-	EXPECT_EQ(&cpprefl::ReflectedEnum<ReflectedEnum>().mType, &cpprefl::StaticType<ReflectedEnum>());
+	EXPECT_STREQ(cpprefl::GetReflectedType<ReflectedEnum>().mName, "ReflectedEnum");
+	EXPECT_EQ(&cpprefl::ReflectedEnum<ReflectedEnum>().mType, &cpprefl::GetReflectedType<ReflectedEnum>());
 }
 
 TEST(EnumTests, EnumValues)

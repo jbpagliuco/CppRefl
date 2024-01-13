@@ -28,7 +28,7 @@ TEST(FunctionTests, Info)
 	{
 		const auto& func = Registry::GetSystemRegistry().GetFunction("ReflectedFunction");
 		EXPECT_STREQ(func.mName, "ReflectedFunction");
-		EXPECT_EQ(&func.mReturnType, &StaticType<void>());
+		EXPECT_EQ(&func.mReturnType, &GetReflectedType<void>());
 		EXPECT_EQ(func.mArgumentTypes.size(), 0);
 	}
 
@@ -36,17 +36,17 @@ TEST(FunctionTests, Info)
 	{
 		const auto& func = Registry::GetSystemRegistry().GetFunction("ReflectedFunctionWithParams");
 		EXPECT_STREQ(func.mName, "ReflectedFunctionWithParams");
-		EXPECT_EQ(&func.mReturnType, &StaticType<void>());
+		EXPECT_EQ(&func.mReturnType, &GetReflectedType<void>());
 		EXPECT_EQ(func.mArgumentTypes.size(), 2);
-		EXPECT_EQ(func.mArgumentTypes[0], &StaticType<int>());
-		EXPECT_EQ(func.mArgumentTypes[1], &StaticType<float>());
+		EXPECT_EQ(func.mArgumentTypes[0], &GetReflectedType<int>());
+		EXPECT_EQ(func.mArgumentTypes[1], &GetReflectedType<float>());
 	}
 
 	// TestNamespace::ReflectedFunction
 	{
 		const auto& func = Registry::GetSystemRegistry().GetFunction("TestNamespace::ReflectedFunction");
 		EXPECT_STREQ(func.mName, "TestNamespace::ReflectedFunction");
-		EXPECT_EQ(&func.mReturnType, &StaticType<void>());
+		EXPECT_EQ(&func.mReturnType, &GetReflectedType<void>());
 		EXPECT_EQ(func.mArgumentTypes.size(), 0);
 	}
 }

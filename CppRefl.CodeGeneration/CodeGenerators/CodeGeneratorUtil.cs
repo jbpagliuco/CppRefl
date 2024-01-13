@@ -95,18 +95,18 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		}
 
 		/// <summary>
-		/// Create a "MaybeCreateStaticType" invocation.
+		/// Create a "MaybeCreateReflectedType" invocation.
 		/// </summary>
 		/// <param name="typeInfo"></param>
 		/// <returns></returns>
-		public static string MaybeCreateStaticType(TypeInfo typeInfo)
+		public static string MaybeCreateReflectedType(TypeInfo typeInfo)
 		{
 			if (typeInfo.IsPrimitive)
 			{
-				return $"cpprefl::StaticType<{typeInfo.QualifiedName}>()";
+				return $"cpprefl::GetReflectedType<{typeInfo.QualifiedName}>()";
 			}
 			
-			return $"CppReflPrivate::MaybeCreateStaticType<{typeInfo.QualifiedName}>(\"{typeInfo.QualifiedName}\")";
+			return $"CppReflPrivate::MaybeCreateReflectedType<{typeInfo.QualifiedName}>(\"{typeInfo.QualifiedName}\")";
 		}
 
 		/// <summary>

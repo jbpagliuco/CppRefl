@@ -79,6 +79,6 @@ namespace cpprefl
 	template <typename T>
 	constexpr TypeInstanceInfo MakeTypeInstance(const char* typeName)
 	{
-		return MakeTypeInstance<T>(CppReflPrivate::MaybeCreateStaticType<T>(typeName));
+		return MakeTypeInstance<T>(CppReflPrivate::MaybeCreateReflectedType<T>(typeName));
 	}
 }

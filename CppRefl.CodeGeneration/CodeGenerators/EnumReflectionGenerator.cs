@@ -15,7 +15,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			{
 				// Static type
 				writer.WriteLine("template <>");
-				writer.WriteLine($"const TypeInfo& StaticType<{enumInfo.Type.GloballyQualifiedName}>();");
+				writer.WriteLine($"const TypeInfo& GetReflectedType<{enumInfo.Type.GloballyQualifiedName}>();");
 
 				writer.WriteLine();
 
@@ -37,7 +37,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			{
 				// Static type
 				writer.WriteLine("template <>");
-				using (writer.WithFunction($"const TypeInfo& StaticType<{enumInfo.Type.GloballyQualifiedName}>()"))
+				using (writer.WithFunction($"const TypeInfo& GetReflectedType<{enumInfo.Type.GloballyQualifiedName}>()"))
 				{
 					writer.WriteLine(
 						$"static auto& type = cpprefl::Registry::GetSystemRegistry().AddType(cpprefl::TypeInfo(\"{enumInfo.Type.QualifiedName}\", cpprefl::TypeKind::Enum, sizeof({enumInfo.Type.GloballyQualifiedName})));");
@@ -70,7 +70,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 					{
 						using (writer.WithPostfix(","))
 						{
-							writer.WriteLine($"StaticType<{enumInfo.Type.GloballyQualifiedName}>()");
+							writer.WriteLine($"GetReflectedType<{enumInfo.Type.GloballyQualifiedName}>()");
 							writer.WriteLine($"{enumInfo.Type.Name}Values");
 							writer.WriteLine(enumTags);
 						}

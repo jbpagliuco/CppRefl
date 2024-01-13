@@ -17,7 +17,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 				{
 					// Static type
 					writer.WriteLine("template <>");
-					writer.WriteLine($"const TypeInfo& StaticType<{aliasInfo.Type.GloballyQualifiedName}>();");
+					writer.WriteLine($"const TypeInfo& GetReflectedType<{aliasInfo.Type.GloballyQualifiedName}>();");
 
 					writer.WriteLine();
 
