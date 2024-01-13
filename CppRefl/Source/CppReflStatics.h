@@ -124,9 +124,9 @@ namespace cpprefl
 	};
 
 	template <typename T>
-	concept GetReflectedEnum = requires(T v)
+	concept ReflectedEnum = requires(T v)
 	{
-		{ cpprefl::StaticEnum<T>() } -> std::convertible_to<const cpprefl::EnumInfo&>;
+		{ cpprefl::GetReflectedEnum<T>() } -> std::convertible_to<const cpprefl::EnumInfo&>;
 	};
 #endif
 }
