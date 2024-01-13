@@ -27,7 +27,7 @@ namespace CppReflPrivate
 	{
 		if constexpr (std::is_class_v<T> && HasGetReflectedType<T>::value)
 		{
-			return T::StaticType();
+			return T::StaticReflectedType();
 		}
 		else if constexpr (std::is_void_v<T>)
 		{
