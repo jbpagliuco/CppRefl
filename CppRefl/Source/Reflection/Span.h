@@ -11,31 +11,90 @@ namespace cpprefl
 	{
 	public:
 		// Constructs an empty span.
-		Span() : mSize(0), mElements(nullptr) {}
+		constexpr Span() : mSize(0), mElements(nullptr) {}
 
 		// Constructs a span from an array.
 		template <SizeType N>
-		Span(const ElementType elements[N]) : mSize(N), mElements(elements.data()) {}
+		constexpr Span(const ElementType elements[N]) : mSize(N), mElements(elements.data()) {}
 
 		// Constructs a span from an array.
 		template <SizeType N>
-		Span(const std::array<ElementType, N>& elements) : mSize(N), mElements(elements.data()) {}
+		constexpr Span(const std::array<ElementType, N>& elements) : mSize(N), mElements(elements.data()) {}
 
 		// Constructs a span from a vector.
-		Span(const std::vector<ElementType>& elements) : mSize((SizeType)elements.size()), mElements(elements.data()) {}
+		constexpr Span(const std::vector<ElementType>& elements) : mSize((SizeType)elements.size()), mElements(elements.data()) {}
 
 		// Returns the size of this span.
-		SizeType size()const { return mSize; }
+		constexpr SizeType size()const { return mSize; }
 
-		auto begin()  { return mElements; }
-		auto begin()const  { return mElements; }
-		auto cbegin()const  { return mElements; }
-		auto end()  { return mElements + mSize; }
-		auto end()const  { return mElements + mSize; }
-		auto cend()const  { return mElements + mSize; }
+		constexpr auto begin()  { return mElements; }
+		constexpr auto begin()const  { return mElements; }
+		constexpr auto cbegin()const  { return mElements; }
+		constexpr auto end()  { return mElements + mSize; }
+		constexpr auto end()const  { return mElements + mSize; }
+		constexpr auto cend()const  { return mElements + mSize; }
 
 		// Returns the element at a given index.
-		const ElementType& operator[](SizeType index)const { return mElements[index]; }
+		constexpr const ElementType& operator[](SizeType index)const { return mElements[index]; }
+
+		// Returns if this span contains an element.
+		constexpr bool Contains(const ElementType& element)const
+		{
+			for (const auto& it : *this)
+			{
+				if (it == element)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		// Returns if this span contains an element.
+		template <typename EqualityFunction>
+		constexpr bool Contains(const ElementType& element, EqualityFunction equalityFunction)const
+		{
+			for (const auto& it : *this)
+			{
+				if (equalityFunction(it, element))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		// Returns if this span contains an element.
+		template <typename T, typename EqualityFunction>
+		constexpr bool Contains(const T& element, EqualityFunction equalityFunction)const
+		{
+			for (const auto& it : *this)
+			{
+				if (equalityFunction(it, element))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		// Returns if this span contains an element.
+		template <typename T, typename EqualityFunction>
+		constexpr const ElementType* Find(const T& element, EqualityFunction equalityFunction)const
+		{
+			for (const auto& it : *this)
+			{
+				if (equalityFunction(it, element))
+				{
+					return &it;
+				}
+			}
+
+			return nullptr;
+		}
 
 	private:
 		SizeType mSize;
