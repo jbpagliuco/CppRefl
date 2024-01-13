@@ -1,4 +1,5 @@
-﻿using CppRefl.CodeGeneration.Reflection;
+﻿using CppRefl.CodeGeneration.CodeWriters;
+using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration.CodeGenerators
 {
@@ -13,7 +14,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		/// <param name="writer"></param>
 		/// <param name="classInfo"></param>
 		/// <param name="registry"></param>
-		public void WriteClassDeclaration(CodeWriter writer, ClassInfo classInfo, Registry registry)
+		public void WriteClassDeclaration(CppWriter writer, ClassInfo classInfo, Registry registry)
 		{
 			if (classInfo.Type.IsInstantiable)
 			{

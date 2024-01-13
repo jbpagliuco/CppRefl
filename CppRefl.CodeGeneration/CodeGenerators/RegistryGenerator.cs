@@ -1,4 +1,5 @@
-﻿using CppRefl.CodeGeneration.Reflection;
+﻿using CppRefl.CodeGeneration.CodeWriters;
+using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration.CodeGenerators
 {
@@ -29,7 +30,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		private IEnumerable<AliasInfo> Aliases(Registry registry) => registry.Aliases.Values.Where(x => x.Metadata.IsReflected && x.AliasClass?.Type.Template?.IsSpecialized == true);
 		
 
-		public void WriteRegistrySource(CodeWriter writer, Registry registry, CodeGeneratorRegistryParams @params)
+		public void WriteRegistrySource(CppWriter writer, Registry registry, CodeGeneratorRegistryParams @params)
 		{
 			HashSet<string> includeFilenames = Classes(registry, @params).Select(x => x.Metadata.SourceLocation.Filepath).ToHashSet();
 			includeFilenames.UnionWith(Enums(registry).Select(x => x.Metadata.SourceLocation.Filepath));
@@ -44,7 +45,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			writer.WriteLine();
 		}
 
-		public void WriteRegistryInitializer(CodeWriter writer, Registry registry, CodeGeneratorRegistryParams @params)
+		public void WriteRegistryInitializer(CppWriter writer, Registry registry, CodeGeneratorRegistryParams @params)
 		{
 			// Register classes
 			writer.WriteLine("// Register classes");

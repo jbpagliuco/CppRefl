@@ -1,10 +1,11 @@
-﻿using CppRefl.CodeGeneration.Reflection;
+﻿using CppRefl.CodeGeneration.CodeWriters;
+using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration.CodeGenerators.STL
 {
 	internal class VectorDynamicArrayGenerator : ICodeGeneratorExtension
 	{
-		public void WriteClassSource(CodeWriter writer, ClassInfo classInfo, Registry registry)
+		public void WriteClassSource(CppWriter writer, ClassInfo classInfo, Registry registry)
 		{
 			var dynamicArrayFields = classInfo.Fields.Where(x => x.Type.QualifiedName.StartsWith("std::vector<"));
 			if (dynamicArrayFields.Any())

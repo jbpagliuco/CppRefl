@@ -1,4 +1,5 @@
-﻿using CppRefl.CodeGeneration.Reflection;
+﻿using CppRefl.CodeGeneration.CodeWriters;
+using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration
 {
@@ -36,7 +37,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="objects"></param>
 		/// <param name="registry"></param>
-		public void WriteHeaderTop(CodeWriter writer, FileObjects objects, Registry registry)
+		public void WriteHeaderTop(CppWriter writer, FileObjects objects, Registry registry)
 		{
 		}
 
@@ -46,7 +47,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="objects"></param>
 		/// <param name="registry"></param>
-		public void WriteHeaderBottom(CodeWriter writer, FileObjects objects, Registry registry)
+		public void WriteHeaderBottom(CppWriter writer, FileObjects objects, Registry registry)
 		{
 		}
 
@@ -56,7 +57,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="objects"></param>
 		/// <param name="registry"></param>
-		public void WriteSourceTop(CodeWriter writer, FileObjects objects, Registry registry)
+		public void WriteSourceTop(CppWriter writer, FileObjects objects, Registry registry)
 		{
 		}
 
@@ -66,7 +67,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="objects"></param>
 		/// <param name="registry"></param>
-		public void WriteSourceBottom(CodeWriter writer, FileObjects objects, Registry registry)
+		public void WriteSourceBottom(CppWriter writer, FileObjects objects, Registry registry)
 		{
 		}
 
@@ -76,7 +77,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="classInfo"></param>
 		/// <param name="registry"></param>
-		public void WriteClassDeclaration(CodeWriter writer, ClassInfo classInfo, Registry registry)
+		public void WriteClassDeclaration(CppWriter writer, ClassInfo classInfo, Registry registry)
 		{
 		}
 
@@ -86,7 +87,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="classInfo"></param>
 		/// <param name="registry"></param>
-		public void WriteClassHeader(CodeWriter writer, ClassInfo classInfo, Registry registry)
+		public void WriteClassHeader(CppWriter writer, ClassInfo classInfo, Registry registry)
 		{
 		}
 
@@ -96,7 +97,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="classInfo"></param>
 		/// <param name="registry"></param>
-		public void WriteClassSource(CodeWriter writer, ClassInfo classInfo, Registry registry)
+		public void WriteClassSource(CppWriter writer, ClassInfo classInfo, Registry registry)
 		{
 		}
 
@@ -106,7 +107,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="enumInfo"></param>
 		/// <param name="registry"></param>
-		public void WriteEnumHeader(CodeWriter writer, EnumInfo enumInfo, Registry registry)
+		public void WriteEnumHeader(CppWriter writer, EnumInfo enumInfo, Registry registry)
 		{
 		}
 
@@ -116,7 +117,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="enumInfo"></param>
 		/// <param name="registry"></param>
-		public void WriteEnumSource(CodeWriter writer, EnumInfo enumInfo, Registry registry)
+		public void WriteEnumSource(CppWriter writer, EnumInfo enumInfo, Registry registry)
 		{
 		}
 
@@ -126,7 +127,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="aliasInfo"></param>
 		/// <param name="registry"></param>
-		public void WriteAliasHeader(CodeWriter writer, AliasInfo aliasInfo, Registry registry)
+		public void WriteAliasHeader(CppWriter writer, AliasInfo aliasInfo, Registry registry)
 		{
 		}
 
@@ -136,7 +137,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="aliasInfo"></param>
 		/// <param name="registry"></param>
-		public void WriteAliasSource(CodeWriter writer, AliasInfo aliasInfo, Registry registry)
+		public void WriteAliasSource(CppWriter writer, AliasInfo aliasInfo, Registry registry)
 		{
 		}
 
@@ -146,7 +147,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="functionInfo"></param>
 		/// <param name="registry"></param>
-		public void WriteFunctionHeader(CodeWriter writer, FunctionInfo functionInfo, Registry registry)
+		public void WriteFunctionHeader(CppWriter writer, FunctionInfo functionInfo, Registry registry)
 		{
 		}
 
@@ -156,7 +157,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="functionInfo"></param>
 		/// <param name="registry"></param>
-		public void WriteFunctionSource(CodeWriter writer, FunctionInfo functionInfo, Registry registry)
+		public void WriteFunctionSource(CppWriter writer, FunctionInfo functionInfo, Registry registry)
 		{
 		}
 
@@ -165,7 +166,7 @@ namespace CppRefl.CodeGeneration
 		/// </summary>
 		/// <param name="writer"></param>
 		/// <param name="registry"></param>
-		public void WriteRegistryHeader(CodeWriter writer, Registry registry, CodeGeneratorRegistryParams @params)
+		public void WriteRegistryHeader(CppWriter writer, Registry registry, CodeGeneratorRegistryParams @params)
 		{
 		}
 
@@ -174,7 +175,7 @@ namespace CppRefl.CodeGeneration
 		/// </summary>
 		/// <param name="writer"></param>
 		/// <param name="registry"></param>
-		public void WriteRegistrySource(CodeWriter writer, Registry registry, CodeGeneratorRegistryParams @params)
+		public void WriteRegistrySource(CppWriter writer, Registry registry, CodeGeneratorRegistryParams @params)
 		{
 		}
 
@@ -183,7 +184,7 @@ namespace CppRefl.CodeGeneration
 		/// </summary>
 		/// <param name="writer"></param>
 		/// <param name="registry"></param>
-		public void WriteRegistryInitializer(CodeWriter writer, Registry registry, CodeGeneratorRegistryParams @params)
+		public void WriteRegistryInitializer(CppWriter writer, Registry registry, CodeGeneratorRegistryParams @params)
 		{
 		}
 	}

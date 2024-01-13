@@ -1,10 +1,11 @@
-﻿using CppRefl.CodeGeneration.Reflection;
+﻿using CppRefl.CodeGeneration.CodeWriters;
+using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration.CodeGenerators
 {
 	internal class AliasStaticGenerator : ICodeGeneratorExtension
 	{
-		public void WriteAliasHeader(CodeWriter writer, AliasInfo aliasInfo, Registry registry)
+		public void WriteAliasHeader(CppWriter writer, AliasInfo aliasInfo, Registry registry)
 		{
 			if (aliasInfo.AliasType.IsTemplated)
 			{
@@ -28,7 +29,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			}
 		}
 
-		public void WriteAliasSource(CodeWriter writer, AliasInfo aliasInfo, Registry registry)
+		public void WriteAliasSource(CppWriter writer, AliasInfo aliasInfo, Registry registry)
 		{
 			throw new NotImplementedException();
 		}

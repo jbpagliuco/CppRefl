@@ -1,10 +1,11 @@
-﻿using CppRefl.CodeGeneration.Reflection;
+﻿using CppRefl.CodeGeneration.CodeWriters;
+using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration.CodeGenerators
 {
 	internal class EnumReflectionGenerator : ICodeGeneratorExtension
 	{
-		public void WriteEnumHeader(CodeWriter writer, EnumInfo enumInfo, Registry registry)
+		public void WriteEnumHeader(CppWriter writer, EnumInfo enumInfo, Registry registry)
 		{
 			// Forward declare
 			var namespaceDec = enumInfo.Type.IsInGlobalNamespace ? null : writer.WithNamespace(enumInfo.Type.Namespace);
@@ -31,7 +32,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		/// <param name="writer"></param>
 		/// <param name="enumInfo"></param>
 		/// <param name="registry"></param>
-		public void WriteEnumSource(CodeWriter writer, EnumInfo enumInfo, Registry registry)
+		public void WriteEnumSource(CppWriter writer, EnumInfo enumInfo, Registry registry)
 		{
 			using (writer.WithNamespace("cpprefl"))
 			{

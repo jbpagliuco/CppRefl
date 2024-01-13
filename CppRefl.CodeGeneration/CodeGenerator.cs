@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using CppRefl.CodeGeneration.CodeGenerators;
 using CppRefl.CodeGeneration.CodeGenerators.STL;
+using CppRefl.CodeGeneration.CodeWriters;
 using CppRefl.CodeGeneration.Reflection;
 using TypeInfo = CppRefl.CodeGeneration.Reflection.TypeInfo;
 
@@ -173,7 +174,7 @@ namespace CppRefl.CodeGeneration
 
 			// Header
 			{
-				using var writer = new CodeWriter(headerFilename);
+				using var writer = new CppWriter(headerFilename);
 
 				// Initializer prototype.
 				writer.WriteLine("#pragma once\n");
@@ -185,7 +186,7 @@ namespace CppRefl.CodeGeneration
 
 			// Source
 			{
-				using var writer = new CodeWriter(sourceFilename);
+				using var writer = new CppWriter(sourceFilename);
 
 				writer.IncludeHeader(Path.GetFileName(headerFilename));
 				writer.WriteLine();
@@ -221,7 +222,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="name"></param>
 		/// <param name="action"></param>
-		private void WriteObject(CodeWriter writer, string name, Action<ICodeGeneratorExtension> action)
+		private void WriteObject(CppWriter writer, string name, Action<ICodeGeneratorExtension> action)
 		{
 			writer.WriteLine($"""
 
@@ -240,8 +241,8 @@ namespace CppRefl.CodeGeneration
 			                  """);
 		}
 
-		private void WriteObject(CodeWriter writer, TypeInfo typeInfo, Action<ICodeGeneratorExtension> action) => WriteObject(writer, typeInfo.QualifiedName, action);
-		private void WriteObject(CodeWriter writer, FunctionInfo functionInfo, Action<ICodeGeneratorExtension> action) => WriteObject(writer, functionInfo.QualifiedName, action);
+		private void WriteObject(CppWriter writer, TypeInfo typeInfo, Action<ICodeGeneratorExtension> action) => WriteObject(writer, typeInfo.QualifiedName, action);
+		private void WriteObject(CppWriter writer, FunctionInfo functionInfo, Action<ICodeGeneratorExtension> action) => WriteObject(writer, functionInfo.QualifiedName, action);
 
 		/// <summary>
 		/// Generate a header file for a reflected file.
@@ -250,7 +251,7 @@ namespace CppRefl.CodeGeneration
 		private void GenerateHeader(FileObjects objects, CodeGeneratorFileParams @params)
 		{
 			string outputFilename = GetOutputFilename(@params.InputFilename, @params.ModuleDirectory, @params.OutputDirectory, FileHeaderExt);
-			using var writer = new CodeWriter(outputFilename);
+			using var writer = new CppWriter(outputFilename);
 
 			if (objects.Any())
 			{
@@ -295,7 +296,7 @@ namespace CppRefl.CodeGeneration
 		/// Generate the top of a class file.
 		/// </summary>
 		/// <param name="writer"></param>
-		private void GenerateHeaderTop(CodeWriter writer)
+		private void GenerateHeaderTop(CppWriter writer)
 		{
 			// Define the file id
 			string fileId = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(writer.Filename));
@@ -328,7 +329,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="classInfo"></param>
 		/// <param name="registry"></param>
-		private void GenerateClassDeclaration(CodeWriter writer, ClassInfo classInfo, Registry registry)
+		private void GenerateClassDeclaration(CppWriter writer, ClassInfo classInfo, Registry registry)
 		{
 			if (classInfo.GeneratedBodyLine != null)
 			{
@@ -383,7 +384,7 @@ namespace CppRefl.CodeGeneration
 		{
 			string outputFilename = GetOutputFilename(@params.InputFilename, @params.ModuleDirectory,
 				@params.OutputDirectory, FileSourceExt);
-			using var writer = new CodeWriter(outputFilename);
+			using var writer = new CppWriter(outputFilename);
 
 			if (objects.Any())
 			{

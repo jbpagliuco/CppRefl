@@ -1,4 +1,5 @@
-﻿using CppRefl.CodeGeneration.Reflection;
+﻿using CppRefl.CodeGeneration.CodeWriters;
+using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration.CodeGenerators
 {
@@ -7,7 +8,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 	/// </summary>
 	internal class ClassReflectionGenerator : ICodeGeneratorExtension
 	{
-		public void WriteHeaderTop(CodeWriter writer, FileObjects objects, Registry registry)
+		public void WriteHeaderTop(CppWriter writer, FileObjects objects, Registry registry)
 		{
 			writer.IncludeHeader("CppReflStatics.h");
 		}
@@ -18,13 +19,13 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		/// <param name="writer"></param>
 		/// <param name="classInfo"></param>
 		/// <param name="registry"></param>
-		public void WriteClassDeclaration(CodeWriter writer, ClassInfo classInfo, Registry registry)
+		public void WriteClassDeclaration(CppWriter writer, ClassInfo classInfo, Registry registry)
 		{
 			writer.WriteLine($"friend const cpprefl::TypeInfo& cpprefl::GetReflectedType<{classInfo.Type.Name}>();");
 			writer.WriteLine($"friend const cpprefl::ClassInfo& cpprefl::GetReflectedClass<{classInfo.Type.Name}>();");
 		}
 
-		public void WriteClassHeader(CodeWriter writer, ClassInfo classInfo, string? name = null)
+		public void WriteClassHeader(CppWriter writer, ClassInfo classInfo, string? name = null)
 		{
 			name ??= classInfo.Type.QualifiedName;
 
@@ -48,7 +49,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			}
 		}
 
-		public void WriteClassHeader(CodeWriter writer, ClassInfo classInfo, Registry registry)
+		public void WriteClassHeader(CppWriter writer, ClassInfo classInfo, Registry registry)
 		{
 			if (!classInfo.Type.IsTemplated)
 			{
@@ -65,7 +66,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		/// </summary>
 		/// <param name="writer"></param>
 		/// <param name="registry"></param>
-		public void WriteSourceTop(CodeWriter writer, FileObjects objects, Registry registry)
+		public void WriteSourceTop(CppWriter writer, FileObjects objects, Registry registry)
 		{
 			writer.WriteLine($"""
 			                  #include "Reflection/ClassInfo.h"
@@ -76,7 +77,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			                  """);
 		}
 
-		private void WriteClassSource(CodeWriter writer, ClassInfo classInfo, string? name = null)
+		private void WriteClassSource(CppWriter writer, ClassInfo classInfo, string? name = null)
 		{
 			name ??= classInfo.Type.QualifiedName;
 
@@ -174,7 +175,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		/// <param name="writer"></param>
 		/// <param name="classInfo"></param>
 		/// <param name="registry"></param>
-		public void WriteClassSource(CodeWriter writer, ClassInfo classInfo, Registry registry)
+		public void WriteClassSource(CppWriter writer, ClassInfo classInfo, Registry registry)
 		{
 			if (!classInfo.Type.IsTemplated)
 			{
@@ -182,7 +183,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			}
 		}
 
-		public void WriteAliasHeader(CodeWriter writer, AliasInfo aliasInfo, Registry registry)
+		public void WriteAliasHeader(CppWriter writer, AliasInfo aliasInfo, Registry registry)
 		{
 			if (aliasInfo.AliasClass != null && aliasInfo.AliasClass.Type.Template?.IsSpecialized == true)
 			{
@@ -190,7 +191,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			}
 		}
 
-		public void WriteAliasSource(CodeWriter writer, AliasInfo aliasInfo, Registry registry)
+		public void WriteAliasSource(CppWriter writer, AliasInfo aliasInfo, Registry registry)
 		{
 			if (aliasInfo.AliasClass != null && aliasInfo.AliasClass.Type.Template?.IsSpecialized == true)
 			{

@@ -1,4 +1,5 @@
-﻿using CppRefl.CodeGeneration.Reflection;
+﻿using CppRefl.CodeGeneration.CodeWriters;
+using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration.CodeGenerators
 {
@@ -6,7 +7,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 	{
 		private string StaticFunctionSignature(FunctionInfo functionInfo) => $"const FunctionInfo& StaticFunction<&{functionInfo.GloballyQualifiedName}>()";
 
-		public void WriteFunctionHeader(CodeWriter writer, FunctionInfo functionInfo, Registry registry)
+		public void WriteFunctionHeader(CppWriter writer, FunctionInfo functionInfo, Registry registry)
 		{
 			// Forward declare
 			var namespaceDec = functionInfo.IsInGlobalNamespace ? null : writer.WithNamespace(functionInfo.Namespace);
@@ -21,7 +22,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			}
 		}
 
-		public void WriteFunctionSource(CodeWriter writer, FunctionInfo functionInfo, Registry registry)
+		public void WriteFunctionSource(CppWriter writer, FunctionInfo functionInfo, Registry registry)
 		{
 			// StaticFunction<>()
 			using (writer.WithNamespace("cpprefl"))
