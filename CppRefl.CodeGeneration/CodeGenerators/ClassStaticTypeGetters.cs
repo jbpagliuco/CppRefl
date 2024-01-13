@@ -3,7 +3,7 @@
 namespace CppRefl.CodeGeneration.CodeGenerators
 {
 	/// <summary>
-	/// Generates Class::GetReflectedType, Class::ReflectedClass().
+	/// Generates Class::StaticReflectedType(), Class::StaticReflectedClass().
 	/// </summary>
 	internal class ClassStaticTypeGetters : ICodeGeneratorExtension
 	{
@@ -23,16 +23,6 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 					                   static inline const cpprefl::TypeInfo& StaticReflectedType() { return cpprefl::GetReflectedType<{{classInfo.Type.Name}}>(); }
 					                   static inline const cpprefl::ClassInfo& StaticReflectedClass() { return cpprefl::GetReflectedClass<{{classInfo.Type.Name}}>(); }
 					                   """);
-
-					// Avoid writing virtual functions for non-class types. Structs are generally used for pure data, so we don't want mess up their memory format with a vtable pointer.
-					if (classInfo.ClassType == ClassType.Class)
-					{
-						writer.WriteLine($$"""
-						                   virtual const cpprefl::TypeInfo& GetReflectedType()const { return cpprefl::GetReflectedType<{{classInfo.Type.Name}}>(); }
-						                   virtual const cpprefl::ClassInfo& GetReflectedClass()const { return cpprefl::GetReflectedClass<{{classInfo.Type.Name}}>(); }
-						                   virtual const char* GetClassName()const { return cpprefl::GetTypeName<{{classInfo.Type.Name}}>(); }
-						                   """);
-					}
 				}
 			}
 		}
