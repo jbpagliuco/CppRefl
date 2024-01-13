@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <string_view>
 
 #include "ObjectInfo.h"
 
@@ -12,7 +13,7 @@ namespace cpprefl
 	class EnumValueInfo : public ObjectInfo
 	{
 	public:
-		EnumValueInfo(
+		constexpr EnumValueInfo(
 			const char* name, 
 			int value, 
 			TagView&& tags, 
@@ -33,7 +34,7 @@ namespace cpprefl
 	class EnumInfo : public ObjectInfo
 	{
 	public:
-		EnumInfo(const TypeInfo& type, EnumValueView values, TagView&& tags, AttributeView&& attributes) : ObjectInfo(std::move(tags), std::move(attributes)), mType(type), mValues(values)
+		constexpr EnumInfo(const TypeInfo& type, EnumValueView values, TagView&& tags, AttributeView&& attributes) : ObjectInfo(std::move(tags), std::move(attributes)), mType(type), mValues(values)
 		{
 		}
 
@@ -44,6 +45,9 @@ namespace cpprefl
 		EnumValueView mValues;
 
 	public:
-		const EnumValueInfo* GetValue(const char* name)const;
+		constexpr const EnumValueInfo* GetValue(const char* name)const { return mValues.Find(name, EnumEquals); }
+
+	private:
+		static constexpr bool EnumEquals(const EnumValueInfo& value1, const char* value2) { return std::string_view(value1.mName) == std::string_view(value2); }
 	};
 }

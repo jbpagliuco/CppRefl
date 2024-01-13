@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string_view>
+
 #include "Span.h"
 
 namespace cpprefl
@@ -13,9 +15,9 @@ namespace cpprefl
 		constexpr Attribute(int value) : mInt(value) {}
 		constexpr Attribute(float value) : mFloat(value) {}
 
-		operator const char*() const { return mString; }
-		operator int() const { return mInt; }
-		operator float() const { return mFloat; }
+		constexpr operator const char*() const { return mString; }
+		constexpr operator int() const { return mInt; }
+		constexpr operator float() const { return mFloat; }
 
 		union
 		{
@@ -34,9 +36,9 @@ namespace cpprefl
 	class ObjectInfo
 	{
 	public:
-		ObjectInfo() = default;
+		constexpr ObjectInfo() = default;
 
-		ObjectInfo(TagView&& tags, AttributeView&& attributes) : mTags(tags), mAttributes(attributes)
+		constexpr ObjectInfo(TagView&& tags, AttributeView&& attributes) : mTags(tags), mAttributes(attributes)
 		{
 		}
 
@@ -47,9 +49,17 @@ namespace cpprefl
 		AttributeView mAttributes;
 
 	public:
-		bool HasTag(const TagType& tag)const;
+		constexpr bool HasTag(const TagType& tag)const { return mTags.Contains(tag, TagEquals); }
 
-		bool HasAttribute(const AttributeKeyType& key)const;
-		const AttributeValueType* GetAttribute(const AttributeKeyType& key)const;
+		constexpr bool HasAttribute(const AttributeKeyType& key)const { return mAttributes.Contains(key, AttributeKeyEquals); }
+		constexpr const AttributeValueType* GetAttribute(const AttributeKeyType& key)const
+		{
+			const auto value = mAttributes.Find(key, AttributeKeyEquals);
+			return value != nullptr ? &value->second : nullptr;
+		}
+
+	private:
+		static constexpr bool TagEquals(const TagType& tag1, const TagType& tag2) { return std::string_view(tag1) == std::string_view(tag2); }
+		static constexpr bool AttributeKeyEquals(const AttributeType& attr1, const AttributeKeyType& attr2) { return std::string_view(attr1.first) == std::string_view(attr2); }
 	};
 }
