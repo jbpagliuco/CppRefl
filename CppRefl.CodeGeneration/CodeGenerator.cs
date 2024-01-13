@@ -341,7 +341,7 @@ namespace CppRefl.CodeGeneration
 				                  ////////////////////////////////////////////////////////////////////////////////////////////////////////
 				                  // {classInfo.Type.QualifiedName}
 
-				                  #if !defined({CppDefines.BuildReflection})
+				                  #if !{CppDefines.BuildReflection}
 				                  // Macro to be added inside the definition of a reflected class.
 				                  #define {generatedBodyMacroName}() \
 				                  """);
@@ -356,12 +356,12 @@ namespace CppRefl.CodeGeneration
 
 				writer.WriteLine($"""
 
-				                  #else // !defined({CppDefines.BuildReflection})
+				                  #else
 
 				                  // Define empty macro when building reflection.
 				                  #define {generatedBodyMacroName}()
 
-				                  #endif // !defined({CppDefines.BuildReflection})
+				                  #endif
 
 				                  """);
 			}

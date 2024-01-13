@@ -17,7 +17,12 @@
 // Always redefine this macro when this file is included.
 #undef GENERATED_REFLECTION_CODE
 
-#if defined(CPPREFL_BUILD_REFLECTION)
+// By default, this is defined as zero. Whenever we invoke the reflection compiler, we'll define this.
+#if !defined(CPPREFL_BUILD_REFLECTION)
+#define CPPREFL_BUILD_REFLECTION() 0
+#endif
+
+#if CPPREFL_BUILD_REFLECTION()
 	// Define a special marker so the reflection compiler can find which line this macro is used at.
 #define GENERATED_REFLECTION_CODE() void CPPREFL_INTERNAL_GENERATED_REFLECTION_CODE_MARKER();
 #elif defined(CPPREFL_INTERNAL_FILE_ID)

@@ -6,7 +6,7 @@
 #define CPPREFL_INTERNAL_ANNOTATION "cpprefl"
 #define CPPREFL_INTERNAL_ANNOTATION_SEPARATOR ","
 
-#if defined(CPPREFL_BUILD_REFLECTION)
+#if CPPREFL_BUILD_REFLECTION()
 // Basic reflection markup. Only needs to be used if no other reflection markup is needed.
 #define REFLECTED				__attribute__((annotate(CPPREFL_INTERNAL_ANNOTATION)))
 

@@ -12,7 +12,7 @@
 		/// <summary>
 		/// Preprocessor flag that that is only defined during reflection compilation.
 		/// </summary>
-		public const string BuildReflection = "CPPREFL_BUILD_REFLECTION";
+		public const string BuildReflection = "CPPREFL_BUILD_REFLECTION()";
 
 		/// <summary>
 		/// File id preprocessor flag.
