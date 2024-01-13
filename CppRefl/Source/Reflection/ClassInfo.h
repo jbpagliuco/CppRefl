@@ -52,7 +52,7 @@ namespace cpprefl
 		template <typename T>
 		bool IsA()const
 		{
-			return IsA(T::StaticClass());
+			return IsA(GetReflectedClass<T>());
 		}
 
 		const FieldInfo* GetField(const char* fieldName)const;

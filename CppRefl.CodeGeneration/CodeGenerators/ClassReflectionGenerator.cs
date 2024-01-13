@@ -3,9 +3,9 @@
 namespace CppRefl.CodeGeneration.CodeGenerators
 {
 	/// <summary>
-	/// Generates Class::GetReflectedType, Class::StaticClass.
+	/// Generates Class::GetReflectedType, Class::ReflectedClass().
 	/// </summary>
-	internal class ClassStaticGenerator : ICodeGeneratorExtension
+	internal class ClassReflectionGenerator : ICodeGeneratorExtension
 	{
 		public void WriteHeaderTop(CodeWriter writer, FileObjects objects, Registry registry)
 		{
@@ -21,29 +21,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		public void WriteClassDeclaration(CodeWriter writer, ClassInfo classInfo, Registry registry)
 		{
 			writer.WriteLine($"friend const cpprefl::TypeInfo& cpprefl::GetReflectedType<{classInfo.Type.Name}>();");
-			writer.WriteLine($"friend const cpprefl::ClassInfo& cpprefl::StaticClass<{classInfo.Type.Name}>();");
-
-			if (classInfo.Type.IsInstantiable)
-			{
-				using (writer.WithPublic())
-				{
-					writer.WriteLine($$"""
-					                   static inline const cpprefl::TypeInfo& GetReflectedType() { return cpprefl::GetReflectedType<{{classInfo.Type.Name}}>(); }
-					                   static inline const cpprefl::ClassInfo& StaticClass() { return cpprefl::StaticClass<{{classInfo.Type.Name}}>(); }
-					                   static inline const char* StaticClassName() { return cpprefl::GetTypeName<{{classInfo.Type.Name}}>(); }
-					                   """);
-
-					// Avoid writing virtual functions for non-class types. Structs are generally used for pure data, so we don't want mess up their memory format with a vtable pointer.
-					if (classInfo.ClassType == ClassType.Class)
-					{
-						writer.WriteLine($$"""
-						                   virtual const cpprefl::TypeInfo& GetType()const { return cpprefl::GetReflectedType<{{classInfo.Type.Name}}>(); }
-						                   virtual const cpprefl::ClassInfo& GetClass()const { return cpprefl::StaticClass<{{classInfo.Type.Name}}>(); }
-						                   virtual const char* GetClassName()const { return cpprefl::GetTypeName<{{classInfo.Type.Name}}>(); }
-						                   """);
-					}
-				}
-			}
+			writer.WriteLine($"friend const cpprefl::ClassInfo& cpprefl::GetReflectedClass<{classInfo.Type.Name}>();");
 		}
 
 		public void WriteClassHeader(CodeWriter writer, ClassInfo classInfo, string? name = null)
@@ -66,7 +44,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 
 				// Static class
 				writer.WriteLine("template <>");
-				writer.WriteLine($"const ClassInfo& StaticClass<{name}>();");
+				writer.WriteLine($"const ClassInfo& GetReflectedClass<{name}>();");
 			}
 		}
 
@@ -118,7 +96,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 				// Static class
 				writer.WriteLine("template <>");
 				using (writer.WithFunction(
-						   $"const ClassInfo& StaticClass<{name}>()"))
+						   $"const ClassInfo& GetReflectedClass<{name}>()"))
 				{
 					string classTags = CodeGeneratorUtil.WriteTagDefinitions(writer, "Class", classInfo.Metadata);
 					string classAttributes =
@@ -174,7 +152,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 							writer.WriteLine($"GetReflectedType<{name}>()");
 							writer.WriteLine(
 								baseClass != null && baseClass.Metadata.IsReflected && !baseClass.Type.IsTemplated
-									? $"&StaticClass<{baseClass.Type.GloballyQualifiedName}>()"
+									? $"&GetReflectedClass<{baseClass.Type.GloballyQualifiedName}>()"
 									: "nullptr");
 							writer.WriteLine(ctor);
 							writer.WriteLine(dtor);

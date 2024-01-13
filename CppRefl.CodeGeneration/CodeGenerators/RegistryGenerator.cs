@@ -50,7 +50,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			writer.WriteLine("// Register classes");
 			foreach (var classInfo in Classes(registry, @params))
 			{
-				writer.WriteLine($"cpprefl::StaticClass<{classInfo.Type.QualifiedName}>();");
+				writer.WriteLine($"cpprefl::GetReflectedClass<{classInfo.Type.QualifiedName}>();");
 			}
 			writer.WriteLine();
 
@@ -59,14 +59,6 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			foreach (var enumInfo in Enums(registry))
 			{
 				writer.WriteLine($"cpprefl::GetReflectedEnum<{enumInfo.Type.QualifiedName}>();");
-			}
-			writer.WriteLine();
-
-			// Register aliases
-			writer.WriteLine("// Register aliases");
-			foreach (var aliasInfo in Aliases(registry))
-			{
-				writer.WriteLine($"cpprefl::StaticClass<{aliasInfo.Type.QualifiedName}>();");
 			}
 			writer.WriteLine();
 		}

@@ -38,7 +38,7 @@ namespace cpprefl
 		Span<const ClassInfo*> GetDerivedClasses(const ClassInfo& baseClass)const;
 
 		template <typename T>
-		Span<const ClassInfo*> GetDerivedClasses()const { return GetDerivedClasses(T::StaticClass()); }
+		Span<const ClassInfo*> GetDerivedClasses()const { return GetDerivedClasses(GetReflectedClass<T>()); }
 
 	private:
 		// Reflected types.

@@ -7,9 +7,9 @@ using namespace cpprefl;
 
 TEST(ClassTests, Names)
 {
-	EXPECT_STREQ(ReflectedClass::StaticClassName(), "ReflectedClass");
-	EXPECT_STREQ(ReflectedStruct::StaticClassName(), "ReflectedStruct");
-	EXPECT_STREQ(TestNamespace::ReflectedClass::StaticClassName(), "TestNamespace::ReflectedClass");
+	EXPECT_STREQ(cpprefl::GetTypeName<ReflectedClass>(), "ReflectedClass");
+	EXPECT_STREQ(cpprefl::GetTypeName<ReflectedStruct>(), "ReflectedStruct");
+	EXPECT_STREQ(cpprefl::GetTypeName<TestNamespace::ReflectedClass>(), "TestNamespace::ReflectedClass");
 }
 
 TEST(ClassTests, Super)
@@ -21,30 +21,30 @@ TEST(ClassTests, DerivedClasses)
 {
 	const auto derivedClasses = Registry::GetSystemRegistry().GetDerivedClasses<BaseClass>();
 	EXPECT_EQ(derivedClasses.size(), 2);
-	EXPECT_NE(std::find(derivedClasses.begin(), derivedClasses.end(), &ChildClass::StaticClass()), derivedClasses.end());
-	EXPECT_NE(std::find(derivedClasses.begin(), derivedClasses.end(), &ChildClass2::StaticClass()), derivedClasses.end());
+	EXPECT_NE(std::find(derivedClasses.begin(), derivedClasses.end(), &ChildClass::StaticReflectedClass()), derivedClasses.end());
+	EXPECT_NE(std::find(derivedClasses.begin(), derivedClasses.end(), &ChildClass2::StaticReflectedClass()), derivedClasses.end());
 
-	EXPECT_TRUE(BaseClass::StaticClass().IsA<BaseClass>());
-	EXPECT_FALSE(BaseClass::StaticClass().IsA<ChildClass>());
-	EXPECT_FALSE(BaseClass::StaticClass().IsA<ChildClass2>());
+	EXPECT_TRUE(BaseClass::StaticReflectedClass().IsA<BaseClass>());
+	EXPECT_FALSE(BaseClass::StaticReflectedClass().IsA<ChildClass>());
+	EXPECT_FALSE(BaseClass::StaticReflectedClass().IsA<ChildClass2>());
 
-	EXPECT_TRUE(ChildClass::StaticClass().IsA<BaseClass>());
-	EXPECT_TRUE(ChildClass::StaticClass().IsA<ChildClass>());
-	EXPECT_FALSE(ChildClass::StaticClass().IsA<ChildClass2>());
+	EXPECT_TRUE(ChildClass::StaticReflectedClass().IsA<BaseClass>());
+	EXPECT_TRUE(ChildClass::StaticReflectedClass().IsA<ChildClass>());
+	EXPECT_FALSE(ChildClass::StaticReflectedClass().IsA<ChildClass2>());
 
-	EXPECT_TRUE(ChildClass2::StaticClass().IsA<BaseClass>());
-	EXPECT_TRUE(ChildClass2::StaticClass().IsA<ChildClass>());
-	EXPECT_TRUE(ChildClass2::StaticClass().IsA<ChildClass2>());
+	EXPECT_TRUE(ChildClass2::StaticReflectedClass().IsA<BaseClass>());
+	EXPECT_TRUE(ChildClass2::StaticReflectedClass().IsA<ChildClass>());
+	EXPECT_TRUE(ChildClass2::StaticReflectedClass().IsA<ChildClass2>());
 }
 
 TEST(ClassTests, Constructors)
 {
 	void* obj = alloca(sizeof(ReflectedClass));
-	ReflectedClass::StaticClass().Construct(obj);
+	ReflectedClass::StaticReflectedClass().Construct(obj);
 
 	const auto typedObject = (ReflectedClass*)obj;
 	EXPECT_EQ(typedObject->mPublicInt, 1234);
 
-	ReflectedClass::StaticClass().Destruct(obj);
+	ReflectedClass::StaticReflectedClass().Destruct(obj);
 	EXPECT_EQ(typedObject->mPublicInt, 666);
 }

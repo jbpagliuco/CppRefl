@@ -115,7 +115,7 @@ namespace cpprefl::serialization
 	std::optional<ClassType> Deserializer::Deserialize(IObjectDeserializer& deserializer)
 	{
 		ClassType obj;
-		if (Deserialize(deserializer, &obj, ClassType::StaticClass()))
+		if (Deserialize(deserializer, &obj, GetReflectedClass<ClassType>()))
 		{
 			return obj;
 		}

@@ -38,7 +38,7 @@ using EnumAlias REFLECTED = EnumForAlias;
 using AliasAlias REFLECTED = EnumAlias;
 
 using TemplateAlias REFLECTED = TemplatedClassForAlias<int>; // Should reflected TemplatedClassForAlias<int> as class.
-// TODO: Multiple aliases from the same class causes redefinitions of StaticClass<>()
+// TODO: Multiple aliases from the same class causes redefinitions of GetReflectedClass<>()
 // using TemplateAliasAlias REFLECTED = TemplateAlias; // Should not reflect TemplateAlias as class.
 using TemplateSpecializationAlias REFLECTED = TemplatedSpecializationForAlias; // Should reflect TemplatedSpecializationForAlias as class.
 

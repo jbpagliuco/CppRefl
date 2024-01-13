@@ -38,15 +38,15 @@ TEST(StaticTests, PrimitiveTypes)
 	TestType<double>("double");
 	TestType<long double>("long double");
 
-	TestType<char>("char", PrimitiveTypes::StaticClass().GetField("mString")->GetType());
-	TestType<int>("int", PrimitiveTypes::StaticClass().GetField("mIntArray")->GetType());
+	TestType<char>("char", PrimitiveTypes::StaticReflectedClass().GetField("mString")->GetType());
+	TestType<int>("int", PrimitiveTypes::StaticReflectedClass().GetField("mIntArray")->GetType());
 
 	EXPECT_STREQ(cpprefl::GetReflectedType<void>().mName, "void");
 }
 
 TEST(StaticTests, TypeInstance)
 {
-	auto field = PrimitiveTypes::StaticClass().GetField("mString");
+	auto field = PrimitiveTypes::StaticReflectedClass().GetField("mString");
 	EXPECT_EQ(field->mTypeInstance.mIsArray, true);
 	EXPECT_EQ(field->mTypeInstance.mIsConst, false);
 	EXPECT_EQ(field->mTypeInstance.IsFixedSizeString(), true);
@@ -54,21 +54,21 @@ TEST(StaticTests, TypeInstance)
 	EXPECT_EQ(field->mTypeInstance.IsString(), true);
 	EXPECT_EQ(field->mTypeInstance.mArraySize, 64);
 
-	field = PrimitiveTypes::StaticClass().GetField("mDynamicString");
+	field = PrimitiveTypes::StaticReflectedClass().GetField("mDynamicString");
 	EXPECT_EQ(field->mTypeInstance.mIsArray, false);
 	EXPECT_EQ(field->mTypeInstance.mIsConst, false);
 	EXPECT_EQ(field->mTypeInstance.IsFixedSizeString(), false);
 	EXPECT_EQ(field->mTypeInstance.IsDynamicString(), true);
 	EXPECT_EQ(field->mTypeInstance.IsString(), true);
 
-	field = PrimitiveTypes::StaticClass().GetField("mIntArray");
+	field = PrimitiveTypes::StaticReflectedClass().GetField("mIntArray");
 	EXPECT_EQ(field->mTypeInstance.mIsArray, true);
 	EXPECT_EQ(field->mTypeInstance.mIsConst, false);
 	EXPECT_EQ(field->mTypeInstance.IsFixedSizeString(), false);
 	EXPECT_EQ(field->mTypeInstance.IsDynamicString(), false);
 	EXPECT_EQ(field->mTypeInstance.mArraySize, 12);
 
-	field = PrimitiveTypes::StaticClass().GetField("mConstBool");
+	field = PrimitiveTypes::StaticReflectedClass().GetField("mConstBool");
 	EXPECT_EQ(field->mTypeInstance.mIsArray, false);
 	EXPECT_EQ(field->mTypeInstance.mIsConst, true);
 	EXPECT_EQ(field->mTypeInstance.IsFixedSizeString(), false);
@@ -78,11 +78,11 @@ TEST(StaticTests, TypeInstance)
 TEST(StaticTests, ClassTypes)
 {
 	EXPECT_STREQ(cpprefl::GetReflectedType<PrimitiveTypes>().mName, "PrimitiveTypes");
-	EXPECT_EQ(&PrimitiveTypes::GetReflectedType(), &cpprefl::GetReflectedType<PrimitiveTypes>());
-	EXPECT_EQ(&PrimitiveTypes::StaticClass().mType, &cpprefl::GetReflectedType<PrimitiveTypes>());
+	EXPECT_EQ(&PrimitiveTypes::StaticReflectedType(), &cpprefl::GetReflectedType<PrimitiveTypes>());
+	EXPECT_EQ(&PrimitiveTypes::StaticReflectedClass().mType, &cpprefl::GetReflectedType<PrimitiveTypes>());
 
 	PrimitiveTypes p;
-	EXPECT_EQ(&PrimitiveTypes::StaticClass(), &p.GetClass());
+	EXPECT_EQ(&PrimitiveTypes::StaticReflectedClass(), &p.GetReflectedClass());
 }
 
 TEST(StaticTests, NameTests)

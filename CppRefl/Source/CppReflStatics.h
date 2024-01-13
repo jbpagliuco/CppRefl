@@ -90,7 +90,7 @@ namespace cpprefl
 
 	// Returns a static class known at compile time.
 	template <typename T>
-	const ClassInfo& StaticClass();
+	const ClassInfo& GetReflectedClass();
 
 	// Returns a static function known at compile time.
 	template <void* FunctionAddress>
@@ -120,7 +120,7 @@ namespace cpprefl
 	template <typename T>
 	concept ReflectedClass = requires(T v)
 	{
-		{ cpprefl::StaticClass<T>() } -> std::convertible_to<const cpprefl::ClassInfo&>;
+		{ cpprefl::GetReflectedClass<T>() } -> std::convertible_to<const cpprefl::ClassInfo&>;
 	};
 
 	template <typename T>
