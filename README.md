@@ -38,10 +38,10 @@ enum class REFLECTED MissionType
 
 // Ways to get access to the reflected class:
 > cpprefl::Registry::GetSystemRegistry().GetEnum("ReflectedEnum")
-> cpprefl::ReflectedEnum<MissionType>()
+> cpprefl::GetReflectedEnum<MissionType>()
 
 // Get the values in an enum.
-> cpprefl::ReflectedEnum<MissionType>().mValues
+> cpprefl::GetReflectedEnum<MissionType>().mValues
 { mName = "MainStory", mValue = 0 }
 { mName = "OpenWorld", mValue = 1 }
 ```
@@ -65,11 +65,12 @@ public:
 
 // Ways to get access to the reflected class:
 > cpprefl::Registry::GetSystemRegistry().GetClass("ShaderFloatParameter")
-> cpprefl::ReflectedClass<ShaderFloatParameter>()
-> ShaderFloatParameter::ReflectedClass()
+> cpprefl::GetReflectedClass<ShaderFloatParameter>()
+> ShaderFloatParameter::StaticReflectedClass()
+> ShaderFloatParameter f; f.GetReflectedClass()
 
 // Get the fields of a class.
-> cpprefl::ReflectedClass<ShaderFloatParameter>().mFields
+> cpprefl::GetReflectedClass<ShaderFloatParameter>().mFields
 { mName = "ParameterName", mType = "cpprefl::ReflectedType<std::string>()" }
 { mName = "ParameterValue", mType = "cpprefl::ReflectedType<float>()" }
 ```
