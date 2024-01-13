@@ -5,7 +5,7 @@
 
 #include "Reflection/TypeInfo.h"
 
-#if __cplusplus >= 202002L
+#if __cplusplus >= 202002L || _MSVC_LANG >= 202002L
 #define CPPREFL_CONCEPTS() 1
 #else
 #define CPPREFL_CONCEPTS() 0
