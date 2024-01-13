@@ -4,10 +4,10 @@ CppRefl is a C++ reflection compiler and code generator. It uses Clang to parse 
 ### Why Use Reflection?
 Reflection is an incredibly powerful tool that gives you access to the layout of your program at runtime. This enables you to do things like:
 - Look up and invoke a function by name (great for communication across languages).
-- Write code the can serialize the data in a class, without ever need to know the actual contents of that class.
+- Write code the can serialize the data in a class, without needing to explicitly know the layout of that class.
 
 ### Why Use Code Generation?
-Oftentimes in C++ code, you can achieve a lite version of code generation using templates and macros. While both of these work for most cases, they cannot handle everything in a clean fashion. Usually you end up with code that is wildly hard to read and debug. A full fledged code generation tool is much more flexible.
+Oftentimes in C++ code, you can achieve a lite version of code generation using preprocessor macros. While this can work for most cases, macros cannot handle everything. And for anything even remotely complex, you often end up with code that is incredibly hard to read and debug.
 
 ---
 
