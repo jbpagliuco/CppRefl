@@ -86,7 +86,7 @@ namespace cpprefl
 
 	// Returns a static enum known at compile time.
 	template <typename T>
-	const EnumInfo& StaticEnum();
+	const EnumInfo& ReflectedEnum();
 
 	// Returns a static class known at compile time.
 	template <typename T>

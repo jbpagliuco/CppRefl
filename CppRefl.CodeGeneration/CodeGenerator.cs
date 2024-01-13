@@ -75,7 +75,7 @@ namespace CppRefl.CodeGeneration
 		{
 			LoadCodeGenerator<ClassStaticGenerator>();
 			LoadCodeGenerator<ClassSuperGenerator>();
-			LoadCodeGenerator<EnumStaticGenerator>();
+			LoadCodeGenerator<EnumReflectionGenerator>();
 			LoadCodeGenerator<FunctionStaticGenerator>();
 			LoadCodeGenerator<VectorDynamicArrayGenerator>();
 			LoadCodeGenerator<RegistryGenerator>();
