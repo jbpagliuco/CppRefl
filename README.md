@@ -71,6 +71,6 @@ public:
 
 // Get the fields of a class.
 > cpprefl::GetReflectedClass<ShaderFloatParameter>().mFields
-{ mName = "ParameterName", mType = "cpprefl::ReflectedType<std::string>()" }
-{ mName = "ParameterValue", mType = "cpprefl::ReflectedType<float>()" }
+{ mName = "ParameterName", mType = "cpprefl::TypeInfo{std::string}" }
+{ mName = "ParameterValue", mType = "cpprefl::TypeInfo{float}" }
 ```
