@@ -34,7 +34,7 @@ enum class REFLECTED MissionType
   OpenWorld
 };
 
-// Example of how to use reflected enums. (NB: Output is a rough example of what you'd see)
+// Example of how to use reflected enums. (NB: Output is only a rough example of what you'd see)
 
 // Ways to get access to the reflected class:
 > cpprefl::Registry::GetSystemRegistry().GetEnum("ReflectedEnum")
@@ -60,7 +60,7 @@ public:
   float ParameterValue REFLECTED;
 };
 
-// Example of how to use reflected classes (NB: Output is a rough example of what you'd see).
+// Example of how to use reflected classes (NB: Output is only a rough example of what you'd see).
 
 // Ways to get access to the reflected class:
 > cpprefl::Registry::GetSystemRegistry().GetClass("ShaderFloatParameter")
