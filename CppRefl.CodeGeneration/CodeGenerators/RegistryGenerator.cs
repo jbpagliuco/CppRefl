@@ -1,0 +1,74 @@
+﻿using CppRefl.CodeGeneration.Reflection;
+
+namespace CppRefl.CodeGeneration.CodeGenerators
+{
+	internal class RegistryGenerator : ICodeGeneratorExtension
+	{
+		/// <summary>
+		/// Classes to reflect.
+		/// </summary>
+		/// <param name="registry"></param>
+		/// <param name="params"></param>
+		/// <returns></returns>
+		private IEnumerable<ClassInfo> Classes(Registry registry, CodeGeneratorRegistryParams @params) => 
+			registry.Classes.Values
+				.Where(x => x.Type.IsInstantiable && x.Metadata.IsReflected && x.GeneratedBodyLine != null && x.Metadata.SourceLocation.Filepath.StartsWith(@params.ModuleDirectory));
+		
+		/// <summary>
+		/// Enums to reflect.
+		/// </summary>
+		/// <param name="registry"></param>
+		/// <returns></returns>
+		private IEnumerable<EnumInfo> Enums(Registry registry) => registry.Enums.Values.Where(x => x.Metadata.IsReflected);
+
+		/// <summary>
+		/// Aliases to reflect.
+		/// </summary>
+		/// <param name="registry"></param>
+		/// <returns></returns>
+		private IEnumerable<AliasInfo> Aliases(Registry registry) => registry.Aliases.Values.Where(x => x.Metadata.IsReflected && x.AliasClass?.Type.Template?.IsSpecialized == true);
+		
+
+		public void WriteRegistrySource(CodeWriter writer, Registry registry, CodeGeneratorRegistryParams @params)
+		{
+			HashSet<string> includeFilenames = Classes(registry, @params).Select(x => x.Metadata.SourceLocation.Filepath).ToHashSet();
+			includeFilenames.UnionWith(Enums(registry).Select(x => x.Metadata.SourceLocation.Filepath));
+			includeFilenames.UnionWith(Aliases(registry).Select(x => x.Metadata.SourceLocation.Filepath));
+
+			foreach (var includeFilename in includeFilenames)
+			{
+				var include = Path.GetRelativePath(@params.ModuleDirectory, includeFilename);
+				writer.IncludeHeader(include);
+			}
+
+			writer.WriteLine();
+		}
+
+		public void WriteRegistryInitializer(CodeWriter writer, Registry registry, CodeGeneratorRegistryParams @params)
+		{
+			// Register classes
+			writer.WriteLine("// Register classes");
+			foreach (var classInfo in Classes(registry, @params))
+			{
+				writer.WriteLine($"cpprefl::StaticClass<{classInfo.Type.QualifiedName}>();");
+			}
+			writer.WriteLine();
+
+			// Register enums
+			writer.WriteLine("// Register enums");
+			foreach (var enumInfo in Enums(registry))
+			{
+				writer.WriteLine($"cpprefl::StaticEnum<{enumInfo.Type.QualifiedName}>();");
+			}
+			writer.WriteLine();
+
+			// Register aliases
+			writer.WriteLine("// Register aliases");
+			foreach (var aliasInfo in Aliases(registry))
+			{
+				writer.WriteLine($"cpprefl::StaticClass<{aliasInfo.Type.QualifiedName}>();");
+			}
+			writer.WriteLine();
+		}
+	}
+}

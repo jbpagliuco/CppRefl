@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="libClangSharp" Version="17.0.4" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == '' AND '$(PackAsTool)' != 'true'">$(NETCoreSdkRuntimeIdentifier)</RuntimeIdentifier>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="CommandLineParser" Version="2.9.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\CppRefl.CodeGeneration\CppRefl.CodeGeneration.csproj" />
+	  <ProjectReference Include="..\CppRefl.Compiler\CppRefl.Compiler.csproj" />
+	</ItemGroup>
+
+</Project>
