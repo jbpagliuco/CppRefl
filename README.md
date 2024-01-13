@@ -22,7 +22,7 @@ Oftentimes in C++ code, you can achieve a lite version of code generation using 
 - Aliases/Typedefs (Somewhat)
 
 # Example Usage
-
+### Reflected Enum
 ```cpp
 // Includes the generated code for this file (which is called "MissionType.h"). 
 #include "MissionType.reflgen.h"
@@ -46,6 +46,7 @@ enum class REFLECTED MissionType
 { mName = "OpenWorld", mValue = 1 }
 ```
 
+### Reflected Class
 ```cpp
 // Includes the generated code for this file (which is called "ShaderFloatParameter.h"). 
 #include "ShaderFloatParameter.reflgen.h"
