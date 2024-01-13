@@ -86,7 +86,7 @@ namespace cpprefl
 
 	// Returns a static enum known at compile time.
 	template <typename T>
-	const EnumInfo& ReflectedEnum();
+	const EnumInfo& GetReflectedEnum();
 
 	// Returns a static class known at compile time.
 	template <typename T>
@@ -124,7 +124,7 @@ namespace cpprefl
 	};
 
 	template <typename T>
-	concept ReflectedEnum = requires(T v)
+	concept GetReflectedEnum = requires(T v)
 	{
 		{ cpprefl::StaticEnum<T>() } -> std::convertible_to<const cpprefl::EnumInfo&>;
 	};

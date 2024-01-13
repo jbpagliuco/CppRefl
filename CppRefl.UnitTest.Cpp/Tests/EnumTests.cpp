@@ -6,12 +6,12 @@
 TEST(EnumTests, EnumTypes)
 {
 	EXPECT_STREQ(cpprefl::GetReflectedType<ReflectedEnum>().mName, "ReflectedEnum");
-	EXPECT_EQ(&cpprefl::ReflectedEnum<ReflectedEnum>().mType, &cpprefl::GetReflectedType<ReflectedEnum>());
+	EXPECT_EQ(&cpprefl::GetReflectedEnum<ReflectedEnum>().mType, &cpprefl::GetReflectedType<ReflectedEnum>());
 }
 
 TEST(EnumTests, EnumValues)
 {
-	const auto& enumInfo = cpprefl::ReflectedEnum<ReflectedEnum>();
+	const auto& enumInfo = cpprefl::GetReflectedEnum<ReflectedEnum>();
 
 	EXPECT_EQ(enumInfo.mValues.size(), 3);
 

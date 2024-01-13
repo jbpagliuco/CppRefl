@@ -58,7 +58,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			writer.WriteLine("// Register enums");
 			foreach (var enumInfo in Enums(registry))
 			{
-				writer.WriteLine($"cpprefl::ReflectedEnum<{enumInfo.Type.QualifiedName}>();");
+				writer.WriteLine($"cpprefl::GetReflectedEnum<{enumInfo.Type.QualifiedName}>();");
 			}
 			writer.WriteLine();
 

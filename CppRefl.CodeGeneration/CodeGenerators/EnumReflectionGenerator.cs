@@ -21,7 +21,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 
 				// Static enum
 				writer.WriteLine("template <>");
-				writer.WriteLine($"const EnumInfo& ReflectedEnum<{enumInfo.Type.GloballyQualifiedName}>();");
+				writer.WriteLine($"const EnumInfo& GetReflectedEnum<{enumInfo.Type.GloballyQualifiedName}>();");
 			}
 		}
 
@@ -48,7 +48,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 
 				// Static enum
 				writer.WriteLine("template <>");
-				using (writer.WithFunction($"const EnumInfo& ReflectedEnum<{enumInfo.Type.GloballyQualifiedName}>()"))
+				using (writer.WithFunction($"const EnumInfo& GetReflectedEnum<{enumInfo.Type.GloballyQualifiedName}>()"))
 				{
 					string enumTags = CodeGeneratorUtil.WriteTagDefinitions(writer, "Enum", enumInfo.Metadata);
 					string enumAttributes = CodeGeneratorUtil.WriteAttributeDefinitions(writer, "Enum", enumInfo.Metadata);
