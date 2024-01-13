@@ -74,3 +74,16 @@ public:
 { mName = "ParameterName", mType = "cpprefl::TypeInfo{std::string}" }
 { mName = "ParameterValue", mType = "cpprefl::TypeInfo{float}" }
 ```
+
+---
+
+# Project Layout
+## C++
+- CppRefl: C++ static library that implements the reflection runtime.
+- CppRefl.UnitTest.Cpp: Unit tests for C++ code.
+
+## C#/.NET
+- CppRefl.CodeGeneration: Library containing functionality for generating code based of a program's reflection information.
+- CppRefl.Compiler: Library that generates compiler agnostic reflection information about a program. Currently this uses Clang to parse the source program. (NB: This is a separate library from the CLI to simplify our unit tests).
+- CppRefl.Compiler.CLI: Small CLI wrapper over CppRefl.Compiler.
+- CppRefl.UnitTest.CSharp: Unit tests for C# code.
