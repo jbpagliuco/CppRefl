@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CppRefl.Compiler.CLI", "Com
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CppRefl.Compiler.Tests", "Compiler\CppRefl.Compiler.Tests\CppRefl.Compiler.Tests.csproj", "{A32111DC-477F-4A5A-A251-BE3A70F4128A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CppRefl.CodeGeneration.Tests", "Compiler\CppRefl.CodeGeneration.Tests\CppRefl.CodeGeneration.Tests.csproj", "{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +129,22 @@ Global
 		{A32111DC-477F-4A5A-A251-BE3A70F4128A}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
 		{A32111DC-477F-4A5A-A251-BE3A70F4128A}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
 		{A32111DC-477F-4A5A-A251-BE3A70F4128A}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.Debug|x64.Build.0 = Debug|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.MinSizeRel|x64.Build.0 = Debug|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.Release|x64.ActiveCfg = Release|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.Release|x64.Build.0 = Release|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.RelWithDebInfo|Any CPU.ActiveCfg = Release|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -138,6 +156,7 @@ Global
 		{1A41B2FC-92A9-4400-8A64-F6936404C857} = {773EBCC9-CD97-4285-87CC-8BBA9B9D5E3E}
 		{2CBD1E17-A7A0-458F-A7CF-DB83605C396E} = {773EBCC9-CD97-4285-87CC-8BBA9B9D5E3E}
 		{A32111DC-477F-4A5A-A251-BE3A70F4128A} = {773EBCC9-CD97-4285-87CC-8BBA9B9D5E3E}
+		{2F7A78F1-7C43-4A29-AB90-78B041FBE51C} = {773EBCC9-CD97-4285-87CC-8BBA9B9D5E3E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F71C9A76-EA8D-498C-BD39-41A41CFE3AC0}

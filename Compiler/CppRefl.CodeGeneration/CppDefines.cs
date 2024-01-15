@@ -28,5 +28,11 @@
 		/// Prefix of the GENERATED_REFLECTION_CODE() body expands to.
 		/// </summary>
 		public const string InternalReflectionMacroPrefix = "__CPPREFLPRIVATE_REFLECTION_CODE";
+
+		public static class Namespaces
+		{
+			public const string Public = "cpprefl";
+			public const string Private = "CppReflPrivate";
+		}
 	}
 }

@@ -13,12 +13,12 @@
 		/// <summary>
 		/// Reflected tags.
 		/// </summary>
-		public required IReadOnlyList<string> Tags { get; init; }
+		public IReadOnlyList<string> Tags { get; init; } = new List<string>();
 
 		/// <summary>
 		/// Reflected attributes.
 		/// </summary>
-		public required IReadOnlyDictionary<string, string> Attributes { get; init; }
+		public IReadOnlyDictionary<string, string> Attributes { get; init; } = new Dictionary<string, string>();
 
 		/// <summary>
 		/// Source information.

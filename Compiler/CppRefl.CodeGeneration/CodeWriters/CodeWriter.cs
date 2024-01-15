@@ -23,10 +23,10 @@ namespace CppRefl.CodeGeneration.CodeWriters
         }
     }
 
-    /// <summary>
-    /// Helper class for adding a postfix to every line in a block of code.
-    /// </summary>
-    public class CodeWriterPostfix : IDisposable
+	/// <summary>
+	/// Helper class for adding a postfix to every line in a block of code.
+	/// </summary>
+	public class CodeWriterPostfix : IDisposable
     {
         private CodeWriter Writer { get; }
         private string Postfix { get; }
@@ -42,47 +42,39 @@ namespace CppRefl.CodeGeneration.CodeWriters
         {
             Writer.RemovePostfix(Postfix);
         }
-    }
+	}
 
-    /// <summary>
-    /// Helper class for writing a block of code.
-    /// </summary>
-    public class CodeWriterCodeBlock : IDisposable
-    {
-        private CodeWriter Writer { get; }
-        private string End { get; }
+	/// <summary>
+	/// Helper class for writing a block of code.
+	/// </summary>
+	public class CodeWriterCodeBlock : IDisposable
+	{
+		private CodeWriter Writer { get; }
+		private string End { get; }
 
-        public CodeWriterCodeBlock(CodeWriter writer, string block, string start, string end)
-        {
-            Writer = writer;
-            End = end;
+		public CodeWriterCodeBlock(CodeWriter writer, string block, string start, string end)
+		{
+			Writer = writer;
+			End = end;
 
-            Writer.WriteLine(block);
-            Writer.WriteLine(start);
-            Writer.BeginIndent();
-        }
+			Writer.WriteLine(block);
+			Writer.WriteLine(start);
+			Writer.BeginIndent();
+		}
 
-        public void Dispose()
-        {
-            Writer.EndIndent();
-            Writer.WriteLine(End);
-        }
-    }
+		public void Dispose()
+		{
+			Writer.EndIndent();
+			Writer.WriteLine(End);
+		}
+	}
 
-    /// <summary>
-    /// Class for writing code to a file.
-    /// </summary>
-    public class CodeWriter : IDisposable
+	public class CodeWriter
     {
         /// <summary>
-        /// Name of the file we're writing to.
+        /// Internal string builder.
         /// </summary>
-        public string Filename { get; }
-
-        /// <summary>
-        /// Our file writer.
-        /// </summary>
-        protected StreamWriter Writer { get; }
+	    private StringBuilder StringBuilder { get; } = new();
 
         /// <summary>
         /// The number of indents each line should have.
@@ -99,92 +91,82 @@ namespace CppRefl.CodeGeneration.CodeWriters
         /// </summary>
         private char LastWrittenChar { get; set; } = '\0';
 
-        public CodeWriter(string filename)
-        {
-            Filename = filename;
-
-            Directory.CreateDirectory(Path.GetDirectoryName(Filename)!);
-            Writer = new StreamWriter(filename);
-        }
-
-        public void Dispose()
-        {
-            Writer.Dispose();
-        }
-
+        public override string ToString() => StringBuilder.ToString().Replace("\r\n", "\n").Replace("\n", Environment.NewLine);
+        
         /// <summary>
-        /// Write some text to the file. If the text contains multiple lines, each new line will be properly indented, etc.
-        /// </summary>
-        /// <param name="text"></param>
-        private void WriteInternal(string text)
-        {
-            StringBuilder sb = new();
+		/// Write some text to the file. If the text contains multiple lines, each new line will be properly indented, etc.
+		/// </summary>
+		/// <param name="text"></param>
+		private void WriteInternal(string text)
+		{
+			StringBuilder sb = new();
 
-            // The last thing we wrote was a newline, so let's start a new one.
-            if (LastWrittenChar == '\n')
-            {
-                string indent = string.Concat(Enumerable.Repeat("\t", IndentCount));
-                sb.Append(indent);
-            }
+			// The last thing we wrote was a newline, so let's start a new one.
+			if (LastWrittenChar == '\n' || LastWrittenChar == '\0')
+			{
+				string indent = string.Concat(Enumerable.Repeat("\t", IndentCount));
+				sb.Append(indent);
+			}
 
-            sb.Append(text);
+			sb.Append(text);
 
-            // Put in our postfix.
-            if (text != "")
-            {
-                LastWrittenChar = text.Last();
-                if (LastWrittenChar == '\n')
-                {
-                    sb.Length -= 1;
-                    sb.Append(Postfix);
-                    sb.Append('\n');
-                }
-            }
+			// Put in our postfix.
+			if (text != "")
+			{
+				LastWrittenChar = text.Last();
+				if (LastWrittenChar == '\n')
+				{
+					sb.Length -= 1;
+					sb.Append(Postfix);
+					sb.Append('\n');
+				}
+			}
 
-            Writer.Write(sb.ToString());
-        }
+			StringBuilder.Append(sb.ToString());
+		}
 
-        /// <summary>
-        /// Write a piece of text.
-        /// </summary>
-        /// <param name="text"></param>
-        private void WriteBodyInternal(string text)
-        {
-            text = text.Replace("\r\n", "\n");
-            string[] lines = text.Split("\n");
-            if (lines.Last() == "")
-            {
-                lines = lines.Take(lines.Length - 1).ToArray();
-            }
+		/// <summary>
+		/// Write a piece of text.
+		/// </summary>
+		/// <param name="text"></param>
+		private void WriteBodyInternal(string text)
+		{
+			text = text.Replace("\r\n", "\n");
 
-            for (int i = 0; i < lines.Length; ++i)
-            {
-                WriteInternal(lines[i]);
+			string[] lines = text.Split('\n');
+			if (lines.Last() == "")
+			{
+				lines = lines.Take(lines.Length - 1).ToArray();
+			}
 
-                if (i < lines.Length - 1 || text.Last() == '\n')
-                {
-                    WriteInternal("\n");
-                }
-            }
-        }
+			for (int i = 0; i < lines.Length; ++i)
+			{
+				WriteInternal(lines[i]);
 
-        /// <summary>
-        /// Write some text to the output file.
-        /// </summary>
-        /// <param name="text"></param>
-        public void Write(string text)
-        {
-            WriteBodyInternal(text);
-        }
+				if (i < lines.Length - 1 || text.Last() == '\n')
+				{
+					WriteInternal("\n");
+				}
+			}
+		}
 
-        /// <summary>
-        /// Write a line of text to the output file.
-        /// </summary>
-        /// <param name="text"></param>
-        public void WriteLine(string text = "")
-        {
-            WriteBodyInternal(text + "\n");
-        }
+		/// <summary>
+		/// Write some text to the output file.
+		/// </summary>
+		/// <param name="text"></param>
+		public void Write(string text)
+		{
+			WriteBodyInternal(text);
+		}
+
+		/// <summary>
+		/// Write a line of text to the output file.
+		/// </summary>
+		/// <param name="text"></param>
+		public void WriteLine(string text = "")
+		{
+			WriteBodyInternal(text + '\n');
+		}
 
         /// <summary>
         /// Indent all new lines.
@@ -211,7 +193,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
         /// <returns></returns>
         public CodeWriterIndent WithIndent(int num = 1)
         {
-            return new CodeWriterIndent(this, num);
+            return new(this, num);
         }
 
         /// <summary>
@@ -245,7 +227,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
         /// <returns></returns>
         public CodeWriterPostfix WithPostfix(string postfix)
         {
-            return new CodeWriterPostfix(this, postfix);
+            return new(this, postfix);
         }
 
         /// <summary>
@@ -257,7 +239,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
         /// <returns></returns>
         public CodeWriterCodeBlock WithCodeBlock(string text, string start = "{", string end = "}")
         {
-            return new CodeWriterCodeBlock(this, text, start, end);
+            return new(this, text, start, end);
         }
     }
 }

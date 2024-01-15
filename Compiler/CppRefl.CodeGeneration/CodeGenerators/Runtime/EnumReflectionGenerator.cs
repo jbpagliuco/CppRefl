@@ -3,49 +3,38 @@ using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
 {
-    internal class EnumReflectionGenerator : ICodeGenerator
+    internal class EnumReflectionGenerator : IFileCodeGenerator
     {
-        public void WriteEnumHeader(CppWriter writer, EnumInfo enumInfo, Registry registry)
+        public void WriteEnumHeader(CppWriter writer, EnumInfo enumInfo)
         {
             // Forward declare
-            var namespaceDec = enumInfo.Type.IsInGlobalNamespace ? null : writer.WithNamespace(enumInfo.Type.Namespace);
-            writer.WriteLine($"enum class {enumInfo.Type.Name};");
-            namespaceDec?.Dispose();
+            writer.ForwardDeclare(enumInfo);
 
-            using (writer.WithNamespace("cpprefl"))
+            // Specialize the templated GetReflectedXX functions.
+			using (writer.WithNamespace(CppDefines.Namespaces.Public))
             {
-                // Static type
-                writer.WriteLine("template <>");
-                writer.WriteLine($"const TypeInfo& GetReflectedType<{enumInfo.Type.GloballyQualifiedName}>();");
-
-                writer.WriteLine();
-
-                // Static enum
-                writer.WriteLine("template <>");
-                writer.WriteLine($"const EnumInfo& GetReflectedEnum<{enumInfo.Type.GloballyQualifiedName}>();");
+                writer.WriteLine($"""
+                                  template <>
+                                  const TypeInfo& GetReflectedType<{enumInfo.Type.GloballyQualifiedName}>();
+                                  
+                                  template <>
+                                  const EnumInfo& GetReflectedEnum<{enumInfo.Type.GloballyQualifiedName}>();
+                                  """);
             }
         }
 
-        /// <summary>
-        /// Generate code for an enum in a source file.
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="enumInfo"></param>
-        /// <param name="registry"></param>
-        public void WriteEnumSource(CppWriter writer, EnumInfo enumInfo, Registry registry)
+        public void WriteEnumSource(CppWriter writer, EnumInfo enumInfo)
         {
-            using (writer.WithNamespace("cpprefl"))
+            using (writer.WithNamespace(CppDefines.Namespaces.Public))
             {
-                // Static type
-                writer.WriteLine("template <>");
-                using (writer.WithFunction($"const TypeInfo& GetReflectedType<{enumInfo.Type.GloballyQualifiedName}>()"))
-                {
-                    writer.WriteLine(
-                        $"static auto& type = cpprefl::Registry::GetSystemRegistry().AddType(cpprefl::TypeInfo(\"{enumInfo.Type.QualifiedName}\", cpprefl::TypeKind::Enum, sizeof({enumInfo.Type.GloballyQualifiedName})));");
-                    writer.WriteLine("return type;");
-                }
-
-                writer.WriteLine();
+                writer.WriteLine($$"""
+                                  template <>
+                                  const TypeInfo& GetReflectedType<{{enumInfo.Type.GloballyQualifiedName}}>()
+                                  {
+                                      static auto& type = cpprefl::Registry::GetSystemRegistry().AddType(cpprefl::TypeInfo("{{enumInfo.Type.QualifiedName}}", cpprefl::TypeKind::Enum, sizeof({{enumInfo.Type.GloballyQualifiedName}})));
+                                      return type;
+                                  }
+                                  """);
 
                 // Static enum
                 writer.WriteLine("template <>");
@@ -81,6 +70,21 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                     writer.WriteLine("return enumInfo;");
                 }
             }
+        }
+
+        public void Execute(FileCodeGeneratorContext context)
+        {
+	        if (!context.Objects.Enums.Any())
+	        {
+		        return;
+	        }
+
+	        foreach (var enumInfo in context.Objects.Enums)
+	        {
+		        context.WriteHeader(writer => WriteEnumHeader(writer, enumInfo));
+		        context.WriteSource(writer => WriteEnumSource(writer, enumInfo));
+			}
+
         }
     }
 }
