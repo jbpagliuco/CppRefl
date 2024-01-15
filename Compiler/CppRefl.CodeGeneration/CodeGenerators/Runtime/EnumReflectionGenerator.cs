@@ -79,11 +79,26 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
 		        return;
 	        }
 
-	        foreach (var enumInfo in context.Objects.Enums)
-	        {
-		        context.WriteHeader(writer => WriteEnumHeader(writer, enumInfo));
-		        context.WriteSource(writer => WriteEnumSource(writer, enumInfo));
-			}
+            context.WriteHeader(writer =>
+            {
+	            // For overloading GetReflectedType() and GetReflectedClass().
+	            writer.IncludeHeader("CppReflStatics.h");
+
+	            foreach (var enumInfo in context.Objects.Enums)
+				{
+					WriteEnumHeader(writer, enumInfo);
+				}
+            });
+
+            context.WriteSource(writer =>
+			{
+				writer.IncludeHeader("Reflection/Registry.h");
+
+				foreach (var enumInfo in context.Objects.Enums)
+	            {
+		            WriteEnumSource(writer, enumInfo);
+	            }
+			});
 
         }
     }

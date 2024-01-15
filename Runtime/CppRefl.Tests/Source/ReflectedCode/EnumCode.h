@@ -1,6 +1,6 @@
 #pragma once
 
-#define TEST_ENUM_CODE() 0
+#define TEST_ENUM_CODE() 1
 
 #if TEST_ENUM_CODE()
 
