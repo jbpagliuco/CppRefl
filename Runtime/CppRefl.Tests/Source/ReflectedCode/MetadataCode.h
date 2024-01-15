@@ -1,6 +1,6 @@
 #pragma once
 
-#define TEST_METADATA_CODE() 0
+#define TEST_METADATA_CODE() 1
 
 #if TEST_METADATA_CODE()
 

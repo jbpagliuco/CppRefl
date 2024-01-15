@@ -16,7 +16,7 @@ set(REFLECTED_FILES
 	ClassCode
 	EnumCode
 	# FunctionCode
-	# MetadataCode
+	MetadataCode
 	# SerializerCode
 	# TemplateCode
 	TypesCode
