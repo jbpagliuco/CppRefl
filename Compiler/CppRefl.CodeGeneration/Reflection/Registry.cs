@@ -136,7 +136,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Add an function to this registry.
 		/// </summary>
 		/// <param name="functionInfo"></param>
-		public void AddFunction(FunctionInfo functionInfo) => Functions.Add(functionInfo.QualifiedName, functionInfo);
+		public void AddFunction(FunctionInfo functionInfo) => Functions.Add(functionInfo.QualifiedName(), functionInfo);
 
 		/// <summary>
 		/// Returns an function in this registry.
