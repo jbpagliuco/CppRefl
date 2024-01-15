@@ -13,7 +13,6 @@ namespace CppRefl.CodeGeneration.Tests
 			var root = Path.GetTempPath();
 			return new()
 			{
-				Registry = new(),
 				Objects = new(),
 				Parameters = new()
 				{

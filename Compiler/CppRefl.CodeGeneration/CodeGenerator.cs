@@ -168,7 +168,6 @@ namespace CppRefl.CodeGeneration
 
 			FileCodeGeneratorContext context = new()
 			{
-				Registry = @params.Registry,
 				Objects = objects,
 				Parameters = @params
 			};

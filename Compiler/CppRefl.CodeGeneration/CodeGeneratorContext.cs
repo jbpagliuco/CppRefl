@@ -19,11 +19,6 @@ namespace CppRefl.CodeGeneration
 	public class CodeGeneratorContext
 	{
 		/// <summary>
-		/// The source program's reflection registry.
-		/// </summary>
-		public required Registry Registry { get; init; }
-
-		/// <summary>
 		/// Writer for our header file.
 		/// </summary>
 		private CppWriter HeaderWriter { get; } = new();

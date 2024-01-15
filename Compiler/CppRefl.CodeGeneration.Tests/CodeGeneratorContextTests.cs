@@ -16,10 +16,7 @@ namespace CppRefl.CodeGeneration.Tests
 			using StringWriter sw = new StringWriter();
 			Console.SetError(sw);
 
-			CodeGeneratorContext context = new()
-			{
-				Registry = new()
-			};
+			CodeGeneratorContext context = new();
 			context.AddDiagnostic(DiagnosticLevel.Warning, "Warning #1...");
 			context.AddDiagnostic(DiagnosticLevel.Warning, "Warning #2...");
 
@@ -29,11 +26,7 @@ namespace CppRefl.CodeGeneration.Tests
 		[Test]
 		public void ShouldRaiseError()
 		{
-			CodeGeneratorContext context = new()
-			{
-				Registry = new()
-			};
-
+			CodeGeneratorContext context = new();
 			Assert.Throws(
 				Is.TypeOf<Exception>()
 					.And.Message.EqualTo("Error"),
