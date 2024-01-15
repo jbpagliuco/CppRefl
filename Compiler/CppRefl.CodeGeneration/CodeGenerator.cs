@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using CppRefl.CodeGeneration.CodeGenerators;
 using CppRefl.CodeGeneration.CodeGenerators.Optional;
 using CppRefl.CodeGeneration.CodeGenerators.Runtime;
@@ -27,11 +30,6 @@ namespace CppRefl.CodeGeneration
 		/// </summary>
 		private readonly string _outputDirectory = string.Empty;
 		public required string OutputDirectory { get => _outputDirectory; init => _outputDirectory = Path.GetFullPath(value); }
-
-		/// <summary>
-		/// List of external .DLLs to load.
-		/// </summary>
-		public IEnumerable<string> ExternalGeneratorDlls { get; init; } = Enumerable.Empty<string>();
 	}
 
 	/// <summary>
@@ -56,21 +54,47 @@ namespace CppRefl.CodeGeneration
 		public required string ModuleName { get; init; }
 	}
 
+	public sealed class FileGenerationResult
+	{
+		/// <summary>
+		/// The filename containing our results.
+		/// </summary>
+		public required string Filename { get; init; }
+
+		/// <summary>
+		/// The stream containing our file contents.
+		/// </summary>
+		public required Stream Stream { get; init; }
+	}
+
+	public sealed class FileCodeGeneratorResult
+	{
+		/// <summary>
+		/// The header file contents.
+		/// </summary>
+		public required FileGenerationResult Header { get; init; }
+
+		/// <summary>
+		/// The source file contents.
+		/// </summary>
+		public required FileGenerationResult Source { get; init; }
+	}
+
 	/// <summary>
 	/// Writes code for a program.
 	/// </summary>
 	public class CodeGenerator
 	{
-		//public const string FileHeaderExt = ".reflgen.h";
-		//public const string FileSourceExt = ".reflgen.cpp";
+		public const string FileHeaderExt = ".reflgen.h";
+		public const string FileSourceExt = ".reflgen.cpp";
 
-		//public const string RegistryHeaderExt = ".reflregistry.h";
-		//public const string RegistrySourceExt = ".reflregistry.cpp";
+		public const string ModuleHeaderExt = ".reflmodule.h";
+		public const string ModuleSourceExt = ".reflmodule.cpp";
 
-		//private List<ICodeGenerator> Generators { get; } = new();
+		public List<IFileCodeGenerator> FileGenerators { get; } = new();
 
-		//public static string GetOutputFilename(string file, string moduleDirectory, string outputDirectory, string extension) => Path.Combine(outputDirectory, Path.GetRelativePath(moduleDirectory, Path.GetDirectoryName(file)!),
-		//		$"{Path.GetFileNameWithoutExtension(file)}{extension}");
+		public static string GetOutputFilename(string file, string moduleDirectory, string outputDirectory, string extension) => Path.Combine(outputDirectory, Path.GetRelativePath(moduleDirectory, Path.GetDirectoryName(file)!),
+				$"{Path.GetFileNameWithoutExtension(file)}{extension}");
 
 		//private string RegistryInitializerSignature(string moduleName) => $"void Registry{moduleName}Reflection()";
 
@@ -89,79 +113,99 @@ namespace CppRefl.CodeGeneration
 		//	LoadCodeGenerator<ClassStaticTypeGetters>();
 		//}
 
-		///// <summary>
-		///// Add a code generator extension.
-		///// </summary>
-		///// <typeparam name="T"></typeparam>
-		//public void LoadCodeGenerator<T>() where T : ICodeGenerator, new()
-		//{
-		//	Generators.Add(new T());
-		//}
+		/// <summary>
+		/// Add a code generator.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		public T AddCodeGenerator<T>() where T : IFileCodeGenerator, new()
+		{
+			T generator = new();
+			FileGenerators.Add(generator);
+			return generator;
+		}
 
-		///// <summary>
-		///// Adds a code generator extension from a .DLL file.
-		///// </summary>
-		///// <param name="dllFilename"></param>
-		//public void LoadCodeGenerator(string dllFilename)
-		//{
-		//	if (!File.Exists(dllFilename))
-		//	{
-		//		throw new FileNotFoundException($"Code generator extension not found: {dllFilename}");
-		//	}
+		/// <summary>
+		/// Adds a code generator extension from an assembly.
+		/// </summary>
+		/// <param name="assembly"></param>
+		public void LoadCodeGenerators(Assembly assembly)
+		{
+			foreach (Type type in assembly.GetExportedTypes())
+			{
+				if (type.GetInterface(nameof(IFileCodeGenerator)) != null)
+				{
+					if (Activator.CreateInstance(type) is IFileCodeGenerator generator)
+					{
+						FileGenerators.Add(generator);
+					}
+				}
+			}
+		}
+		
+		/// <summary>
+		/// Generate code pertaining to a single file.
+		/// </summary>
+		/// <param name="params"></param>
+		public FileCodeGeneratorResult GenerateFileCode(CodeGeneratorFileParams @params, Func<string, Stream>? streamCreator = null)
+		{
+			streamCreator ??= filename => new FileStream(filename, FileMode.Create, FileAccess.Write);
 
-		//	var dll = Assembly.LoadFile(dllFilename);
+			IEnumerable<T> FindFileObjects<T>(IEnumerable<T> items) where T : ObjectInfo
+			{
+				return items.Where(x =>
+					x.Metadata.IsReflected && 
+					x.Metadata.SourceLocation.Filepath == @params.InputFilename);
+			}
 
-		//	foreach (Type type in dll.GetExportedTypes())
-		//	{
-		//		if (type.GetInterface(nameof(ICodeGenerator)) != null)
-		//		{
-		//			if (Activator.CreateInstance(type) is ICodeGenerator generator)
-		//			{
-		//				Generators.Add(generator);
-		//			}
-		//		}
-		//	}
-		//}
+			// Find all reflected classes in our input file.
+			FileObjects objects = new()
+			{
+				Classes = FindFileObjects(@params.Registry.GetClasses()),
+				Enums = FindFileObjects(@params.Registry.GetEnums()),
+				Aliases = FindFileObjects(@params.Registry.GetAliases()),
+				Functions = FindFileObjects(@params.Registry.GetFunctions())
+			};
 
-		//public void LoadCodeGenerators(IEnumerable<string> dlls)
-		//{
-		//	foreach (var dll in dlls)
-		//	{
-		//		LoadCodeGenerator(dll);
-		//	}
-		//}
+			FileCodeGeneratorContext context = new()
+			{
+				Registry = @params.Registry,
+				Objects = objects,
+				Parameters = @params
+			};
 
-		///// <summary>
-		///// Generate code pertaining to a single file.
-		///// </summary>
-		///// <param name="params"></param>
-		//public void GenerateFileCode(CodeGeneratorFileParams @params)
-		//{
-		//	LoadCodeGenerators(@params.ExternalGeneratorDlls);
+			foreach (var generator in FileGenerators)
+			{
+				generator.Execute(context);
+			}
 
-		//	// Find all reflected classes in our input file.
-		//	FileObjects objects = new()
-		//	{
-		//		Classes = @params.Registry.GetClasses()
-		//			.Where(x => x.Metadata.SourceLocation.Filepath == @params.InputFilename)
-		//			.Where(x => x.Metadata.IsReflected),
+			var headerFilename = GetOutputFilename(@params.InputFilename, @params.ModuleDirectory, @params.OutputDirectory, FileHeaderExt);
+			var sourceFilename = GetOutputFilename(@params.InputFilename, @params.ModuleDirectory, @params.OutputDirectory, FileSourceExt);
+			FileCodeGeneratorResult result = new()
+			{
+				Header = new()
+				{
+					Filename = headerFilename,
+					Stream = streamCreator(headerFilename)
+				},
+				Source = new()
+				{
+					Filename = sourceFilename,
+					Stream = streamCreator(sourceFilename)
+				}
+			};
 
-		//		Enums = @params.Registry.GetEnums()
-		//			.Where(x => x.Metadata.SourceLocation.Filepath == @params.InputFilename)
-		//			.Where(x => x.Metadata.IsReflected),
+			using (var writer = new StreamWriter(result.Header.Stream))
+			{
+				writer.Write(context.DumpHeader());
+			}
 
-		//		Aliases = @params.Registry.GetAliases()
-		//			.Where(x => x.Metadata.SourceLocation.Filepath == @params.InputFilename)
-		//			.Where(x => x.Metadata.IsReflected),
+			using (var writer = new StreamWriter(result.Source.Stream))
+			{
+				writer.Write(context.DumpSource());
+			}
 
-		//		Functions = @params.Registry.GetFunctions()
-		//			.Where(x => x.Metadata.SourceLocation.Filepath == @params.InputFilename)
-		//			.Where(x => x.Metadata.IsReflected)
-		//	};
-			
-		//	GenerateHeader(objects, @params);
-		//	GenerateSource(objects, @params);
-		//}
+			return result;
+		}
 
 		///// <summary>
 		///// Generate code pertaining to the module registry.
@@ -205,7 +249,7 @@ namespace CppRefl.CodeGeneration
 		//		}
 		//	}
 		//}
-		
+
 		///// <summary>
 		///// Invokes all generators.
 		///// </summary>
@@ -298,89 +342,6 @@ namespace CppRefl.CodeGeneration
 		//		// Write out the bottom of the class file.
 		//		InvokeGenerators(gen => gen.WriteHeaderBottom(context, objects));
 		//	}
-		//}
-
-		///// <summary>
-		///// Generate the top of a class file.
-		///// </summary>
-		///// <param name="writer"></param>
-		//private void GenerateHeaderTop(CppWriter writer)
-		//{
-		//	// Define the file id
-		//	string fileId = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(writer.Filename));
-		//	writer.WriteLine($"""
-		//	                  // This must be defined before we include the private macros so GENERATED_REFLECTION_CODE() works correctly.
-		//	                  #undef {CppDefines.FileId}
-		//	                  #define {CppDefines.FileId} {fileId}
-
-		//	                  """);
-
-		//	// Define the header guard
-		//	string headerGuard = $"{fileId}_REFLGEN_H";
-		//	writer.WriteLine($"""
-		//	                  // Header guard. Raise an error if this file is included multiple times.
-		//	                  #if defined({headerGuard})
-		//	                  #error Including {Path.GetFileName(writer.Filename)} multiple times! Use `#pragma once` in {fileId}.h.
-		//	                  #endif
-		//	                  #define {headerGuard}
-
-		//	                  """);
-
-		//	// Include the generated macro magic.
-		//	writer.WriteLine("#include \"Private/CppReflGeneratedCodeMacros.h\"");
-		//	writer.WriteLine();
-		//}
-
-		///// <summary>
-		///// Generate a class declaration.
-		///// </summary>
-		///// <param name="context"></param>
-		///// <param name="classInfo"></param>
-		//private void GenerateClassDeclaration(CodeGeneratorContext context, ClassInfo classInfo)
-		//{
-		//	if (classInfo.GeneratedBodyLine != null)
-		//	{
-		//		string generatedBodyMacroName =
-		//			$"{CppDefines.InternalReflectionMacroPrefix}_{classInfo.Metadata.SourceLocation.FilenameNoExt}{classInfo.GeneratedBodyLine}";
-
-		//		context.Writer.WriteLine($"""
-
-		//		                  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//		                  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//		                  // {classInfo.Type.QualifiedName}
-
-		//		                  #if !{CppDefines.BuildReflection}
-		//		                  // Macro to be added inside the definition of a reflected class.
-		//		                  #define {generatedBodyMacroName}() \
-		//		                  """);
-
-		//		using (context.Writer.WithPostfix("\\"))
-		//		{
-		//			using (context.Writer.WithIndent())
-		//			{
-		//				InvokeGenerators(gen => { gen.WriteClassDeclaration(context, classInfo); });
-		//			}
-		//		}
-
-		//		context.Writer.WriteLine($"""
-
-		//		                  #else
-
-		//		                  // Define empty macro when building reflection.
-		//		                  #define {generatedBodyMacroName}()
-
-		//		                  #endif
-
-		//		                  """);
-		//	}
-
-		//	InvokeGenerators(gen => gen.WriteClassHeader(context, classInfo));
-
-		//	context.Writer.WriteLine($"""
-
-		//	                  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//	                  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//	                  """);
 		//}
 
 		///// <summary>

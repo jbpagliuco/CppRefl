@@ -10,19 +10,34 @@ namespace CppRefl.CodeGeneration.Tests
 		/// <returns></returns>
 		private static FileCodeGeneratorContext CreateFileCodeGeneratorContext()
 		{
+			var root = Path.GetTempPath();
 			return new()
 			{
 				Registry = new(),
 				Objects = new(),
 				Parameters = new()
 				{
-					InputFilename = "D:\file.txt",
+					InputFilename = $@"{root}Source/File.h",
 					Registry = new(),
-					ModuleDirectory = "D:",
-					OutputDirectory = "D:"
+					ModuleDirectory = $@"{root}Source",
+					OutputDirectory = $@"{root}Generated"
 				}
 			};
 		}
+
+		private string ExpectedHeaderPrefix =>
+			$"""
+			 #undef {CppDefines.FileId}
+			 #define {CppDefines.FileId} File
+
+			 #if defined(File_REFLGEN_H)
+			     #error Including {Path.GetTempPath()}Source/File.h multiple times! Use `#pragma once` in File.h.
+			 #endif
+
+			 #define File_REFLGEN_H
+
+			 #include "Private/CppReflGeneratedCodeMacros.h"
+			 """;
 
 		[Test]
 		public void ShouldWriteClassDeclaration()
@@ -36,21 +51,23 @@ namespace CppRefl.CodeGeneration.Tests
 			});
 
 			string generatedBodyMacroName = $"{CppDefines.InternalReflectionMacroPrefix}_{classInfo.Metadata.SourceLocation.FilenameNoExt}{classInfo.GeneratedBodyLine}";
-			Assert.That(context.DumpHeader().Trim(), Is.EqualTo($"""
+			Assert.That(context.DumpHeader().Trim(), Is.EqualTo($$"""
+			                                                     {{ExpectedHeaderPrefix}}
+			                                                     
 			                                                     ////////////////////////////////////////////////////////////////////////////////////////////////////////
 			                                                     ////////////////////////////////////////////////////////////////////////////////////////////////////////
-			                                                     // {classInfo.Type.QualifiedName} class declaration
+			                                                     // {{classInfo.Type.QualifiedName}} class declaration
 
-			                                                     #if !{CppDefines.BuildReflection}
+			                                                     #if !{{CppDefines.BuildReflection}}
 			                                                     // Macro to be added inside the definition of a reflected class.
-			                                                     	#define {generatedBodyMacroName}()\
+			                                                     	#define {{generatedBodyMacroName}}()\
 			                                                     		Line #1\
 			                                                     		Line #2\
 			                                                     
 			                                                     
 			                                                     #else
 			                                                     	// Define empty macro when building reflection.
-			                                                     	#define {generatedBodyMacroName}()
+			                                                     	#define {{generatedBodyMacroName}}()
 			                                                     #endif
 
 			                                                     ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,7 +86,8 @@ namespace CppRefl.CodeGeneration.Tests
 				writer.WriteLine("Header Line #2.");
 			});
 
-			Assert.That(context.DumpHeader().Trim(), Is.EqualTo("""
+			Assert.That(context.DumpHeader().Trim(), Is.EqualTo($"""
+			                                                     {ExpectedHeaderPrefix}
 			                                                     Header Line #1.
 			                                                     Header Line #2.
 			                                                     """));
@@ -86,7 +104,7 @@ namespace CppRefl.CodeGeneration.Tests
 				writer.WriteLine("Source Line #2.");
 			});
 
-			Assert.That(context.DumpHeader().Trim(), Is.EqualTo(""));
+			Assert.That(context.DumpHeader().Trim(), Is.EqualTo(ExpectedHeaderPrefix));
 			Assert.That(context.DumpSource().Trim(), Is.EqualTo("""
 			                                                    Source Line #1.
 			                                                    Source Line #2.

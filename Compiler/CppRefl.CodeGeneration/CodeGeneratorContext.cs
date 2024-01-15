@@ -134,8 +134,28 @@ namespace CppRefl.CodeGeneration
 
 		public override string DumpHeader()
 		{
-			StringBuilder sb = new(base.DumpHeader());
+			StringBuilder sb = new();
 
+			// Write the include guard at the top, as well as the file id which makes the GENERATED_REFLECTION_CODE macros work.
+			string fileId = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(Parameters.InputFilename));
+			string headerGuard = $"{fileId}_REFLGEN_H";
+			sb.AppendLine($"""
+			               #undef {CppDefines.FileId}
+			               #define {CppDefines.FileId} {fileId}
+			               
+			               #if defined({headerGuard})
+			                   #error Including {Parameters.InputFilename} multiple times! Use `#pragma once` in {fileId}.h.
+			               #endif
+			               
+			               #define {headerGuard}
+			               
+			               #include "Private/CppReflGeneratedCodeMacros.h"
+			               """);
+
+			// Write the base header data.
+			sb.AppendLine(base.DumpHeader());
+
+			// Write all of the class bodies.
 			foreach (var (classInfo, writer) in ClassDeclarationWriters)
 			{
 				string generatedBodyMacroName = $"{CppDefines.InternalReflectionMacroPrefix}_{classInfo.Metadata.SourceLocation.FilenameNoExt}{classInfo.GeneratedBodyLine}";
