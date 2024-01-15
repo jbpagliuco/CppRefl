@@ -2,7 +2,7 @@
 
 namespace CppRefl.CodeGeneration.CodeWriters
 {
-	public class CppWriter : CodeWriter
+    public class CppWriter : CodeWriter
 	{
 		public CppWriter(string filename) : base(filename)
 		{

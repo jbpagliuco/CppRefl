@@ -349,7 +349,7 @@ namespace CppRefl.CodeGeneration
 
 				using (writer.WithPostfix("\\"))
 				{
-					using (writer.Indent())
+					using (writer.WithIndent())
 					{
 						InvokeGenerators(gen => { gen.WriteClassDeclaration(writer, classInfo, registry); });
 					}

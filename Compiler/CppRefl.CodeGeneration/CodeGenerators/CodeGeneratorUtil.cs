@@ -1,11 +1,12 @@
 ﻿using System.Text;
+using CppRefl.CodeGeneration.CodeWriters;
 using CppRefl.CodeGeneration.Reflection;
 using FieldInfo = CppRefl.CodeGeneration.Reflection.FieldInfo;
 using TypeInfo = CppRefl.CodeGeneration.Reflection.TypeInfo;
 
 namespace CppRefl.CodeGeneration.CodeGenerators
 {
-	public static class CodeGeneratorUtil
+    public static class CodeGeneratorUtil
 	{
 		private static string StripQuotes(string s) => s.Trim('"');
 
