@@ -43,6 +43,9 @@ namespace CppRefl.CodeGeneration.Tests
 			 #include "Private/CppReflGeneratedCodeMacros.h"
 			 """;
 
+
+		private string ExpectedSourcePrefix => "#include \"Subfolder/File.h\" ";
+
 		[Test]
 		public void ShouldProduceCorrectFilenames()
 		{
@@ -83,8 +86,8 @@ namespace CppRefl.CodeGeneration.Tests
 			var headerStream = result.Header.Stream as MemoryStream;
 			var sourceStream = result.Source.Stream as MemoryStream;
 
-			Assert.That(Encoding.UTF8.GetString(headerStream!.ToArray()), Is.EqualTo($"{ExpectedHeaderPrefix}{Environment.NewLine}Header{Environment.NewLine}"));
-			Assert.That(Encoding.UTF8.GetString(sourceStream!.ToArray()), Is.EqualTo("Source"));
+			Assert.That(Encoding.UTF8.GetString(headerStream!.ToArray()).Trim(), Is.EqualTo($"{ExpectedHeaderPrefix}{Environment.NewLine}Header"));
+			Assert.That(Encoding.UTF8.GetString(sourceStream!.ToArray()).Trim(), Is.EqualTo($"{ExpectedSourcePrefix}{Environment.NewLine}Source"));
 		}
 	}
 }

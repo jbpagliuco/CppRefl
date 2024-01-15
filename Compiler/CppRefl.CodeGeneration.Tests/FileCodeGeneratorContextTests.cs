@@ -39,6 +39,8 @@ namespace CppRefl.CodeGeneration.Tests
 			 #include "Private/CppReflGeneratedCodeMacros.h"
 			 """;
 
+		private string ExpectedSourcePrefix => "#include \"File.h\" ";
+
 		[Test]
 		public void ShouldWriteClassDeclaration()
 		{
@@ -73,7 +75,7 @@ namespace CppRefl.CodeGeneration.Tests
 			                                                     ////////////////////////////////////////////////////////////////////////////////////////////////////////
 			                                                     ////////////////////////////////////////////////////////////////////////////////////////////////////////
 			                                                     """));
-			Assert.That(context.DumpSource().Trim(), Is.EqualTo(""));
+			Assert.That(context.DumpSource().Trim(), Is.EqualTo(ExpectedSourcePrefix.Trim()));
 		}
 
 		[Test]
@@ -91,7 +93,7 @@ namespace CppRefl.CodeGeneration.Tests
 			                                                     Header Line #1.
 			                                                     Header Line #2.
 			                                                     """));
-			Assert.That(context.DumpSource().Trim(), Is.EqualTo(""));
+			Assert.That(context.DumpSource().Trim(), Is.EqualTo(ExpectedSourcePrefix.Trim()));
 		}
 
 		[Test]
@@ -105,7 +107,8 @@ namespace CppRefl.CodeGeneration.Tests
 			});
 
 			Assert.That(context.DumpHeader().Trim(), Is.EqualTo(ExpectedHeaderPrefix));
-			Assert.That(context.DumpSource().Trim(), Is.EqualTo("""
+			Assert.That(context.DumpSource().Trim(), Is.EqualTo($"""
+			                                                    {ExpectedSourcePrefix}
 			                                                    Source Line #1.
 			                                                    Source Line #2.
 			                                                    """));

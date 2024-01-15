@@ -181,5 +181,19 @@ namespace CppRefl.CodeGeneration
 
 			return sb.ToString();
 		}
+
+		public override string DumpSource()
+		{
+			StringBuilder sb = new();
+
+			// Include the original source file.
+			string originalFilenameRelative = Path.GetRelativePath(Parameters.ModuleDirectory, Parameters.InputFilename).Replace("\\", "/");
+			sb.AppendLine($"""#include "{originalFilenameRelative}" """);
+
+			// Write the base data.
+			sb.AppendLine(base.DumpSource());
+
+			return sb.ToString();
+		}
 	}
 }
