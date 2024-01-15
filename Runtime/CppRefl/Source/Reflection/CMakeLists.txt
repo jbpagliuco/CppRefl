@@ -1,0 +1,23 @@
+target_sources(CppRefl 
+	PUBLIC
+	ClassInfo.h
+	DynamicArray.h
+	EnumInfo.h
+	FieldInfo.h
+	FunctionInfo.h
+	ObjectInfo.h
+	Registry.h
+	Span.h
+	TypeInfo.h
+	TypeInstanceInfo.h
+
+	PRIVATE
+	ClassInfo.cpp
+	EnumInfo.cpp
+	FieldInfo.cpp
+	FunctionInfo.cpp
+	ObjectInfo.cpp
+	Registry.cpp
+	TypeInfo.cpp
+	TypeInstanceInfo.cpp
+)
