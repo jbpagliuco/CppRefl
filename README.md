@@ -4,10 +4,10 @@ CppRefl is a C++ reflection compiler and code generator. It uses Clang to parse 
 ### Why Use Reflection?
 Reflection is an incredibly powerful tool that gives you access to the layout of your program at runtime. This enables you to do things like:
 - Look up and invoke a function by name (great for communication across languages).
-- Write code the can serialize the data in a class, without ever need to know the actual contents of that class.
+- Write code the can serialize the data in a class, without needing to explicitly know the layout of that class.
 
 ### Why Use Code Generation?
-Oftentimes in C++ code, you can achieve a lite version of code generation using templates and macros. While both of these work for most cases, they cannot handle everything in a clean fashion. Usually you end up with code that is wildly hard to read and debug. A full fledged code generation tool is much more flexible.
+Oftentimes in C++ code, you can achieve a lite version of code generation using preprocessor macros. While this can work for most cases, macros cannot handle everything. And for anything even remotely complex, you often end up with code that is incredibly hard to read and debug.
 
 ---
 
@@ -22,7 +22,7 @@ Oftentimes in C++ code, you can achieve a lite version of code generation using 
 - Aliases/Typedefs (Somewhat)
 
 # Example Usage
-
+### Reflected Enum
 ```cpp
 // Includes the generated code for this file (which is called "MissionType.h"). 
 #include "MissionType.reflgen.h"
@@ -34,18 +34,19 @@ enum class REFLECTED MissionType
   OpenWorld
 };
 
-// Example of how to use reflected enums. (NB: Output is a rough example of what you'd see)
+// Example of how to use reflected enums. (NB: Output is only a rough example of what you'd see)
 
 // Ways to get access to the reflected class:
 > cpprefl::Registry::GetSystemRegistry().GetEnum("ReflectedEnum")
-> cpprefl::ReflectedEnum<MissionType>()
+> cpprefl::GetReflectedEnum<MissionType>()
 
 // Get the values in an enum.
-> cpprefl::ReflectedEnum<MissionType>().mValues
+> cpprefl::GetReflectedEnum<MissionType>().mValues
 { mName = "MainStory", mValue = 0 }
 { mName = "OpenWorld", mValue = 1 }
 ```
 
+### Reflected Class
 ```cpp
 // Includes the generated code for this file (which is called "ShaderFloatParameter.h"). 
 #include "ShaderFloatParameter.reflgen.h"
@@ -60,15 +61,16 @@ public:
   float ParameterValue REFLECTED;
 };
 
-// Example of how to use reflected classes (NB: Output is a rough example of what you'd see).
+// Example of how to use reflected classes (NB: Output is only a rough example of what you'd see).
 
 // Ways to get access to the reflected class:
 > cpprefl::Registry::GetSystemRegistry().GetClass("ShaderFloatParameter")
-> cpprefl::ReflectedClass<ShaderFloatParameter>()
-> ShaderFloatParameter::ReflectedClass()
+> cpprefl::GetReflectedClass<ShaderFloatParameter>()
+> ShaderFloatParameter::StaticReflectedClass()
+> ShaderFloatParameter f; f.GetReflectedClass()
 
 // Get the fields of a class.
-> cpprefl::ReflectedClass<ShaderFloatParameter>().mFields
-{ mName = "ParameterName", mType = "cpprefl::ReflectedType<std::string>()" }
-{ mName = "ParameterValue", mType = "cpprefl::ReflectedType<float>()" }
+> cpprefl::GetReflectedClass<ShaderFloatParameter>().mFields
+{ mName = "ParameterName", mType = "cpprefl::TypeInfo{std::string}" }
+{ mName = "ParameterValue", mType = "cpprefl::TypeInfo{float}" }
 ```
