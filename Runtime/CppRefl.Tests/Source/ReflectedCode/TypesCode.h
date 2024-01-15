@@ -1,6 +1,6 @@
 #pragma once
 
-#define TEST_TYPES_CODE() 0
+#define TEST_TYPES_CODE() 1
 
 #if TEST_TYPES_CODE()
 

@@ -19,7 +19,7 @@ set(REFLECTED_FILES
 	# MetadataCode
 	# SerializerCode
 	# TemplateCode
-	# TypesCode
+	TypesCode
 )
 set(REFLECTED_MODULE_FILES
 	${CMAKE_CURRENT_LIST_DIR}/GeneratedCode/CppReflTests.reflgen.h
