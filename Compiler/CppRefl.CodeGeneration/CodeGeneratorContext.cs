@@ -23,7 +23,14 @@ namespace CppRefl.CodeGeneration
 		/// </summary>
 		public required Registry Registry { get; init; }
 
+		/// <summary>
+		/// Writer for our header file.
+		/// </summary>
 		private CppWriter HeaderWriter { get; } = new();
+
+		/// <summary>
+		/// Writer for our source file.
+		/// </summary>
 		private CppWriter SourceWriter { get; } = new();
 
 		/// <summary>
