@@ -157,7 +157,7 @@ namespace CppRefl.CodeGeneration
 				sb.AppendLine($"""
 			                  ////////////////////////////////////////////////////////////////////////////////////////////////////////
 			                  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-			                  // {classInfo.Type.QualifiedName} class declaration
+			                  // {classInfo.Type.QualifiedName()} class declaration
 			                  
 			                  #if !{CppDefines.BuildReflection}
 			                  // Macro to be added inside the definition of a reflected class.

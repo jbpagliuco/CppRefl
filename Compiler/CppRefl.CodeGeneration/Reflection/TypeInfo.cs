@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Security.AccessControl;
 using System.Text.Json.Serialization;
 
 namespace CppRefl.CodeGeneration.Reflection
@@ -66,7 +65,7 @@ namespace CppRefl.CodeGeneration.Reflection
 	/// A type declaration. Could be a class, primitive, enum, etc.
 	/// </summary>
 	[DebuggerDisplay("{QualifiedName}")]
-	public class TypeInfo
+	public class TypeInfo : INameMixin
 	{
 		/// <summary>
 		/// Type name (without the namespace).
@@ -87,38 +86,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Template information.
 		/// </summary>
 		public TemplateInfo? Template { get; set; }
-
-		/// <summary>
-		/// An enumerable of all nested namespaces.
-		/// </summary>
-		[JsonIgnore]
-		public IEnumerable<string> Namespaces => Namespace.Split("::");
-
-		/// <summary>
-		/// Returns true if this type was defined in the global namespace.
-		/// </summary>
-		[JsonIgnore]
-		public bool IsInGlobalNamespace => Namespace.Length == 0;
-
-		/// <summary>
-		/// Returns the qualified name of this type, excluding the global namespace.
-		/// </summary>
-		[JsonIgnore]
-		public string QualifiedName => IsInGlobalNamespace ? Name : $"{Namespace}::{Name}";
-
-		/// <summary>
-		/// Returns the qualified name of this type, including the global namespace.
-		/// </summary>
-		[JsonIgnore]
-		public string GloballyQualifiedName => IsInGlobalNamespace ? $"::{Name}" : $"::{Namespace}::{Name}";
-
-		/// <summary>
-		/// Returns a fully qualified name using underscores instead of colons.
-		/// </summary>
-		[JsonIgnore]
-		public string FlattenedName => QualifiedName.Replace("::", "_");
-
-
+		
 		/// <summary>
 		/// Returns true if this is a primitive data type.
 		/// </summary>
@@ -171,7 +139,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Name of the underlying template generic.
 		/// </summary>
 		[JsonIgnore]
-		public string? TemplateType => IsTemplated ? QualifiedName.Substring(0, QualifiedName.IndexOf('<')) : null;
+		public string? TemplateType => IsTemplated ? this.QualifiedName().Substring(0, this.QualifiedName().IndexOf('<')) : null;
 
 		/// <summary>
 		/// Is this type instantiable?
@@ -180,6 +148,6 @@ namespace CppRefl.CodeGeneration.Reflection
 		public bool IsInstantiable => !IsTemplated || Template?.IsSpecialized == true;
 		
 
-		public override string ToString() => QualifiedName;
+		public override string ToString() => this.QualifiedName();
 	}
 }

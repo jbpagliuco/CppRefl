@@ -104,10 +104,10 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		{
 			if (typeInfo.IsPrimitive)
 			{
-				return $"cpprefl::GetReflectedType<{typeInfo.QualifiedName}>()";
+				return $"cpprefl::GetReflectedType<{typeInfo.QualifiedName()}>()";
 			}
 			
-			return $"CppReflPrivate::MaybeCreateReflectedType<{typeInfo.QualifiedName}>(\"{typeInfo.QualifiedName}\")";
+			return $"CppReflPrivate::MaybeCreateReflectedType<{typeInfo.QualifiedName()}>(\"{typeInfo.QualifiedName()}\")";
 		}
 
 		/// <summary>
@@ -116,8 +116,8 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		/// <returns></returns>
 		public static string RegisterDynamicArrayFunctions(ClassInfo classInfo, FieldInfo fieldInfo, string dynamicArrayFunctions)
 		{
-			string varName = $"{classInfo.Type.FlattenedName}{fieldInfo.Name}_DynamicArray";
-			return $"const auto& {varName} = cpprefl::Registry::GetSystemRegistry().AddDynamicArrayFunctions(\"{fieldInfo.Type.QualifiedName}\", {dynamicArrayFunctions});";
+			string varName = $"{classInfo.Type.FlattenedName()}{fieldInfo.Name}_DynamicArray";
+			return $"const auto& {varName} = cpprefl::Registry::GetSystemRegistry().AddDynamicArrayFunctions(\"{fieldInfo.Type.QualifiedName()}\", {dynamicArrayFunctions});";
 		}
 	}
 }

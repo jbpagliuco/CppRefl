@@ -64,7 +64,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
 		/// <param name="enumInfo"></param>
 		public void ForwardDeclare(EnumInfo enumInfo)
 		{
-			var namespaceDec = enumInfo.Type.IsInGlobalNamespace ? null : WithNamespace(enumInfo.Type.Namespace);
+			var namespaceDec = enumInfo.Type.IsInGlobalNamespace() ? null : WithNamespace(enumInfo.Type.Namespace);
 			WriteLine($"enum class {enumInfo.Type.Name};");
 			namespaceDec?.Dispose();
 		}

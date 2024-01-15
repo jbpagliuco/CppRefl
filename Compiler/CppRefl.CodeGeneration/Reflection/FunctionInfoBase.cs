@@ -18,6 +18,6 @@
 		public IList<TypeInstanceInfo> ArgumentTypes { get; init; } = new List<TypeInstanceInfo>();
 
 
-		public string Signature => $"{ReturnType.Type.QualifiedName} {Name}({string.Join(",", ArgumentTypes.Select(x => x.Type.QualifiedName))})";
+		public string Signature => $"{ReturnType.Type.QualifiedName()} {Name}({string.Join(",", ArgumentTypes.Select(x => x.Type.QualifiedName()))})";
 	}
 }

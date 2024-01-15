@@ -15,10 +15,10 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
             {
                 writer.WriteLine($"""
                                   template <>
-                                  const TypeInfo& GetReflectedType<{enumInfo.Type.GloballyQualifiedName}>();
+                                  const TypeInfo& GetReflectedType<{enumInfo.Type.GloballyQualifiedName()}>();
                                   
                                   template <>
-                                  const EnumInfo& GetReflectedEnum<{enumInfo.Type.GloballyQualifiedName}>();
+                                  const EnumInfo& GetReflectedEnum<{enumInfo.Type.GloballyQualifiedName()}>();
                                   """);
             }
         }
@@ -29,16 +29,16 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
             {
                 writer.WriteLine($$"""
                                   template <>
-                                  const TypeInfo& GetReflectedType<{{enumInfo.Type.GloballyQualifiedName}}>()
+                                  const TypeInfo& GetReflectedType<{{enumInfo.Type.GloballyQualifiedName()}}>()
                                   {
-                                      static auto& type = cpprefl::Registry::GetSystemRegistry().AddType(cpprefl::TypeInfo("{{enumInfo.Type.QualifiedName}}", cpprefl::TypeKind::Enum, sizeof({{enumInfo.Type.GloballyQualifiedName}})));
+                                      static auto& type = cpprefl::Registry::GetSystemRegistry().AddType(cpprefl::TypeInfo("{{enumInfo.Type.QualifiedName()}}", cpprefl::TypeKind::Enum, sizeof({{enumInfo.Type.GloballyQualifiedName()}})));
                                       return type;
                                   }
                                   """);
 
                 // Static enum
                 writer.WriteLine("template <>");
-                using (writer.WithFunction($"const EnumInfo& GetReflectedEnum<{enumInfo.Type.GloballyQualifiedName}>()"))
+                using (writer.WithFunction($"const EnumInfo& GetReflectedEnum<{enumInfo.Type.GloballyQualifiedName()}>()"))
                 {
                     string enumTags = CodeGeneratorUtil.WriteTagDefinitions(writer, "Enum", enumInfo.Metadata);
                     string enumAttributes = CodeGeneratorUtil.WriteAttributeDefinitions(writer, "Enum", enumInfo.Metadata);
@@ -52,7 +52,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                         {
                             string tags = value.Metadata.Tags.Count > 0 ? $"{enumInfo.Type.Name}::{value.Name}Tags" : "cpprefl::TagView()";
                             string attributes = value.Metadata.Attributes.Count > 0 ? $"{enumInfo.Type.Name}::{value.Name}Attributes" : "cpprefl::AttributeView()";
-                            writer.WriteLine($"cpprefl::EnumValueInfo(\"{value.Name}\", (int){enumInfo.Type.GloballyQualifiedName}::{value.Name}, {tags}, {attributes}),");
+                            writer.WriteLine($"cpprefl::EnumValueInfo(\"{value.Name}\", (int){enumInfo.Type.GloballyQualifiedName()}::{value.Name}, {tags}, {attributes}),");
                         }
                     }
 
@@ -60,7 +60,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                     {
                         using (writer.WithPostfix(","))
                         {
-                            writer.WriteLine($"GetReflectedType<{enumInfo.Type.GloballyQualifiedName}>()");
+                            writer.WriteLine($"GetReflectedType<{enumInfo.Type.GloballyQualifiedName()}>()");
                             writer.WriteLine($"{enumInfo.Type.Name}Values");
                             writer.WriteLine(enumTags);
                         }

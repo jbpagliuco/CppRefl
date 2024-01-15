@@ -54,7 +54,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Create a reflected type.
 		/// </summary>
 		/// <param name="typeInfo"></param>
-		public void AddType(TypeInfo typeInfo) => Types.Add(typeInfo.QualifiedName, typeInfo);
+		public void AddType(TypeInfo typeInfo) => Types.Add(typeInfo.QualifiedName(), typeInfo);
 
 		/// <summary>
 		/// Returns a type in this registry.
@@ -70,7 +70,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Add a class to this registry.
 		/// </summary>
 		/// <param name="classInfo"></param>
-		public void AddClass(ClassInfo classInfo) => Classes.Add(classInfo.Type.QualifiedName, classInfo);
+		public void AddClass(ClassInfo classInfo) => Classes.Add(classInfo.Type.QualifiedName(), classInfo);
 
 		/// <summary>
 		/// Returns a class in this registry.
@@ -92,7 +92,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Add an enum to this registry.
 		/// </summary>
 		/// <param name="enumInfo"></param>
-		public void AddEnum(EnumInfo enumInfo) => Enums.Add(enumInfo.Type.QualifiedName, enumInfo);
+		public void AddEnum(EnumInfo enumInfo) => Enums.Add(enumInfo.Type.QualifiedName(), enumInfo);
 
 		/// <summary>
 		/// Returns an enum in this registry.
@@ -114,7 +114,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Add an alias to this registry.
 		/// </summary>
 		/// <param name="aliasInfo"></param>
-		public void AddAlias(AliasInfo aliasInfo) => Aliases.Add(aliasInfo.Type.QualifiedName, aliasInfo);
+		public void AddAlias(AliasInfo aliasInfo) => Aliases.Add(aliasInfo.Type.QualifiedName(), aliasInfo);
 
 		/// <summary>
 		/// Returns an alias in this registry.

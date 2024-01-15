@@ -7,7 +7,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.STL
 	{
 		public void WriteClassSource(CppWriter writer, ClassInfo classInfo, Registry registry)
 		{
-			var dynamicArrayFields = classInfo.Fields.Where(x => x.Type.QualifiedName.StartsWith("std::vector<"));
+			var dynamicArrayFields = classInfo.Fields.Where(x => x.Type.QualifiedName().StartsWith("std::vector<"));
 			if (dynamicArrayFields.Any())
 			{
 				using (writer.WithNamespace("CppReflPrivate"))

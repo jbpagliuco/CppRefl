@@ -13,7 +13,7 @@ namespace CppRefl.Compiler.Tests
 			Assert.IsNotNull(typeInfo);
 			Assert.True(typeInfo.IsTemplated);
 			Assert.False(typeInfo.Template!.IsSpecialized);
-			Assert.That(typeInfo.Template.Arguments.Select(x => x.QualifiedName), Is.EquivalentTo(new[] {"T"}));
+			Assert.That(typeInfo.Template.Arguments.Select(x => x.QualifiedName()), Is.EquivalentTo(new[] {"T"}));
 
 			var classInfo = Registry.GetClass("TestNamespace::TemplatedClass")!;
 			Assert.IsNotNull(classInfo);
@@ -38,7 +38,7 @@ namespace CppRefl.Compiler.Tests
 				Assert.IsNotNull(typeInfo);
 				Assert.True(typeInfo.IsTemplated);
 				Assert.True(typeInfo.Template!.IsSpecialized);
-				Assert.That(typeInfo.Template.Arguments.Select(x => x.QualifiedName), Is.EquivalentTo(new[] { "float" }));
+				Assert.That(typeInfo.Template.Arguments.Select(x => x.QualifiedName()), Is.EquivalentTo(new[] { "float" }));
 
 				Assert.IsNotNull(Registry.GetClass("TestNamespace::TemplatedClass2<float>"));
 			}
@@ -67,7 +67,7 @@ namespace CppRefl.Compiler.Tests
 			Assert.IsNotNull(typeInfo);
 			Assert.True(typeInfo.IsTemplated);
 			Assert.True(typeInfo.Template!.IsSpecialized);
-			Assert.That(typeInfo.Template.Arguments.Select(x => x.QualifiedName), Is.EquivalentTo(new[] { "int", "std::allocator<int>" }));
+			Assert.That(typeInfo.Template.Arguments.Select(x => x.QualifiedName()), Is.EquivalentTo(new[] { "int", "std::allocator<int>" }));
 		}
 
 		[Test]
@@ -77,7 +77,7 @@ namespace CppRefl.Compiler.Tests
 			Assert.IsNotNull(typeInfo);
 			Assert.True(typeInfo.IsTemplated);
 			Assert.True(typeInfo.Template!.IsSpecialized);
-			Assert.That(typeInfo.Template.Arguments.Select(x => x.QualifiedName), Is.EquivalentTo(new[] { "TestNamespace::NamespacedClass", "std::allocator<TestNamespace::NamespacedClass>" }));
+			Assert.That(typeInfo.Template.Arguments.Select(x => x.QualifiedName()), Is.EquivalentTo(new[] { "TestNamespace::NamespacedClass", "std::allocator<TestNamespace::NamespacedClass>" }));
 		}
 
 		[Test]
@@ -87,7 +87,7 @@ namespace CppRefl.Compiler.Tests
 			Assert.IsNotNull(typeInfo);
 			Assert.True(typeInfo.IsTemplated);
 			Assert.True(typeInfo.Template!.IsSpecialized);
-			Assert.That(typeInfo.Template.Arguments.Select(x => x.QualifiedName), Is.EquivalentTo(new[] { "TestNamespace2::NamespacedClass", "std::allocator<TestNamespace2::NamespacedClass>" }));
+			Assert.That(typeInfo.Template.Arguments.Select(x => x.QualifiedName()), Is.EquivalentTo(new[] { "TestNamespace2::NamespacedClass", "std::allocator<TestNamespace2::NamespacedClass>" }));
 		}
 	}
 }

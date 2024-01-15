@@ -22,7 +22,7 @@
 		/// </summary>
 		public EnumInfo? AliasEnum { get; init; }
 
-		public ClassInfo? GetUnderlyingClass(Registry registry) => AliasClass ?? registry.GetAlias(AliasType.QualifiedName)?.GetUnderlyingClass(registry);
-		public EnumInfo? GetUnderlyingEnum(Registry registry) => AliasEnum ?? registry.GetAlias(AliasType.QualifiedName)?.GetUnderlyingEnum(registry);
+		public ClassInfo? GetUnderlyingClass(Registry registry) => AliasClass ?? registry.GetAlias(AliasType.QualifiedName())?.GetUnderlyingClass(registry);
+		public EnumInfo? GetUnderlyingEnum(Registry registry) => AliasEnum ?? registry.GetAlias(AliasType.QualifiedName())?.GetUnderlyingEnum(registry);
 	}
 }

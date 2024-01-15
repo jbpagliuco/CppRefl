@@ -10,7 +10,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
     {
         public void WriteClassHeader(CppWriter writer, ClassInfo classInfo, string? name = null)
         {
-            name ??= classInfo.Type.QualifiedName;
+            name ??= classInfo.Type.QualifiedName();
 
             if (classInfo.Type.Template?.IsGeneric == true)
             {
@@ -34,7 +34,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
 
         private void WriteClassSource(CppWriter writer, ClassInfo classInfo, string? name = null)
         {
-            name ??= classInfo.Type.QualifiedName;
+            name ??= classInfo.Type.QualifiedName();
 
             using (writer.WithNamespace(CppDefines.Namespaces.Public))
             {
@@ -108,7 +108,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                             writer.WriteLine($"GetReflectedType<{name}>()");
                             writer.WriteLine(
                                 baseClass != null && baseClass.Metadata.IsReflected && !baseClass.Type.IsTemplated
-                                    ? $"&GetReflectedClass<{baseClass.Type.GloballyQualifiedName}>()"
+                                    ? $"&GetReflectedClass<{baseClass.Type.GloballyQualifiedName()}>()"
                                     : "nullptr");
                             writer.WriteLine(ctor);
                             writer.WriteLine(dtor);

@@ -1,4 +1,6 @@
-﻿namespace CppRefl.CodeGeneration.CodeGenerators.Optional
+﻿using CppRefl.CodeGeneration.Reflection;
+
+namespace CppRefl.CodeGeneration.CodeGenerators.Optional
 {
     /// <summary>
     /// Generates Class::Super.
@@ -16,7 +18,7 @@
 					{
 						using (writer.WithPublic())
 						{
-							writer.WriteLine($"using Super = {baseClass.Type.GloballyQualifiedName};");
+							writer.WriteLine($"using Super = {baseClass.Type.GloballyQualifiedName()};");
 						}
 					});
 				}

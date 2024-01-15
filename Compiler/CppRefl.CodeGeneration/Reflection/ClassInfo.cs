@@ -79,7 +79,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// <summary>
 		/// Forward declaration of this class.
 		/// </summary>
-		public string ForwardDeclaration => Type.IsInGlobalNamespace
+		public string ForwardDeclaration => Type.IsInGlobalNamespace()
 			? ForwardDeclarationNoNamespace
 			: $"namespace {Type.Namespace} {{ {ForwardDeclarationNoNamespace} }}";
 	}
