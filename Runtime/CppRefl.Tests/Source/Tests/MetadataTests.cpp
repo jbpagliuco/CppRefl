@@ -1,6 +1,9 @@
 #include "gtest/gtest.h"
 
 #include "MetadataCode.h"
+
+#if TEST_METADATA_CODE()
+
 #include "Reflection/ClassInfo.h"
 #include "Reflection/FieldInfo.h"
 
@@ -34,3 +37,5 @@ TEST(Metadatatests, Attributes)
 	EXPECT_STREQ(ClassWithAttributes::StaticReflectedClass().mFields[0].mAttributes[1].first, "NoQuotes");
 	EXPECT_STREQ(ClassWithAttributes::StaticReflectedClass().mFields[0].mAttributes[1].second, "ClassWithAttributes");
 }
+
+#endif

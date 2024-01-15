@@ -30,7 +30,7 @@ namespace CppRefl.CodeGeneration.Tests
 			 #define {CppDefines.FileId} File
 
 			 #if defined(File_REFLGEN_H)
-			     #error Including {Path.GetTempPath()}Source/File.h multiple times! Use `#pragma once` in File.h.
+			     #error Including File.reflgen.h multiple times! Use `#pragma once` in File.h.
 			 #endif
 
 			 #define File_REFLGEN_H

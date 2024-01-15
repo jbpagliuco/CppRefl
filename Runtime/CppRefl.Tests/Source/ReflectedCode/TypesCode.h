@@ -1,5 +1,9 @@
 #pragma once
 
+#define TEST_TYPES_CODE() 0
+
+#if TEST_TYPES_CODE()
+
 #include "CppReflMarkup.h"
 
 #include "TypesCode.reflgen.h"
@@ -30,3 +34,5 @@ class REFLECTED PrimitiveTypes
 
 	const bool mConstBool REFLECTED = false;
 };
+
+#endif

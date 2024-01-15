@@ -139,7 +139,7 @@ namespace CppRefl.CodeGeneration
 			               #define {CppDefines.FileId} {fileId}
 			               
 			               #if defined({headerGuard})
-			                   #error Including {Parameters.InputFilename} multiple times! Use `#pragma once` in {fileId}.h.
+			                   #error Including {fileId}.reflgen.h multiple times! Use `#pragma once` in {fileId}.h.
 			               #endif
 			               
 			               #define {headerGuard}
@@ -187,6 +187,73 @@ namespace CppRefl.CodeGeneration
 
 			// Write the base data.
 			sb.AppendLine(base.DumpSource());
+
+			return sb.ToString();
+		}
+	}
+
+	/// <summary>
+	/// The context that a module code generator runs in.
+	/// </summary>
+	public class ModuleCodeGeneratorContext : CodeGeneratorContext
+	{
+		/// <summary>
+		/// The original code generator parameters.
+		/// </summary>
+		public required CodeGeneratorModuleParams Parameters { get; init; }
+
+		/// <summary>
+		/// Writer for our initializer function.
+		/// </summary>
+		private CppWriter InitializerWriter { get; } = new();
+
+		private string InitializerSignature => $"void Register{Parameters.ModuleName}Reflection()";
+
+		/// <summary>
+		/// Writes code to the body of module initializer function.
+		/// </summary>
+		/// <param name="action"></param>
+		public void WriteInitializer(Action<CppWriter> action)
+		{
+			// Indent this code since it's contained within a function.
+			using (InitializerWriter.WithIndent())
+			{
+				action(InitializerWriter);
+			}
+		}
+
+		public override string DumpHeader()
+		{
+			StringBuilder sb = new();
+
+			sb.AppendLine($"""
+			               #pragma once
+
+			               // Register the reflection runtime information for this module.
+			               {InitializerSignature};
+			               
+			               {base.DumpHeader()}
+			               """);
+			
+			return sb.ToString();
+		}
+
+		public override string DumpSource()
+		{
+			StringBuilder sb = new();
+			
+			sb.AppendLine($$"""
+			               #include "{{Parameters.ModuleName}}{{CodeGenerator.FileHeaderExt}}"
+
+			               #include "CppReflStatics.h"
+
+			               {{base.DumpSource()}}
+			               
+			               {{InitializerSignature}}
+			               {
+			               {{InitializerWriter}}
+			               }
+			               """);
 
 			return sb.ToString();
 		}

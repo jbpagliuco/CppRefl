@@ -1,5 +1,9 @@
 #pragma once
 
+#define REFLECT_TEMPLATE_CODE() 0
+
+#if REFLECT_TEMPLATE_CODE()
+
 #include <vector>
 
 #include "CppReflMarkup.h"
@@ -56,3 +60,5 @@ public:
 	std::vector<TestNamespace::NamespacedClass> mNamespacedArray REFLECTED;
 	std::vector<NamespacedClass> mNamespacedArray2 REFLECTED;
 };
+
+#endif

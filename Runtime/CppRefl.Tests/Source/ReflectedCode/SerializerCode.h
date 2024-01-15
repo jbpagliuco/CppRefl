@@ -1,5 +1,9 @@
 #pragma once
 
+#define TEST_SERIALIZER_CODE() 0
+
+#if TEST_SERIALIZER_CODE()
+
 #include <cstdint>
 #include <vector>
 
@@ -112,3 +116,5 @@ class REFLECTED DeserializationDynamic
 public:
 	std::vector<DeserializationBase*> mInstances REFLECTED;
 };
+
+#endif

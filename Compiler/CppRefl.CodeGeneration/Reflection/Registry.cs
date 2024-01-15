@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace CppRefl.CodeGeneration.Reflection
@@ -48,6 +49,16 @@ namespace CppRefl.CodeGeneration.Reflection
 			return default(T);
 		}
 
+		/// <summary>
+		/// Returns all the objects within a module.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="module"></param>
+		/// <param name="collection"></param>
+		/// <returns></returns>
+		private IEnumerable<T> GetObjectsWithinModule<T>(DirectoryInfo module, IDictionary<string, T> collection) where T : ObjectInfo => 
+			collection.Values.Where(x => x.Metadata.SourceLocation.Filepath.StartsWith(module.FullName));
+
 
 
 		/// <summary>
@@ -85,6 +96,14 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// <returns></returns>
 		public ICollection<ClassInfo> GetClasses() => Classes.Values;
 
+		/// <summary>
+		/// Returns all the classes within a module.
+		/// </summary>
+		/// <param name="moduleDirectory"></param>
+		/// <returns></returns>
+		public IEnumerable<ClassInfo> GetClassesWithinModule(DirectoryInfo moduleDirectory) =>
+			GetObjectsWithinModule(moduleDirectory, Classes);
+
 
 
 
@@ -106,6 +125,14 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// </summary>
 		/// <returns></returns>
 		public ICollection<EnumInfo> GetEnums() => Enums.Values;
+
+		/// <summary>
+		/// Returns all the enums within a module.
+		/// </summary>
+		/// <param name="moduleDirectory"></param>
+		/// <returns></returns>
+		public IEnumerable<EnumInfo> GetEnumsWithinModule(DirectoryInfo moduleDirectory) =>
+			GetObjectsWithinModule(moduleDirectory, Enums);
 
 
 

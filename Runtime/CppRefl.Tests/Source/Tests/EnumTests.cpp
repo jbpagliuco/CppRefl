@@ -1,6 +1,9 @@
 #include "gtest/gtest.h"
 
 #include "EnumCode.h"
+
+#if TEST_ENUM_CODE()
+
 #include "Reflection/EnumInfo.h"
 
 TEST(EnumTests, EnumTypes)
@@ -24,3 +27,5 @@ TEST(EnumTests, EnumValues)
 	EXPECT_STREQ(enumInfo.mValues[2].mName, "Foo");
 	EXPECT_EQ(enumInfo.mValues[2].mValue, (int)ReflectedEnum::Foo);
 }
+
+#endif

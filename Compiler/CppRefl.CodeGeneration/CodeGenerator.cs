@@ -1,14 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
 using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
-using CppRefl.CodeGeneration.CodeGenerators;
 using CppRefl.CodeGeneration.CodeGenerators.Optional;
 using CppRefl.CodeGeneration.CodeGenerators.Runtime;
 using CppRefl.CodeGeneration.CodeGenerators.STL;
-using CppRefl.CodeGeneration.CodeWriters;
 using CppRefl.CodeGeneration.Reflection;
-using TypeInfo = CppRefl.CodeGeneration.Reflection.TypeInfo;
 
 namespace CppRefl.CodeGeneration
 {
@@ -46,7 +41,7 @@ namespace CppRefl.CodeGeneration
 	/// <summary>
 	/// Parameters for generating per-registry reflection code.
 	/// </summary>
-	public class CodeGeneratorRegistryParams : CodeGeneratorParamsCommon
+	public class CodeGeneratorModuleParams : CodeGeneratorParamsCommon
 	{
 		/// <summary>
 		/// Module name.
@@ -80,6 +75,19 @@ namespace CppRefl.CodeGeneration
 		public required FileGenerationResult Source { get; init; }
 	}
 
+	public sealed class ModuleCodeGeneratorResult
+	{
+		/// <summary>
+		/// The module header file contents.
+		/// </summary>
+		public required FileGenerationResult Header { get; init; }
+
+		/// <summary>
+		/// The module source file contents.
+		/// </summary>
+		public required FileGenerationResult Source { get; init; }
+	}
+
 	/// <summary>
 	/// Writes code for a program.
 	/// </summary>
@@ -88,39 +96,48 @@ namespace CppRefl.CodeGeneration
 		public const string FileHeaderExt = ".reflgen.h";
 		public const string FileSourceExt = ".reflgen.cpp";
 
-		public const string ModuleHeaderExt = ".reflmodule.h";
-		public const string ModuleSourceExt = ".reflmodule.cpp";
-
 		public List<IFileCodeGenerator> FileGenerators { get; } = new();
+		public List<IModuleCodeGenerator> ModuleGenerators { get; } = new();
 
 		public static string GetOutputFilename(string file, string moduleDirectory, string outputDirectory, string extension) => Path.Combine(outputDirectory, Path.GetRelativePath(moduleDirectory, Path.GetDirectoryName(file)!),
 				$"{Path.GetFileNameWithoutExtension(file)}{extension}");
 
 		//private string RegistryInitializerSignature(string moduleName) => $"void Registry{moduleName}Reflection()";
 
-		//public CodeGenerator()
-		//{
-		//	// Essential
-		//	LoadCodeGenerator<ClassReflectionGenerator>();
-		//	LoadCodeGenerator<EnumReflectionGenerator>();
-		//	LoadCodeGenerator<FunctionStaticGenerator>();
-		//	LoadCodeGenerator<VectorDynamicArrayGenerator>();
-		//	LoadCodeGenerator<RegistryGenerator>();
+		public CodeGenerator()
+		{
+			// Essential
+			AddFileCodeGenerator<ClassReflectionGenerator>();
+			AddFileCodeGenerator<EnumReflectionGenerator>();
+			//AddCodeGenerator<FunctionStaticGenerator>();
+			AddFileCodeGenerator<VectorDynamicArrayGenerator>();
+			AddModuleCodeGenerator<ModuleReflectionGenerator>();
 
-		//	// Optional
-		//	// LoadCodeGenerator<ClassSuperGenerator>();
-		//	LoadCodeGenerator<ClassMemberTypeGetters>();
-		//	LoadCodeGenerator<ClassStaticTypeGetters>();
-		//}
+			// Optional
+			AddFileCodeGenerator<ClassSuperGenerator>();
+			AddFileCodeGenerator<ClassMemberTypeGetters>();
+			AddFileCodeGenerator<ClassStaticTypeGetters>();
+		}
 
 		/// <summary>
 		/// Add a code generator.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
-		public T AddCodeGenerator<T>() where T : IFileCodeGenerator, new()
+		public T AddFileCodeGenerator<T>() where T : IFileCodeGenerator, new()
 		{
 			T generator = new();
 			FileGenerators.Add(generator);
+			return generator;
+		}
+
+		/// <summary>
+		/// Add a code generator.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		public T AddModuleCodeGenerator<T>() where T : IModuleCodeGenerator, new()
+		{
+			T generator = new();
+			ModuleGenerators.Add(generator);
 			return generator;
 		}
 
@@ -139,6 +156,13 @@ namespace CppRefl.CodeGeneration
 						FileGenerators.Add(generator);
 					}
 				}
+				else if (type.GetInterface(nameof(IModuleCodeGenerator)) != null)
+				{
+					if (Activator.CreateInstance(type) is IModuleCodeGenerator generator)
+					{
+						ModuleGenerators.Add(generator);
+					}
+				}
 			}
 		}
 		
@@ -148,7 +172,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="params"></param>
 		public FileCodeGeneratorResult GenerateFileCode(CodeGeneratorFileParams @params, Func<string, Stream>? streamCreator = null)
 		{
-			streamCreator ??= filename => new FileStream(filename, FileMode.Create, FileAccess.Write);
+			streamCreator ??= filename => new FileStream(filename, FileMode.Create, FileAccess.ReadWrite);
 
 			IEnumerable<T> FindFileObjects<T>(IEnumerable<T> items) where T : ObjectInfo
 			{
@@ -196,57 +220,65 @@ namespace CppRefl.CodeGeneration
 			using (var writer = new StreamWriter(result.Header.Stream))
 			{
 				writer.Write(context.DumpHeader());
+				writer.Close();
 			}
 
 			using (var writer = new StreamWriter(result.Source.Stream))
 			{
 				writer.Write(context.DumpSource());
+				writer.Close();
 			}
 
 			return result;
 		}
 
-		///// <summary>
-		///// Generate code pertaining to the module registry.
-		///// </summary>
-		///// <param name="params"></param>
-		//public void GenerateRegistryCode(CodeGeneratorRegistryParams @params, CodeGeneratorContext context)
-		//{
-		//	LoadCodeGenerators(@params.ExternalGeneratorDlls);
+		/// <summary>
+		/// Generate code pertaining to the module registry.
+		/// </summary>
+		/// <param name="params"></param>
+		public ModuleCodeGeneratorResult GenerateModuleCode(CodeGeneratorModuleParams @params, Func<string, Stream>? streamCreator = null)
+		{
+			streamCreator ??= filename => new FileStream(filename, FileMode.Create, FileAccess.ReadWrite);
 
-		//	string headerFilename = Path.Combine(@params.OutputDirectory, $"{@params.ModuleName}{RegistryHeaderExt}");
-		//	string sourceFilename = Path.Combine(@params.OutputDirectory, $"{@params.ModuleName}{RegistrySourceExt}");
+			ModuleCodeGeneratorContext context = new()
+			{
+				Parameters = @params
+			};
 
-		//	// Header
-		//	{
-		//		using var writer = new CppWriter(headerFilename);
+			string headerFilename = Path.Combine(@params.OutputDirectory, $"{@params.ModuleName}{FileHeaderExt}");
+			string sourceFilename = Path.Combine(@params.OutputDirectory, $"{@params.ModuleName}{FileSourceExt}");
+			ModuleCodeGeneratorResult result = new()
+			{
+				Header = new()
+				{
+					Filename = headerFilename,
+					Stream = streamCreator(headerFilename)
+				},
+				Source = new()
+				{
+					Filename = sourceFilename,
+					Stream = streamCreator(sourceFilename)
+				}
+			};
 
-		//		// Initializer prototype.
-		//		writer.WriteLine("#pragma once\n");
-		//		writer.WriteLine("// Registers the reflection classes for this module.");
-		//		writer.WriteLine($"{RegistryInitializerSignature(@params.ModuleName)};");
+			foreach (var generator in ModuleGenerators)
+			{
+				generator.Execute(context);
+			}
 
-		//		InvokeGenerators(gen => gen.WriteRegistryHeader(context));
-		//	}
+			using (var writer = new StreamWriter(result.Header.Stream))
+			{
+				writer.Write(context.DumpHeader());
+				writer.Close();
+			}
 
-		//	// Source
-		//	{
-		//		using var writer = new CppWriter(sourceFilename);
+			using (var writer = new StreamWriter(result.Source.Stream))
+			{
+				writer.Write(context.DumpSource());
+				writer.Close();
+			}
 
-		//		writer.IncludeHeader(Path.GetFileName(headerFilename));
-		//		writer.WriteLine();
-
-		//		writer.IncludeHeader("CppReflStatics.h");
-		//		writer.WriteLine();
-
-		//		InvokeGenerators(gen => gen.WriteRegistrySource(context, @params));
-
-		//		// Initializer definition.
-		//		using (writer.WithFunction(RegistryInitializerSignature(@params.ModuleName)))
-		//		{
-		//			InvokeGenerators(gen => gen.WriteRegistryInitializer(context, @params));
-		//		}
-		//	}
-		//}
+			return result;
+		}
 	}
 }

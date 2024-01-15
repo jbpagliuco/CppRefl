@@ -12,10 +12,11 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
         {
             name ??= classInfo.Type.QualifiedName();
 
-            if (classInfo.Type.Template?.IsGeneric == true)
+            writer.ForwardDeclare(classInfo);
+
+			if (classInfo.Type.Template?.IsGeneric == true)
             {
 	            // Just forward declare generic templates to make life a little easier.
-	            writer.ForwardDeclare(classInfo);
 	            return;
             }
 

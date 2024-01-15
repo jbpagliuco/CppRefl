@@ -1,7 +1,11 @@
 #include "gtest/gtest.h"
 
-#include "Reflection/Registry.h"
 #include "FunctionCode.h"
+
+#if TEST_FUNCTION_CODE()
+
+
+#include "Reflection/Registry.h"
 
 using namespace cpprefl;
 
@@ -70,3 +74,5 @@ TEST(FunctionTests, Invokers)
 
 	// TODO: Test incorrect invokers.
 }
+
+#endif

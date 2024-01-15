@@ -12,7 +12,7 @@ namespace CppRefl.CodeGeneration.Reflection
 	/// <summary>
 	/// Reflected class.
 	/// </summary>
-	[DebuggerDisplay("{Type.QualifiedName}")]
+	[DebuggerDisplay("{NameMixinStatics.QualifiedName(Type)}")]
 	public class ClassInfo : ObjectInfo
 	{
 		/// <summary>

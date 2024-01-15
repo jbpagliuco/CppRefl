@@ -1,5 +1,9 @@
 #pragma once
 
+#define REFLECT_ALIAS_CODE() 0
+
+#if REFLECT_ALIAS_CODE()
+
 #include "CppReflMarkup.h"
 
 #include "AliasCode.reflgen.h"
@@ -47,3 +51,5 @@ namespace TestNamespace
 {
 	using NamespacedAlias REFLECTED = NamespacedClassForAlias;
 }
+
+#endif

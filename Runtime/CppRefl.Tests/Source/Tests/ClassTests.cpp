@@ -1,6 +1,9 @@
 #include "gtest/gtest.h"
 
 #include "ClassCode.h"
+
+#if TEST_CLASS_CODE()
+
 #include "Reflection/Registry.h"
 
 using namespace cpprefl;
@@ -48,3 +51,5 @@ TEST(ClassTests, Constructors)
 	ReflectedClass::StaticReflectedClass().Destruct(obj);
 	EXPECT_EQ(typedObject->mPublicInt, 666);
 }
+
+#endif

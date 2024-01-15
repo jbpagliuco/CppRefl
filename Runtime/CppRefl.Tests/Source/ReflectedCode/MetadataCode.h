@@ -1,5 +1,9 @@
 #pragma once
 
+#define TEST_METADATA_CODE() 0
+
+#if TEST_METADATA_CODE()
+
 #include "CppReflMarkup.h"
 
 #include "MetadataCode.reflgen.h"
@@ -21,3 +25,5 @@ public:
 	REFL_TAG("FunctionTag") REFL_ATTR("FunctionAttr", "Function")
 	double Func(int param1, short param2);
 };
+
+#endif

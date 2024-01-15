@@ -1,5 +1,9 @@
 #pragma once
 
+#define TEST_FUNCTION_CODE() 0
+
+#if TEST_FUNCTION_CODE()
+
 #include "CppReflMarkup.h"
 #include "FunctionCode.reflgen.h"
 
@@ -10,3 +14,5 @@ namespace TestNamespace
 {
 	void REFLECTED ReflectedFunction();
 }
+
+#endif

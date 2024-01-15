@@ -41,7 +41,7 @@ namespace CppRefl.Compiler.Tests
 					/// <summary>
 					/// Directory containing the "CppRefl.Tests" generated code.
 					/// </summary>
-					public static string GeneratedCodeDirectory => Path.Combine(SourceDirectory, "GeneratedCode");
+					public static string GeneratedCodeDirectory => Path.Combine(Directory, "CppRefl.Tests", "GeneratedCode");
 				}
 			}
 		}

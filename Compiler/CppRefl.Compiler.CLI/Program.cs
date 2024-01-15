@@ -97,8 +97,7 @@ static void CompileFile(FileOptions opts)
 		InputFilename = opts.SourceFileEntrypoint,
 		Registry = compiler.Registry,
 		ModuleDirectory = opts.ModulePath,
-		OutputDirectory = opts.OutputDirectory,
-		ExternalGeneratorDlls = opts.CodeGeneratorDlls
+		OutputDirectory = opts.OutputDirectory
 	};
 
 	var codeGenerator = new CodeGenerator();
@@ -120,17 +119,16 @@ static void CompileRegistry(RegistryOptions opts)
 		string registryJson = File.ReadAllText(opts.Registry);
 		var registry = Registry.FromJson(registryJson)!;
 
-		CodeGeneratorRegistryParams @params = new()
+		CodeGeneratorModuleParams @params = new()
 		{
 			Registry = registry,
 			ModuleName = opts.ModuleName,
 			ModuleDirectory = opts.ModulePath,
-			OutputDirectory = opts.OutputDirectory,
-			ExternalGeneratorDlls = opts.CodeGeneratorDlls
+			OutputDirectory = opts.OutputDirectory
 		};
 
-		var codeGenerator = new CodeGenerator();
-		codeGenerator.GenerateRegistryCode(@params);
+		//var codeGenerator = new CodeGenerator();
+		//codeGenerator.GenerateModuleCode(@params);
 	}
 }
 
@@ -148,8 +146,8 @@ public record CommonOptions
 	[Option(Required = true, HelpText = "The directory to generate output files under.")]
 	public required string OutputDirectory { get; init; }
 
-	[Option(HelpText = "List of .DLL files containing external code generators.", Separator = ';')]
-	public IEnumerable<string> CodeGeneratorDlls { get; init; } = Enumerable.Empty<string>();
+	//[Option(HelpText = "List of .DLL files containing external code generators.", Separator = ';')]
+	//public IEnumerable<string> CodeGeneratorDlls { get; init; } = Enumerable.Empty<string>();
 }
 
 [Verb("file")]

@@ -15,6 +15,6 @@ namespace CppRefl.CodeGeneration
 	/// </summary>
 	public interface IModuleCodeGenerator
 	{
-		public void Execute(CodeGeneratorContext context);
+		public void Execute(ModuleCodeGeneratorContext context);
 	}
 }

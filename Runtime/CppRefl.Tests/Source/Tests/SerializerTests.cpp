@@ -1,6 +1,9 @@
 #include "gtest/gtest.h"
 
-#include "ReflectedCode/SerializerCode.h"
+#include "SerializerCode.h"
+
+#if TEST_SERIALIZER_CODE()
+
 #include "Serialization/Serializer.h"
 #include "Serialization/JsonDeserializer.h"
 
@@ -306,3 +309,5 @@ TEST(SerializerTests, JsonDynamic)
 	EXPECT_EQ(((DeserializationClass1*)object.mInstances[3])->mInt, 25);
 	EXPECT_EQ(object.mInstances[3]->GetBaseField(), true);
 }
+
+#endif

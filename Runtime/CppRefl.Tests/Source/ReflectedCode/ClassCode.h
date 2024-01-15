@@ -1,5 +1,9 @@
 #pragma once
 
+#define TEST_CLASS_CODE() 1
+
+#if TEST_CLASS_CODE()
+
 #include "CppReflMarkup.h"
 
 #include "ClassCode.reflgen.h"
@@ -76,3 +80,5 @@ class REFLECTED ChildClass2 : public ChildClass
 {
 	GENERATED_REFLECTION_CODE()
 };
+
+#endif

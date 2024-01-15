@@ -12,13 +12,18 @@ target_include_directories("CppRefl.Tests" PRIVATE "${CMAKE_CURRENT_LIST_DIR}/Ge
 target_include_directories("CppRefl.Tests" PRIVATE "${CMAKE_CURRENT_LIST_DIR}/Source/ReflectedCode")
 
 set(REFLECTED_FILES
-	AliasCode
+	# AliasCode
 	ClassCode
 	EnumCode
-	FunctionCode
-	MetadataCode
-	TemplateCode
-	TypesCode
+	# FunctionCode
+	# MetadataCode
+	# SerializerCode
+	# TemplateCode
+	# TypesCode
+)
+set(REFLECTED_MODULE_FILES
+	${CMAKE_CURRENT_LIST_DIR}/GeneratedCode/CppReflTests.reflgen.h
+	${CMAKE_CURRENT_LIST_DIR}/GeneratedCode/CppReflTests.reflgen.cpp
 )
 
 foreach(FILE IN LISTS REFLECTED_FILES)
@@ -35,6 +40,7 @@ foreach(FILE IN LISTS REFLECTED_HEADERS)
 endforeach()
 
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/GeneratedCode" PREFIX "Generated Files" FILES ${GENERATED_FILES})
+source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/GeneratedCode" PREFIX "Generated Files" FILES ${REFLECTED_MODULE_FILES})
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/Source/ReflectedCode" PREFIX "Reflected Headers" FILES ${REFLECTED_HEADERS})
 
 set(TEST_FILES
@@ -42,6 +48,7 @@ set(TEST_FILES
 	Source/Tests/EnumTests.cpp
 	Source/Tests/FunctionTests.cpp
 	Source/Tests/MetadataTests.cpp
+	Source/Tests/SerializerTests.cpp
 	Source/Tests/TypesTests.cpp
 )
 
@@ -51,8 +58,7 @@ endforeach()
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/Source/Tests" PREFIX "Tests" FILES ${TEST_FILES})
 
 target_sources("CppRefl.Tests" PRIVATE
-	GeneratedCode/CppReflUnitTest.reflregistry.h
-	GeneratedCode/CppReflUnitTest.reflregistry.cpp
+	${REFLECTED_MODULE_FILES}
 	Source/Main.cpp
 )
 

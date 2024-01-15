@@ -1,5 +1,9 @@
 #pragma once
 
+#define TEST_ENUM_CODE() 0
+
+#if TEST_ENUM_CODE()
+
 #include "CppReflMarkup.h"
 
 #include "EnumCode.reflgen.h"
@@ -19,3 +23,5 @@ namespace TestNamespace
 		Valu2
 	};
 }
+
+#endif

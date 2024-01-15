@@ -1,8 +1,10 @@
 #include "gtest/gtest.h"
 
-#include "EnumCode.h"
 #include "TypesCode.h"
 
+#if TEST_TYPES_CODE()
+
+#include "EnumCode.h"
 #include "Reflection/ClassInfo.h"
 #include "Reflection/EnumInfo.h"
 #include "Reflection/FieldInfo.h"
@@ -91,3 +93,5 @@ TEST(StaticTests, NameTests)
 	EXPECT_STREQ(cpprefl::GetTypeName<PrimitiveTypes>(), "PrimitiveTypes");
 	EXPECT_STREQ(cpprefl::GetTypeName<ReflectedEnum>(), "ReflectedEnum");
 }
+
+#endif
