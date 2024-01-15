@@ -3,7 +3,7 @@ using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration.CodeGenerators
 {
-	internal class FunctionStaticGenerator : ICodeGeneratorExtension
+	internal class FunctionStaticGenerator : ICodeGenerator
 	{
 		private string StaticFunctionSignature(FunctionInfo functionInfo) => $"const FunctionInfo& StaticFunction<&{functionInfo.GloballyQualifiedName}>()";
 

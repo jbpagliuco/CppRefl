@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using CppRefl.CodeGeneration.CodeGenerators;
+using CppRefl.CodeGeneration.CodeGenerators.Optional;
+using CppRefl.CodeGeneration.CodeGenerators.Runtime;
 using CppRefl.CodeGeneration.CodeGenerators.STL;
 using CppRefl.CodeGeneration.CodeWriters;
 using CppRefl.CodeGeneration.Reflection;
@@ -7,7 +9,7 @@ using TypeInfo = CppRefl.CodeGeneration.Reflection.TypeInfo;
 
 namespace CppRefl.CodeGeneration
 {
-	public class CodeGeneratorParamsCommon
+    public class CodeGeneratorParamsCommon
 	{
 		/// <summary>
 		/// Reflection registry.
@@ -65,7 +67,7 @@ namespace CppRefl.CodeGeneration
 		public const string RegistryHeaderExt = ".reflregistry.h";
 		public const string RegistrySourceExt = ".reflregistry.cpp";
 
-		private List<ICodeGeneratorExtension> Generators { get; } = new();
+		private List<ICodeGenerator> Generators { get; } = new();
 
 		public static string GetOutputFilename(string file, string moduleDirectory, string outputDirectory, string extension) => Path.Combine(outputDirectory, Path.GetRelativePath(moduleDirectory, Path.GetDirectoryName(file)!),
 				$"{Path.GetFileNameWithoutExtension(file)}{extension}");
@@ -91,7 +93,7 @@ namespace CppRefl.CodeGeneration
 		/// Add a code generator extension.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
-		public void LoadCodeGenerator<T>() where T : ICodeGeneratorExtension, new()
+		public void LoadCodeGenerator<T>() where T : ICodeGenerator, new()
 		{
 			Generators.Add(new T());
 		}
@@ -111,9 +113,9 @@ namespace CppRefl.CodeGeneration
 
 			foreach (Type type in dll.GetExportedTypes())
 			{
-				if (type.GetInterface(nameof(ICodeGeneratorExtension)) != null)
+				if (type.GetInterface(nameof(ICodeGenerator)) != null)
 				{
-					if (Activator.CreateInstance(type) is ICodeGeneratorExtension generator)
+					if (Activator.CreateInstance(type) is ICodeGenerator generator)
 					{
 						Generators.Add(generator);
 					}
@@ -208,7 +210,7 @@ namespace CppRefl.CodeGeneration
 		/// Invokes all generators.
 		/// </summary>
 		/// <param name="action"></param>
-		private void InvokeGenerators(Action<ICodeGeneratorExtension> action)
+		private void InvokeGenerators(Action<ICodeGenerator> action)
 		{
 			foreach (var generator in Generators)
 			{
@@ -222,7 +224,7 @@ namespace CppRefl.CodeGeneration
 		/// <param name="writer"></param>
 		/// <param name="name"></param>
 		/// <param name="action"></param>
-		private void WriteObject(CppWriter writer, string name, Action<ICodeGeneratorExtension> action)
+		private void WriteObject(CppWriter writer, string name, Action<ICodeGenerator> action)
 		{
 			writer.WriteLine($"""
 
@@ -241,8 +243,8 @@ namespace CppRefl.CodeGeneration
 			                  """);
 		}
 
-		private void WriteObject(CppWriter writer, TypeInfo typeInfo, Action<ICodeGeneratorExtension> action) => WriteObject(writer, typeInfo.QualifiedName, action);
-		private void WriteObject(CppWriter writer, FunctionInfo functionInfo, Action<ICodeGeneratorExtension> action) => WriteObject(writer, functionInfo.QualifiedName, action);
+		private void WriteObject(CppWriter writer, TypeInfo typeInfo, Action<ICodeGenerator> action) => WriteObject(writer, typeInfo.QualifiedName, action);
+		private void WriteObject(CppWriter writer, FunctionInfo functionInfo, Action<ICodeGenerator> action) => WriteObject(writer, functionInfo.QualifiedName, action);
 
 		/// <summary>
 		/// Generate a header file for a reflected file.

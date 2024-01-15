@@ -3,7 +3,7 @@ using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration.CodeGenerators
 {
-	internal class AliasStaticGenerator : ICodeGeneratorExtension
+	internal class AliasStaticGenerator : ICodeGenerator
 	{
 		public void WriteAliasHeader(CppWriter writer, AliasInfo aliasInfo, Registry registry)
 		{

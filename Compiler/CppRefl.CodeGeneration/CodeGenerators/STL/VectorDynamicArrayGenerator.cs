@@ -3,7 +3,7 @@ using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration.CodeGenerators.STL
 {
-	internal class VectorDynamicArrayGenerator : ICodeGeneratorExtension
+	internal class VectorDynamicArrayGenerator : ICodeGenerator
 	{
 		public void WriteClassSource(CppWriter writer, ClassInfo classInfo, Registry registry)
 		{

@@ -3,7 +3,7 @@ using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration
 {
-	public interface ICodeGeneratorExtension
+	public interface ICodeGenerator
 	{
 		/// <summary>
 		/// Writes code at the top of a generated file containing class info.
