@@ -52,9 +52,9 @@ TEST(ClassTests, Constructors)
 	EXPECT_EQ(typedObject->mPublicInt, 666);
 }
 
-#if CPPREFL_CONCEPTS()
 TEST(ClassTests, Concepts)
 {
+#if CPPREFL_CONCEPTS()
 	static_assert(cpprefl::ReflectedType<::ReflectedClass>);
 	static_assert(!cpprefl::ReflectedType<::NonReflectedClass>);
 
@@ -63,7 +63,16 @@ TEST(ClassTests, Concepts)
 
 	static_assert(!cpprefl::ReflectedEnum<::ReflectedClass>);
 	static_assert(!cpprefl::ReflectedEnum<::NonReflectedClass>);
-}
+#else
+	static_assert(cpprefl::IsReflectedType_v<::ReflectedClass>);
+	static_assert(!cpprefl::IsReflectedType_v<::NonReflectedClass>);
+
+	static_assert(cpprefl::IsReflectedClass_v<::ReflectedClass>);
+	static_assert(!cpprefl::IsReflectedClass_v<::NonReflectedClass>);
+
+	static_assert(!cpprefl::IsReflectedEnum_v<::ReflectedClass>);
+	static_assert(!cpprefl::IsReflectedEnum_v<::NonReflectedClass>);
 #endif
+}
 
 #endif

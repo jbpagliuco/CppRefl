@@ -28,9 +28,9 @@ TEST(EnumTests, EnumValues)
 	EXPECT_EQ(enumInfo.mValues[2].mValue, (int)ReflectedEnum::Foo);
 }
 
-#if CPPREFL_CONCEPTS()
 TEST(EnumTests, Concepts)
 {
+#if CPPREFL_CONCEPTS()
 	static_assert(cpprefl::ReflectedType<::ReflectedEnum>);
 	static_assert(!cpprefl::ReflectedType<::NonReflectedEnum>);
 
@@ -39,7 +39,16 @@ TEST(EnumTests, Concepts)
 
 	static_assert(cpprefl::ReflectedEnum<::ReflectedEnum>);
 	static_assert(!cpprefl::ReflectedEnum<::NonReflectedEnum>);
-}
+#else
+	static_assert(cpprefl::IsReflectedType_v<::ReflectedEnum>);
+	static_assert(!cpprefl::IsReflectedType_v<::NonReflectedEnum>);
+
+	static_assert(!cpprefl::IsReflectedClass_v<::ReflectedEnum>);
+	static_assert(!cpprefl::IsReflectedClass_v<::NonReflectedEnum>);
+
+	static_assert(cpprefl::IsReflectedEnum_v<::ReflectedEnum>);
+	static_assert(!cpprefl::IsReflectedEnum_v<::NonReflectedEnum>);
 #endif
+}
 
 #endif

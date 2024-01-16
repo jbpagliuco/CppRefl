@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cassert>
 #include <type_traits>
 
 #include "Reflection/TypeInfo.h"
@@ -13,33 +12,9 @@
 
 namespace CppReflPrivate
 {
-	// Helper to figure out if a template parameter has a member variable named "GetReflectedType".
-	template <typename T, typename = int>
-	struct HasGetReflectedType : std::false_type { };
-
-	// Helper to figure out if a template parameter has a member variable named "GetReflectedType".
-	template <typename T>
-	struct HasGetReflectedType<T, decltype((void)T::StaticType, 0)> : std::true_type { };
-
 	// Creates a static type if it doesn't already exist.
 	template <typename T>
-	const cpprefl::TypeInfo& MaybeCreateReflectedType(const char* typeName)
-	{
-		if constexpr (std::is_class_v<T> && HasGetReflectedType<T>::value)
-		{
-			return T::StaticReflectedType();
-		}
-		else if constexpr (std::is_void_v<T>)
-		{
-			static cpprefl::TypeInfo staticType(typeName, cpprefl::TypeKind::Void, 0);
-			return staticType;
-		}
-		else
-		{
-			static cpprefl::TypeInfo staticType(typeName, cpprefl::GetTypeKind<T>(), sizeof(T));
-			return staticType;
-		}
-	}
+	const cpprefl::TypeInfo& MaybeCreateReflectedType(const char* typeName);
 }
 
 namespace cpprefl
@@ -113,5 +88,46 @@ namespace cpprefl
 	{
 		GetReflectedEnum<T>();
 	};
+#else
+	template <typename T, typename = int> struct IsReflectedType : std::false_type {};
+	template <typename T> struct IsReflectedType<T, decltype((void)GetReflectedType<T>(), 0)> : std::true_type {};
+	template <typename T> constexpr bool IsReflectedType_v = IsReflectedType<T>::value;
+
+	template <typename T, typename = int> struct IsReflectedClass : std::false_type {};
+	template <typename T> struct IsReflectedClass<T, decltype((void)GetReflectedClass<T>(), 0)> : std::true_type {};
+	template <typename T> constexpr bool IsReflectedClass_v = IsReflectedClass<T>::value;
+
+	template <typename T, typename = int> struct IsReflectedEnum : std::false_type {};
+	template <typename T> struct IsReflectedEnum<T, decltype((void)GetReflectedEnum<T>(), 0)> : std::true_type {};
+	template <typename T> constexpr bool IsReflectedEnum_v = IsReflectedEnum<T>::value;
 #endif
+}
+
+namespace CppReflPrivate
+{
+	template <typename T>
+	const cpprefl::TypeInfo& MaybeCreateReflectedType(const char* typeName)
+	{
+#if CPPREFL_CONCEPTS()
+		if constexpr (std::is_class_v<T> && cpprefl::ReflectedType<T>)
+		{
+			return cpprefl::GetReflectedType<T>();
+		}
+#else
+		if constexpr (std::is_class_v<T> && cpprefl::IsReflectedType_v<T>)
+		{
+			return cpprefl::GetReflectedType<T>();
+		}
+#endif
+		else if constexpr (std::is_void_v<T>)
+		{
+			static cpprefl::TypeInfo staticType(typeName, cpprefl::TypeKind::Void, 0);
+			return staticType;
+		}
+		else
+		{
+			static cpprefl::TypeInfo staticType(typeName, cpprefl::GetTypeKind<T>(), sizeof(T));
+			return staticType;
+		}
+	}
 }
