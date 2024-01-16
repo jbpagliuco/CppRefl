@@ -174,6 +174,4 @@ public record FileOptions : CommonOptions
 
 [Verb("module")]
 public record ModuleOptions : CommonOptions
-{
-
-}
+{}

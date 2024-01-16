@@ -5,6 +5,10 @@ namespace CppRefl.CodeGeneration.CodeGenerators.STL
 {
 	internal class VectorDynamicArrayGenerator : IFileCodeGenerator
 	{
+		public void Execute(FileCodeGeneratorContext context)
+		{
+		}
+
 		public void WriteClassSource(CppWriter writer, ClassInfo classInfo, Registry registry)
 		{
 			var dynamicArrayFields = classInfo.Fields.Where(x => x.Type.QualifiedName().StartsWith("std::vector<"));
@@ -20,10 +24,6 @@ namespace CppRefl.CodeGeneration.CodeGenerators.STL
 					}
 				}
 			}
-		}
-
-		public void Execute(FileCodeGeneratorContext context)
-		{
 		}
 	}
 }

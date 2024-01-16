@@ -5,7 +5,28 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
 {
     internal class FunctionReflectionGenerator : IFileCodeGenerator
     {
-        public void WriteFunctionHeader(CppWriter writer, FunctionInfo functionInfo)
+	    public void Execute(FileCodeGeneratorContext context)
+		{
+			if (!context.Objects.Functions.Any())
+			{
+				return;
+			}
+
+			context.WriteHeader(writer => writer.IncludeHeader("CppReflStatics.h"));
+			context.WriteSource(writer =>
+			{
+				writer.IncludeHeader("Reflection/FunctionInfo.h");
+				writer.IncludeHeader("Reflection/Registry.h");
+			});
+
+			foreach (var functionInfo in context.Objects.Functions)
+			{
+				context.WriteHeader(writer => WriteFunctionHeader(writer, functionInfo));
+				context.WriteSource(writer => WriteFunctionSource(writer, functionInfo));
+			}
+		}
+
+	    public void WriteFunctionHeader(CppWriter writer, FunctionInfo functionInfo)
         {
             writer.ForwardDeclare(functionInfo);
 
@@ -18,7 +39,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
             }
         }
 
-        public void WriteFunctionSource(CppWriter writer, FunctionInfo functionInfo)
+	    public void WriteFunctionSource(CppWriter writer, FunctionInfo functionInfo)
         {
 			// StaticFunction<>()
 			using (writer.WithNamespace(CppDefines.Namespaces.Public))
@@ -65,26 +86,5 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                 }
             }
         }
-
-        public void Execute(FileCodeGeneratorContext context)
-		{
-			if (!context.Objects.Functions.Any())
-			{
-				return;
-			}
-
-			context.WriteHeader(writer => writer.IncludeHeader("CppReflStatics.h"));
-			context.WriteSource(writer =>
-			{
-				writer.IncludeHeader("Reflection/FunctionInfo.h");
-				writer.IncludeHeader("Reflection/Registry.h");
-			});
-
-			foreach (var functionInfo in context.Objects.Functions)
-			{
-				context.WriteHeader(writer => WriteFunctionHeader(writer, functionInfo));
-				context.WriteSource(writer => WriteFunctionSource(writer, functionInfo));
-			}
-		}
     }
 }

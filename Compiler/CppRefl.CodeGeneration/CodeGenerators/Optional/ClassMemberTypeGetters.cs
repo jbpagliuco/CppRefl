@@ -7,7 +7,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Optional
     /// </summary>
     internal class ClassMemberTypeGetters : IFileCodeGenerator
 	{
-        public void Execute(FileCodeGeneratorContext context)
+		public void Execute(FileCodeGeneratorContext context)
         {
 	        foreach (var classInfo in context.Objects.Classes)
 	        {

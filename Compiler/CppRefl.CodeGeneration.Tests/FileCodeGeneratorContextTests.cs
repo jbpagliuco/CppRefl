@@ -4,6 +4,22 @@ namespace CppRefl.CodeGeneration.Tests
 {
 	internal class FileCodeGeneratorContextTests
 	{
+		private string ExpectedHeaderPrefix =>
+			$"""
+			 #undef {CppDefines.FileId}
+			 #define {CppDefines.FileId} File
+
+			 #if defined(File_REFLGEN_H)
+			     #error Including File.reflgen.h multiple times! Use `#pragma once` in File.h.
+			 #endif
+
+			 #define File_REFLGEN_H
+
+			 #include "Private/CppReflGeneratedCodeMacros.h"
+			 """;
+
+		private string ExpectedSourcePrefix => "#include \"File.h\" ";
+
 		/// <summary>
 		/// Creates a default code generator context.
 		/// </summary>
@@ -23,22 +39,6 @@ namespace CppRefl.CodeGeneration.Tests
 				}
 			};
 		}
-
-		private string ExpectedHeaderPrefix =>
-			$"""
-			 #undef {CppDefines.FileId}
-			 #define {CppDefines.FileId} File
-
-			 #if defined(File_REFLGEN_H)
-			     #error Including File.reflgen.h multiple times! Use `#pragma once` in File.h.
-			 #endif
-
-			 #define File_REFLGEN_H
-
-			 #include "Private/CppReflGeneratedCodeMacros.h"
-			 """;
-
-		private string ExpectedSourcePrefix => "#include \"File.h\" ";
 
 		[Test]
 		public void ShouldWriteClassDeclaration()

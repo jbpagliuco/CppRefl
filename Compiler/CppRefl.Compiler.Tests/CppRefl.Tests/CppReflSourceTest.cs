@@ -10,7 +10,7 @@ namespace CppRefl.Compiler.Tests.CppRefl.Tests
     /// </summary>
     internal class CppReflSourceTest
     {
-        [Test]
+	    [Test]
         public void Generate()
         {
             var reflectedFiles = TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory.EnumerateFiles();

@@ -4,48 +4,6 @@ namespace CppRefl.Compiler.Tests
 {
 	internal static class TestUtil
 	{
-		internal static class Const
-		{
-			public static DirectoryInfo SolutionDirectory => new(Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "..")));
-			public static DirectoryInfo CompilerDirectory => new(Path.Combine(SolutionDirectory.FullName, "Compiler"));
-
-			internal static class Runtime
-			{
-				/// <summary>
-				/// Directory containing the "Runtime" modules.
-				/// </summary>
-				public static DirectoryInfo Directory => new(Path.Combine(SolutionDirectory.FullName, "Runtime"));
-
-				/// <summary>
-				/// Directory containing the "CppRefl" runtime source code.
-				/// </summary>
-				public static DirectoryInfo SourceDirectory => new(Path.Combine(Directory.FullName, "CppRefl", "Source"));
-
-				internal static class Tests
-				{
-					/// <summary>
-					/// CppRefl.Tests module name.
-					/// </summary>
-					public const string ModuleName = "CppReflTests";
-
-					/// <summary>
-					/// Directory containing the "CppRefl.Tests" source code.
-					/// </summary>
-					public static DirectoryInfo SourceDirectory => new(Path.Combine(Directory.FullName, "CppRefl.Tests", "Source"));
-
-					/// <summary>
-					/// Directory containing the "CppRefl.Tests" reflected headers.
-					/// </summary>
-					public static DirectoryInfo ReflectedHeadersDirectory = new(Path.Combine(SourceDirectory.FullName, "ReflectedCode"));
-
-					/// <summary>
-					/// Directory containing the "CppRefl.Tests" generated code.
-					/// </summary>
-					public static DirectoryInfo GeneratedCodeDirectory => new(Path.Combine(Directory.FullName, "CppRefl.Tests", "GeneratedCode"));
-				}
-			}
-		}
-
 		public static CompilerParams CompilerParams(FileInfo file) => new()
 		{
 			InputFile = file,
@@ -108,6 +66,48 @@ namespace CppRefl.Compiler.Tests
 		{
 			Assert.That(typeInstanceInfo.Type, Is.EqualTo(typeInfo));
 			Assert.That(typeInstanceInfo.Const, Is.EqualTo(isConst));
+		}
+
+		internal static class Const
+		{
+			public static DirectoryInfo SolutionDirectory => new(Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "..")));
+			public static DirectoryInfo CompilerDirectory => new(Path.Combine(SolutionDirectory.FullName, "Compiler"));
+
+			internal static class Runtime
+			{
+				/// <summary>
+				/// Directory containing the "Runtime" modules.
+				/// </summary>
+				public static DirectoryInfo Directory => new(Path.Combine(SolutionDirectory.FullName, "Runtime"));
+
+				/// <summary>
+				/// Directory containing the "CppRefl" runtime source code.
+				/// </summary>
+				public static DirectoryInfo SourceDirectory => new(Path.Combine(Directory.FullName, "CppRefl", "Source"));
+
+				internal static class Tests
+				{
+					/// <summary>
+					/// CppRefl.Tests module name.
+					/// </summary>
+					public const string ModuleName = "CppReflTests";
+
+					/// <summary>
+					/// Directory containing the "CppRefl.Tests" reflected headers.
+					/// </summary>
+					public static DirectoryInfo ReflectedHeadersDirectory = new(Path.Combine(SourceDirectory.FullName, "ReflectedCode"));
+
+					/// <summary>
+					/// Directory containing the "CppRefl.Tests" source code.
+					/// </summary>
+					public static DirectoryInfo SourceDirectory => new(Path.Combine(Directory.FullName, "CppRefl.Tests", "Source"));
+
+					/// <summary>
+					/// Directory containing the "CppRefl.Tests" generated code.
+					/// </summary>
+					public static DirectoryInfo GeneratedCodeDirectory => new(Path.Combine(Directory.FullName, "CppRefl.Tests", "GeneratedCode"));
+				}
+			}
 		}
 	}
 }

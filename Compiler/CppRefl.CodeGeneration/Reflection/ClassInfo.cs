@@ -39,7 +39,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Record/class type.
 		/// </summary>
 		public required ClassType ClassType { get; init; }
-		
+
 		/// <summary>
 		/// List of base classes.
 		/// </summary>

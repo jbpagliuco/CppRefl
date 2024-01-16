@@ -1,9 +1,23 @@
-﻿using CppRefl.CodeGeneration.Reflection;
-
-namespace CppRefl.CodeGeneration.Tests
+﻿namespace CppRefl.CodeGeneration.Tests
 {
 	internal class ModuleCodeGeneratorContextTests
 	{
+		private string ExpectedHeaderPrefix =>
+			"""
+			 #pragma once
+			 
+			 // Register the reflection runtime information for this module.
+			 void RegisterModuleNameReflection();
+			 """;
+
+		private string ExpectedSourcePrefix =>
+			"""
+			#include "ModuleName.reflgen.h"
+			
+			#include "CppReflStatics.h"
+			
+			""";
+
 		/// <summary>
 		/// Creates a default code generator context.
 		/// </summary>
@@ -22,22 +36,6 @@ namespace CppRefl.CodeGeneration.Tests
 				}
 			};
 		}
-
-		private string ExpectedHeaderPrefix =>
-			"""
-			 #pragma once
-			 
-			 // Register the reflection runtime information for this module.
-			 void RegisterModuleNameReflection();
-			 """;
-
-		private string ExpectedSourcePrefix =>
-			"""
-			#include "ModuleName.reflgen.h"
-			
-			#include "CppReflStatics.h"
-			
-			""";
 
 		[Test]
 		public void ShouldWriteInitializerFunction()

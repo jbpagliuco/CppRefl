@@ -1,7 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using System.Xml.Linq;
-
-namespace CppRefl.CodeGeneration.Reflection
+﻿namespace CppRefl.CodeGeneration.Reflection
 {
 	public interface INameMixin
 	{

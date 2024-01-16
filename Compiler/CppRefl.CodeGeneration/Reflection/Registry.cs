@@ -41,6 +41,20 @@ namespace CppRefl.CodeGeneration.Reflection
 	public class Registry
 	{
 		/// <summary>
+		/// Json serialization options.
+		/// </summary>
+		private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+		{
+			WriteIndented = true,
+			PropertyNameCaseInsensitive = true,
+			Converters =
+			{
+				new JsonStringEnumConverter()
+			},
+			MaxDepth = 100
+		};
+
+		/// <summary>
 		/// Reflected types.
 		/// </summary>
 		public IDictionary<string, TypeInfo> Types { get; init; } = new Dictionary<string, TypeInfo>();
@@ -94,7 +108,6 @@ namespace CppRefl.CodeGeneration.Reflection
 			collection.Values.Where(x => x.Metadata.SourceLocation.FileInfo.FullName.StartsWith(module.FullName));
 
 
-
 		/// <summary>
 		/// Create a reflected type.
 		/// </summary>
@@ -107,8 +120,6 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// <param name="name"></param>
 		/// <returns></returns>
 		public TypeInfo? GetType(string name) => GetValue(name, Types);
-		
-
 
 
 		/// <summary>
@@ -139,8 +150,6 @@ namespace CppRefl.CodeGeneration.Reflection
 			GetObjectsWithinModule(moduleDirectory, Classes);
 
 
-
-
 		/// <summary>
 		/// Add an enum to this registry.
 		/// </summary>
@@ -169,8 +178,6 @@ namespace CppRefl.CodeGeneration.Reflection
 			GetObjectsWithinModule(moduleDirectory, Enums);
 
 
-
-
 		/// <summary>
 		/// Add an alias to this registry.
 		/// </summary>
@@ -189,8 +196,6 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// </summary>
 		/// <returns></returns>
 		public ICollection<AliasInfo> GetAliases() => Aliases.Values;
-
-
 
 
 		/// <summary>
@@ -246,7 +251,6 @@ namespace CppRefl.CodeGeneration.Reflection
 		}
 
 
-
 		private void MergeDictionary<T>(IDictionary<string, T> baseDictionary, IDictionary<string, T> newDictionary)
 		{
 			foreach (var it in newDictionary)
@@ -267,22 +271,6 @@ namespace CppRefl.CodeGeneration.Reflection
 			MergeDictionary(Aliases, newRegistry.Aliases);
 			MergeDictionary(Functions, newRegistry.Functions);
 		}
-
-
-
-		/// <summary>
-		/// Json serialization options.
-		/// </summary>
-		private static readonly JsonSerializerOptions JsonSerializerOptions = new()
-		{
-			WriteIndented = true,
-			PropertyNameCaseInsensitive = true,
-			Converters =
-			{
-				new JsonStringEnumConverter()
-			},
-			MaxDepth = 100
-		};
 
 		/// <summary>
 		/// Convert this registry to JSON.

@@ -5,7 +5,7 @@
     /// </summary>
     internal class ClassStaticTypeGetters : IFileCodeGenerator
     {
-        public void Execute(FileCodeGeneratorContext context)
+	    public void Execute(FileCodeGeneratorContext context)
         {
 	        foreach (var classInfo in context.Objects.Classes)
 	        {
@@ -21,5 +21,5 @@
 		        });
 	        }
         }
-	}
+    }
 }

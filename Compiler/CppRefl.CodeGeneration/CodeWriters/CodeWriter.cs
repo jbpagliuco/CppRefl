@@ -7,17 +7,17 @@ namespace CppRefl.CodeGeneration.CodeWriters
     /// </summary>
     public class CodeWriterIndent : IDisposable
     {
-        private CodeWriter Writer { get; }
-        private int Num { get; }
-
-        public CodeWriterIndent(CodeWriter writer, int num)
+	    public CodeWriterIndent(CodeWriter writer, int num)
         {
             Writer = writer;
             Writer.BeginIndent(num);
             Num = num;
         }
 
-        public void Dispose()
+	    private CodeWriter Writer { get; }
+	    private int Num { get; }
+
+	    public void Dispose()
         {
             Writer.EndIndent(Num);
         }
@@ -28,30 +28,27 @@ namespace CppRefl.CodeGeneration.CodeWriters
 	/// </summary>
 	public class CodeWriterPostfix : IDisposable
     {
-        private CodeWriter Writer { get; }
-        private string Postfix { get; }
-
-        public CodeWriterPostfix(CodeWriter writer, string postfix)
+	    public CodeWriterPostfix(CodeWriter writer, string postfix)
         {
             Writer = writer;
             Postfix = postfix;
             Writer.AddPostfix(postfix);
         }
 
-        public void Dispose()
+	    private CodeWriter Writer { get; }
+	    private string Postfix { get; }
+
+	    public void Dispose()
         {
             Writer.RemovePostfix(Postfix);
         }
-	}
+    }
 
 	/// <summary>
 	/// Helper class for writing a block of code.
 	/// </summary>
 	public class CodeWriterCodeBlock : IDisposable
 	{
-		private CodeWriter Writer { get; }
-		private string End { get; }
-
 		public CodeWriterCodeBlock(CodeWriter writer, string block, string start, string end)
 		{
 			Writer = writer;
@@ -62,6 +59,9 @@ namespace CppRefl.CodeGeneration.CodeWriters
 			Writer.BeginIndent();
 		}
 
+		private CodeWriter Writer { get; }
+		private string End { get; }
+
 		public void Dispose()
 		{
 			Writer.EndIndent();
@@ -71,29 +71,29 @@ namespace CppRefl.CodeGeneration.CodeWriters
 
 	public class CodeWriter
     {
-        /// <summary>
+	    /// <summary>
         /// Internal string builder.
         /// </summary>
 	    private StringBuilder StringBuilder { get; } = new();
 
-        /// <summary>
+	    /// <summary>
         /// The number of indents each line should have.
         /// </summary>
         private int IndentCount { get; set; } = 0;
 
-        /// <summary>
+	    /// <summary>
         /// A string to append to every line.
         /// </summary>
         private string Postfix { get; set; } = "";
 
-        /// <summary>
+	    /// <summary>
         /// The last character we wrote.
         /// </summary>
         private char LastWrittenChar { get; set; } = '\0';
 
-        public override string ToString() => StringBuilder.ToString().Replace("\r\n", "\n").Replace("\n", Environment.NewLine);
-        
-        /// <summary>
+	    public override string ToString() => StringBuilder.ToString().Replace("\r\n", "\n").Replace("\n", Environment.NewLine);
+
+	    /// <summary>
 		/// Write some text to the file. If the text contains multiple lines, each new line will be properly indented, etc.
 		/// </summary>
 		/// <param name="text"></param>
@@ -125,7 +125,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
 			StringBuilder.Append(sb.ToString());
 		}
 
-		/// <summary>
+	    /// <summary>
 		/// Write a piece of text.
 		/// </summary>
 		/// <param name="text"></param>
@@ -150,7 +150,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
 			}
 		}
 
-		/// <summary>
+	    /// <summary>
 		/// Write some text to the output file.
 		/// </summary>
 		/// <param name="text"></param>
@@ -159,7 +159,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
 			WriteBodyInternal(text);
 		}
 
-		/// <summary>
+	    /// <summary>
 		/// Write a line of text to the output file.
 		/// </summary>
 		/// <param name="text"></param>
@@ -168,7 +168,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
 			WriteBodyInternal(text + '\n');
 		}
 
-        /// <summary>
+	    /// <summary>
         /// Indent all new lines.
         /// </summary>
         /// <param name="num"></param>
@@ -177,7 +177,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
             IndentCount += num;
         }
 
-        /// <summary>
+	    /// <summary>
         /// Stop indenting new lines.
         /// </summary>
         /// <param name="num"></param>
@@ -186,7 +186,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
             IndentCount -= num;
         }
 
-        /// <summary>
+	    /// <summary>
         /// Convenience disposable for controlling indentation.
         /// </summary>
         /// <param name="num"></param>
@@ -196,7 +196,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
             return new(this, num);
         }
 
-        /// <summary>
+	    /// <summary>
         /// Add a string that will be postfixed to all new lines.
         /// </summary>
         /// <param name="postfix"></param>
@@ -205,7 +205,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
             Postfix += postfix;
         }
 
-        /// <summary>
+	    /// <summary>
         /// Remove an existing postfix.
         /// </summary>
         /// <param name="postfix"></param>
@@ -220,7 +220,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
             Postfix = Postfix.Substring(0, Postfix.Length - postfix.Length);
         }
 
-        /// <summary>
+	    /// <summary>
         /// Convenience disposable for controlling postfixes.
         /// </summary>
         /// <param name="postfix"></param>
@@ -230,7 +230,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
             return new(this, postfix);
         }
 
-        /// <summary>
+	    /// <summary>
         /// Write a code block. Automatically indents any new lines.
         /// </summary>
         /// <param name="text"></param>

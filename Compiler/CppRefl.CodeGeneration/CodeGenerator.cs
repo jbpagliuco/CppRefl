@@ -93,18 +93,6 @@ namespace CppRefl.CodeGeneration
 		public const string FileHeaderExt = ".reflgen.h";
 		public const string FileSourceExt = ".reflgen.cpp";
 
-		public List<IFileCodeGenerator> FileGenerators { get; } = new();
-		public List<IModuleCodeGenerator> ModuleGenerators { get; } = new();
-
-		public static FileInfo GetOutputFilename(FileInfo file, DirectoryInfo moduleDirectory, DirectoryInfo outputDirectory, string extension)
-		{
-			return new(
-				Path.Combine(
-					outputDirectory.FullName,
-					Path.GetRelativePath(moduleDirectory.FullName, file.DirectoryName!),
-					$"{Path.GetFileNameWithoutExtension(file.Name)}{extension}"));
-		}
-
 		//private string RegistryInitializerSignature(string moduleName) => $"void Registry{moduleName}Reflection()";
 
 		public CodeGenerator()
@@ -120,6 +108,18 @@ namespace CppRefl.CodeGeneration
 			AddFileCodeGenerator<ClassSuperGenerator>();
 			AddFileCodeGenerator<ClassMemberTypeGetters>();
 			AddFileCodeGenerator<ClassStaticTypeGetters>();
+		}
+
+		public List<IFileCodeGenerator> FileGenerators { get; } = new();
+		public List<IModuleCodeGenerator> ModuleGenerators { get; } = new();
+
+		public static FileInfo GetOutputFilename(FileInfo file, DirectoryInfo moduleDirectory, DirectoryInfo outputDirectory, string extension)
+		{
+			return new(
+				Path.Combine(
+					outputDirectory.FullName,
+					Path.GetRelativePath(moduleDirectory.FullName, file.DirectoryName!),
+					$"{Path.GetFileNameWithoutExtension(file.Name)}{extension}"));
 		}
 
 		/// <summary>
@@ -168,7 +168,7 @@ namespace CppRefl.CodeGeneration
 				}
 			}
 		}
-		
+
 		/// <summary>
 		/// Generate code pertaining to a single file.
 		/// </summary>

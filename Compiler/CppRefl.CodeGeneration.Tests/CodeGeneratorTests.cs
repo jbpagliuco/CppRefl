@@ -53,7 +53,7 @@ namespace CppRefl.CodeGeneration.Tests
 				OutputDirectory = new DirectoryInfo($@"{root}Generated")
 			};
 		}
-		
+
 
 		[Test]
 		public void ShouldProduceCorrectFilenames()
@@ -78,8 +78,6 @@ namespace CppRefl.CodeGeneration.Tests
 					Is.EqualTo($@"{Path.GetTempPath()}Generated\ModuleName.reflgen.cpp"));
 			}
 		}
-
-
 
 
 		[Test]
@@ -135,9 +133,6 @@ namespace CppRefl.CodeGeneration.Tests
 				            Source
 				            """));
 		}
-
-
-
 
 
 		[Test]

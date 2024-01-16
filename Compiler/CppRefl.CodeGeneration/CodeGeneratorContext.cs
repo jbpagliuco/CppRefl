@@ -106,7 +106,7 @@ namespace CppRefl.CodeGeneration
 
 			action(writer);
 		}
-		
+
 		/// <summary>
 		/// Writes code to the body of a class declaration.
 		/// </summary>

@@ -1,6 +1,4 @@
-﻿using CppRefl.CodeGeneration.Reflection;
-
-namespace CppRefl.CodeGeneration
+﻿namespace CppRefl.CodeGeneration
 {
 	/// <summary>
 	/// Implements a code generator for a file.

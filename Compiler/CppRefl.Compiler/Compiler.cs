@@ -1,15 +1,14 @@
-﻿using ClangSharp;
-using ClangSharp.Interop;
+﻿using ClangSharp.Interop;
 using CppRefl.CodeGeneration;
 using CppRefl.CodeGeneration.Reflection;
-using FieldInfo = CppRefl.CodeGeneration.Reflection.FieldInfo;
-using MethodInfo = CppRefl.CodeGeneration.Reflection.MethodInfo;
-using TypeInfo = CppRefl.CodeGeneration.Reflection.TypeInfo;
 
 namespace CppRefl.Compiler;
 
 public record CompilerParams
 {
+	// Filename where metadata will be written to.
+	private readonly string? _registryFilename;
+
 	// Entrypoint of the program. Should be a .cpp of .h file.
 	public required FileInfo InputFile { get; init; }
 
@@ -18,7 +17,7 @@ public record CompilerParams
 
 	// Base file path of the module. Any symbols defined outside of this filepath are ignored.
 	public required DirectoryInfo ModuleDirectory { get; init; }
-	
+
 	// List of arguments to pass to clang.
 	public IEnumerable<string> ClangArgs { get; init; } = Enumerable.Empty<string>();
 
@@ -36,7 +35,7 @@ public record CompilerParams
 
 	// Output directory containing generated code.
 	public required DirectoryInfo OutputDirectory { get; init; }
-	
+
 	// Deletes empty header files after compilation.
 	public bool DeleteEmptyHeaderFiles { get; set; } = false;
 
@@ -45,9 +44,6 @@ public record CompilerParams
 
 	// Deletes empty directories after compilation.
 	public bool DeleteEmptyDirectories { get; set; } = true;
-
-	// Filename where metadata will be written to.
-	private readonly string? _registryFilename;
 	public string? RegistryFilename { get => _registryFilename; init => _registryFilename = value != null ? Path.GetFullPath(value) : null; }
 }
 
@@ -60,6 +56,24 @@ internal record TemplatedFieldInfo
 
 public class Compiler
 {
+	public Compiler(CompilerParams @params)
+	{
+		Params = @params;
+		
+		ClangArgs = DefaultClangArgs
+			.Concat(@params.ClangArgs)
+			.Concat(@params.IncludePaths.Where(x => x != "").Select(x => $"-I{x}"))
+			.Concat(@params.Definitions.Where(x => x != "").Select(x => $"-D{x}"))
+			.Append($"-D{CppDefines.BuildReflection}")
+			.ToArray();
+
+		OutputFiles = new[]
+		{
+			CodeGenerator.GetOutputFilename(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.FileHeaderExt),
+			CodeGenerator.GetOutputFilename(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.FileSourceExt),
+		};
+	}
+
 	/// <summary>
 	/// Parameters of this compiler instance.
 	/// </summary>
@@ -103,7 +117,7 @@ public class Compiler
 	/// Clang index.
 	/// </summary>
 	private CXTranslationUnit TranslationUnit { get; set; }
-	
+
 	/// <summary>
 	/// List of output files that will be generated.
 	/// </summary>
@@ -114,24 +128,6 @@ public class Compiler
 	/// </summary>
 	private IDictionary<TypeInfo, CXCursor> TypeCursors { get; } = new Dictionary<TypeInfo, CXCursor>();
 
-	public Compiler(CompilerParams @params)
-	{
-		Params = @params;
-		
-		ClangArgs = DefaultClangArgs
-			.Concat(@params.ClangArgs)
-			.Concat(@params.IncludePaths.Where(x => x != "").Select(x => $"-I{x}"))
-			.Concat(@params.Definitions.Where(x => x != "").Select(x => $"-D{x}"))
-			.Append($"-D{CppDefines.BuildReflection}")
-			.ToArray();
-
-		OutputFiles = new[]
-		{
-			CodeGenerator.GetOutputFilename(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.FileHeaderExt),
-			CodeGenerator.GetOutputFilename(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.FileSourceExt),
-		};
-	}
-	
 	/// <summary>
 	/// Generates empty files that are included for reflection.
 	/// </summary>
@@ -201,7 +197,7 @@ public class Compiler
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Deletes pre-generated files that don't actually contain any reflection data.
 	/// </summary>
@@ -448,7 +444,7 @@ public class Compiler
 			parameterTypes.Add(ReflectTypeInstance(parameterType));
 		}
 	}
-	
+
 	/// <summary>
 	/// Reflects a field on a class.
 	/// </summary>

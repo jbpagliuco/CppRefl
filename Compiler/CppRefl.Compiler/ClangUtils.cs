@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Text;
-using ClangSharp;
+﻿using System.Text;
 using ClangSharp.Interop;
 using CppRefl.CodeGeneration;
 using CppRefl.CodeGeneration.Reflection;

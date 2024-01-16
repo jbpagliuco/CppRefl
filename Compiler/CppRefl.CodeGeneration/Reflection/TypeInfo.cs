@@ -68,16 +68,6 @@ namespace CppRefl.CodeGeneration.Reflection
 	public class TypeInfo : INameMixin
 	{
 		/// <summary>
-		/// Type name (without the namespace).
-		/// </summary>
-		public required string Name { get; init; }
-
-		/// <summary>
-		/// Type namespace.
-		/// </summary>
-		public required string Namespace { get; init; }
-		
-		/// <summary>
 		/// Kind of type data.
 		/// </summary>
 		public TypeKind Kind { get; set; }
@@ -86,7 +76,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Template information.
 		/// </summary>
 		public TemplateInfo? Template { get; set; }
-		
+
 		/// <summary>
 		/// Returns true if this is a primitive data type.
 		/// </summary>
@@ -98,13 +88,13 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// </summary>
 		[JsonIgnore]
 		public bool IsInteger => Kind >= TypeKind.Uint8 && Kind <= TypeKind.Int64;
-		
+
 		/// <summary>
 		/// Return true if this is a real number data type.
 		/// </summary>
 		[JsonIgnore]
 		public bool IsReal => Kind >= TypeKind.Float && Kind <= TypeKind.LongDouble;
-		
+
 		/// <summary>
 		/// Return true if this is an unsigned integer type.
 		/// </summary>
@@ -146,7 +136,17 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// </summary>
 		[JsonIgnore]
 		public bool IsInstantiable => !IsTemplated || Template?.IsSpecialized == true;
-		
+
+		/// <summary>
+		/// Type name (without the namespace).
+		/// </summary>
+		public required string Name { get; init; }
+
+		/// <summary>
+		/// Type namespace.
+		/// </summary>
+		public required string Namespace { get; init; }
+
 
 		public override string ToString() => this.QualifiedName();
 	}

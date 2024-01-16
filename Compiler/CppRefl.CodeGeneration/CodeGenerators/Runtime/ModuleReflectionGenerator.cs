@@ -1,12 +1,10 @@
-﻿using CppRefl.CodeGeneration.CodeWriters;
-using CppRefl.CodeGeneration.Reflection;
-using Microsoft.Win32;
+﻿using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
 {
     internal class ModuleReflectionGenerator : IModuleCodeGenerator
     {
-        public void Execute(ModuleCodeGeneratorContext context)
+	    public void Execute(ModuleCodeGeneratorContext context)
         {
 	        HashSet<ObjectInfo> reflectedObjects = new();
 

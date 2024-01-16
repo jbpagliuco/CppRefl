@@ -36,7 +36,7 @@ namespace CppRefl.CodeGeneration.Reflection
 
 		[JsonIgnore]
 		public string FilenameNoExt => Path.GetFileNameWithoutExtension(FileInfo.FullName);
-		
+
 		[JsonIgnore]
 		public string IdeDiagnostic => $"{FileInfo.FullName}({Line}):";
 	}

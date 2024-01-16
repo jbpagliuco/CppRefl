@@ -8,7 +8,65 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
     /// </summary>
     internal class ClassReflectionGenerator : IFileCodeGenerator
     {
-        public void WriteClassHeader(CppWriter writer, ClassInfo classInfo, string? name = null)
+	    //public void WriteAliasHeader(CppWriter writer, AliasInfo aliasInfo, Registry registry)
+	    //{
+	    //    if (aliasInfo.AliasClass != null && aliasInfo.AliasClass.Type.Template?.IsSpecialized == true)
+	    //    {
+	    //        WriteClassHeader(writer, aliasInfo.AliasClass);
+	    //    }
+	    //}
+
+	    //public void WriteAliasSource(CppWriter writer, AliasInfo aliasInfo, Registry registry)
+	    //{
+	    //    if (aliasInfo.AliasClass != null && aliasInfo.AliasClass.Type.Template?.IsSpecialized == true)
+	    //    {
+	    //        WriteClassSource(writer, aliasInfo.AliasClass, aliasInfo.Type.QualifiedName);
+	    //    }
+	    //}
+
+	    public void Execute(FileCodeGeneratorContext context)
+        {
+	        if (!context.Objects.Classes.Any())
+	        {
+		        return;
+	        }
+
+	        context.WriteHeader(writer =>
+	        {
+                // For overloading GetReflectedType() and GetReflectedClass().
+                writer.IncludeHeader("CppReflStatics.h");
+
+                foreach (var classInfo in context.Objects.Classes)
+                {
+	                WriteClassHeader(writer, classInfo);
+				}
+	        });
+
+			foreach (var classInfo in context.Objects.Classes)
+	        {
+                context.WriteClassDeclaration(classInfo, writer =>
+                {
+                    // Make these functions friends since they may need to access the offset of any private fields.
+	                writer.WriteLine($"friend const cpprefl::TypeInfo& cpprefl::GetReflectedType<{classInfo.Type.Name}>();");
+	                writer.WriteLine($"friend const cpprefl::ClassInfo& cpprefl::GetReflectedClass<{classInfo.Type.Name}>();");
+				});
+			}
+
+			context.WriteSource(writer =>
+			{
+				writer.IncludeHeader("Reflection/ClassInfo.h");
+				writer.IncludeHeader("Reflection/FieldInfo.h");
+				writer.IncludeHeader("Reflection/Registry.h");
+				writer.IncludeHeader("Reflection/TypeInfo.h");
+
+				foreach (var classInfo in context.Objects.Classes)
+				{
+                    WriteClassSource(writer, classInfo);
+				}
+			});
+		}
+
+	    public void WriteClassHeader(CppWriter writer, ClassInfo classInfo, string? name = null)
         {
             name ??= classInfo.Type.QualifiedName();
 
@@ -38,7 +96,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
             }
         }
 
-        private void WriteClassSource(CppWriter writer, ClassInfo classInfo, string? name = null)
+	    private void WriteClassSource(CppWriter writer, ClassInfo classInfo, string? name = null)
         {
             name ??= classInfo.Type.QualifiedName();
 
@@ -134,63 +192,5 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                 }
             }
         }
-
-        //public void WriteAliasHeader(CppWriter writer, AliasInfo aliasInfo, Registry registry)
-        //{
-        //    if (aliasInfo.AliasClass != null && aliasInfo.AliasClass.Type.Template?.IsSpecialized == true)
-        //    {
-        //        WriteClassHeader(writer, aliasInfo.AliasClass);
-        //    }
-        //}
-
-        //public void WriteAliasSource(CppWriter writer, AliasInfo aliasInfo, Registry registry)
-        //{
-        //    if (aliasInfo.AliasClass != null && aliasInfo.AliasClass.Type.Template?.IsSpecialized == true)
-        //    {
-        //        WriteClassSource(writer, aliasInfo.AliasClass, aliasInfo.Type.QualifiedName);
-        //    }
-        //}
-
-        public void Execute(FileCodeGeneratorContext context)
-        {
-	        if (!context.Objects.Classes.Any())
-	        {
-		        return;
-	        }
-
-	        context.WriteHeader(writer =>
-	        {
-                // For overloading GetReflectedType() and GetReflectedClass().
-                writer.IncludeHeader("CppReflStatics.h");
-
-                foreach (var classInfo in context.Objects.Classes)
-                {
-	                WriteClassHeader(writer, classInfo);
-				}
-	        });
-
-			foreach (var classInfo in context.Objects.Classes)
-	        {
-                context.WriteClassDeclaration(classInfo, writer =>
-                {
-                    // Make these functions friends since they may need to access the offset of any private fields.
-	                writer.WriteLine($"friend const cpprefl::TypeInfo& cpprefl::GetReflectedType<{classInfo.Type.Name}>();");
-	                writer.WriteLine($"friend const cpprefl::ClassInfo& cpprefl::GetReflectedClass<{classInfo.Type.Name}>();");
-				});
-			}
-
-			context.WriteSource(writer =>
-			{
-				writer.IncludeHeader("Reflection/ClassInfo.h");
-				writer.IncludeHeader("Reflection/FieldInfo.h");
-				writer.IncludeHeader("Reflection/Registry.h");
-				writer.IncludeHeader("Reflection/TypeInfo.h");
-
-				foreach (var classInfo in context.Objects.Classes)
-				{
-                    WriteClassSource(writer, classInfo);
-				}
-			});
-		}
     }
 }

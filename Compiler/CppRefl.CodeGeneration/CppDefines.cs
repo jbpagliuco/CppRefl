@@ -7,8 +7,9 @@
 		/// Annotation marker (used by REFLECTED, REFL_TAG, and REFL_ATTR).
 		/// </summary>
 		public const string Annotation = "cpprefl";
+
 		public const char AnnotationSeparator = ',';
-		
+
 		/// <summary>
 		/// Preprocessor flag that that is only defined during reflection compilation.
 		/// </summary>

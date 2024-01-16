@@ -1,5 +1,4 @@
-﻿using System.Text;
-using CppRefl.CodeGeneration.Reflection;
+﻿using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration.CodeWriters
 {
@@ -49,7 +48,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
 		    return WithIndent();
 	    }
 
-		/// <summary>
+	    /// <summary>
 		/// Forward declare a class. NB: This MUST be called from the global namespace.
 		/// </summary>
 		/// <param name="classInfo"></param>
@@ -58,7 +57,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
 			WriteLine(classInfo.ForwardDeclaration);
 		}
 
-		/// <summary>
+	    /// <summary>
 		/// Forward declare an enum. NB: This MUST be called from the global namespace.
 		/// </summary>
 		/// <param name="enumInfo"></param>
@@ -69,7 +68,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
 			namespaceDec?.Dispose();
 		}
 
-		/// <summary>
+	    /// <summary>
 		/// Forward declare a function. NB: This MUST be called from the global namespace.
 		/// </summary>
 		/// <param name="functionInfo"></param>
@@ -79,5 +78,5 @@ namespace CppRefl.CodeGeneration.CodeWriters
 			WriteLine($"{functionInfo.Signature};");
 			namespaceDec?.Dispose();
 		}
-	}
+    }
 }

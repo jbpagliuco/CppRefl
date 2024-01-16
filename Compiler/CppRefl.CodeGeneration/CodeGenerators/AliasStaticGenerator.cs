@@ -1,7 +1,4 @@
-﻿using CppRefl.CodeGeneration.CodeWriters;
-using CppRefl.CodeGeneration.Reflection;
-
-namespace CppRefl.CodeGeneration.CodeGenerators
+﻿namespace CppRefl.CodeGeneration.CodeGenerators
 {
 	//internal class AliasStaticGenerator : ICodeGenerator
 	//{

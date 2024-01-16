@@ -5,7 +5,37 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
 {
     internal class EnumReflectionGenerator : IFileCodeGenerator
     {
-        public void WriteEnumHeader(CppWriter writer, EnumInfo enumInfo)
+	    public void Execute(FileCodeGeneratorContext context)
+        {
+	        if (!context.Objects.Enums.Any())
+	        {
+		        return;
+	        }
+
+            context.WriteHeader(writer =>
+            {
+	            // For overloading GetReflectedType() and GetReflectedClass().
+	            writer.IncludeHeader("CppReflStatics.h");
+
+	            foreach (var enumInfo in context.Objects.Enums)
+				{
+					WriteEnumHeader(writer, enumInfo);
+				}
+            });
+
+            context.WriteSource(writer =>
+			{
+				writer.IncludeHeader("Reflection/Registry.h");
+
+				foreach (var enumInfo in context.Objects.Enums)
+	            {
+		            WriteEnumSource(writer, enumInfo);
+	            }
+			});
+
+        }
+
+	    public void WriteEnumHeader(CppWriter writer, EnumInfo enumInfo)
         {
             // Forward declare
             writer.ForwardDeclare(enumInfo);
@@ -23,7 +53,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
             }
         }
 
-        public void WriteEnumSource(CppWriter writer, EnumInfo enumInfo)
+	    public void WriteEnumSource(CppWriter writer, EnumInfo enumInfo)
         {
             using (writer.WithNamespace(CppDefines.Namespaces.Public))
             {
@@ -70,36 +100,6 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                     writer.WriteLine("return enumInfo;");
                 }
             }
-        }
-
-        public void Execute(FileCodeGeneratorContext context)
-        {
-	        if (!context.Objects.Enums.Any())
-	        {
-		        return;
-	        }
-
-            context.WriteHeader(writer =>
-            {
-	            // For overloading GetReflectedType() and GetReflectedClass().
-	            writer.IncludeHeader("CppReflStatics.h");
-
-	            foreach (var enumInfo in context.Objects.Enums)
-				{
-					WriteEnumHeader(writer, enumInfo);
-				}
-            });
-
-            context.WriteSource(writer =>
-			{
-				writer.IncludeHeader("Reflection/Registry.h");
-
-				foreach (var enumInfo in context.Objects.Enums)
-	            {
-		            WriteEnumSource(writer, enumInfo);
-	            }
-			});
-
         }
     }
 }
