@@ -23,7 +23,6 @@ namespace CppRefl.Compiler.Tests
 					Const.Runtime.Tests.SourceDirectory.FullName,
 					Const.Runtime.Tests.GeneratedCodeDirectory.FullName
 				},
-				// TODO: Create a "no output" mode.
 				OutputDirectory = Const.Runtime.Tests.GeneratedCodeDirectory
 			};
 			Compiler = new Compiler(compilerParams);
