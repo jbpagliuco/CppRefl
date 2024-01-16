@@ -77,15 +77,15 @@ static void CompileFile(FileOptions opts)
 {
 	var compiler = new Compiler(new CompilerParams()
 	{
-		SourceFileEntrypoint = opts.SourceFileEntrypoint,
+		InputFile = new(opts.InputFilename),
 		ModuleName = opts.ModuleName,
-		ModulePath = opts.ModulePath,
+		ModuleDirectory = new(opts.ModuleDirectory),
 		ClangArgs = opts.ClangArgs,
 		IncludePaths = opts.IncludePaths,
 		Definitions = opts.Definitions,
 		RaiseClangWarnings = !opts.NoRaiseClangWarnings,
 		RaiseClangErrors = !opts.NoRaiseClangErrors,
-		OutputDirectory = opts.OutputDirectory,
+		OutputDirectory = new(opts.OutputDirectory),
 		RegistryFilename = opts.Registry
 	});
 
@@ -94,10 +94,10 @@ static void CompileFile(FileOptions opts)
 	
 	CodeGeneratorFileParams @params = new()
 	{
-		InputFilename = opts.SourceFileEntrypoint,
+		InputFilename = new(opts.InputFilename),
 		Registry = compiler.Registry,
-		ModuleDirectory = opts.ModulePath,
-		OutputDirectory = opts.OutputDirectory
+		ModuleDirectory = new(opts.ModuleDirectory),
+		OutputDirectory = new(opts.OutputDirectory)
 	};
 
 	var codeGenerator = new CodeGenerator();
@@ -123,12 +123,12 @@ static void CompileRegistry(RegistryOptions opts)
 		{
 			Registry = registry,
 			ModuleName = opts.ModuleName,
-			ModuleDirectory = opts.ModulePath,
-			OutputDirectory = opts.OutputDirectory
+			ModuleDirectory = new(opts.ModuleDirectory),
+			OutputDirectory = new(opts.OutputDirectory)
 		};
 
-		//var codeGenerator = new CodeGenerator();
-		//codeGenerator.GenerateModuleCode(@params);
+		var codeGenerator = new CodeGenerator();
+		codeGenerator.GenerateModuleCode(@params);
 	}
 }
 
@@ -138,7 +138,7 @@ public record CommonOptions
 	public string ModuleName { get; init; } = string.Empty;
 
 	[Option(Required = true, HelpText = "Base file path of the module. Any symbols defined outside of this filepath are ignored.")]
-	public string ModulePath { get; init; } = string.Empty;
+	public string ModuleDirectory { get; init; } = string.Empty;
 
 	[Option(HelpText = "Output filename to contain reflection registry information.")]
 	public string? Registry { get; init; }
@@ -154,7 +154,7 @@ public record CommonOptions
 public record FileOptions : CommonOptions
 {
 	[Option("entry", Required = true, HelpText = "Entrypoint of the program. Should be a .cpp of .h file.")]
-	public string SourceFileEntrypoint { get; init; } = string.Empty;
+	public string InputFilename { get; init; } = string.Empty;
 
 	[Option(Required = false, HelpText = "List of arguments to pass to clang.", Separator = ';')]
 	public IEnumerable<string> ClangArgs { get; init; } = Array.Empty<string>();

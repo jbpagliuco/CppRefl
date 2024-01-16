@@ -48,7 +48,7 @@ namespace CppRefl.Compiler.Tests
 
 		public static CompilerParams CompilerParams(FileInfo file) => new()
 		{
-			SourceFileEntrypoint = file,
+			InputFile = file,
 			ModuleDirectory = Const.Runtime.Tests.ReflectedHeadersDirectory,
 			ModuleName = "CppReflUnitTest",
 			IncludePaths = new[]

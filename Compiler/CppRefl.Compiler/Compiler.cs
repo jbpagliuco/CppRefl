@@ -11,7 +11,7 @@ namespace CppRefl.Compiler;
 public record CompilerParams
 {
 	// Entrypoint of the program. Should be a .cpp of .h file.
-	public required FileInfo SourceFileEntrypoint { get; init; }
+	public required FileInfo InputFile { get; init; }
 
 	// Name of the module we're generating reflection for (Game, Engine, Core, etc.)
 	public required string ModuleName { get; init; }
@@ -127,8 +127,8 @@ public class Compiler
 
 		OutputFiles = new[]
 		{
-			CodeGenerator.GetOutputFilename(Params.SourceFileEntrypoint, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.FileHeaderExt),
-			CodeGenerator.GetOutputFilename(Params.SourceFileEntrypoint, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.FileSourceExt),
+			CodeGenerator.GetOutputFilename(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.FileHeaderExt),
+			CodeGenerator.GetOutputFilename(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.FileSourceExt),
 		};
 	}
 	
@@ -176,13 +176,13 @@ public class Compiler
 		GenerateEmptyFiles();
 
 		Index = CXIndex.Create();
-		TranslationUnit = ClangUtils.CreateTranslationUnit(Index, Params.SourceFileEntrypoint.FullName, ClangArgs, Params.RaiseClangWarnings, Params.RaiseClangErrors);
+		TranslationUnit = ClangUtils.CreateTranslationUnit(Index, Params.InputFile.FullName, ClangArgs, Params.RaiseClangWarnings, Params.RaiseClangErrors);
 
 		ClangUtils.VisitCursorChildren(TranslationUnit.Cursor, ReflectCursor);
 
 		if (Params.RegistryFilename != null)
 		{
-			RegistryFile.AppendRegistry(Params.RegistryFilename, Params.SourceFileEntrypoint.FullName, Registry);
+			RegistryFile.AppendRegistry(Params.RegistryFilename, Params.InputFile.FullName, Registry);
 		}
 	}
 
