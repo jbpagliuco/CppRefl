@@ -14,8 +14,8 @@ try
 			CompileFile(opts);
 			break;
 
-		case RegistryOptions opts:
-			CompileRegistry(opts);
+		case ModuleOptions opts:
+			CompileModule(opts);
 			break;
 
 		default:
@@ -49,7 +49,7 @@ return 0;
 
 static object ParseCommandLine(string[] args)
 {
-	var verbs = new[] { typeof(FileOptions), typeof(RegistryOptions) };
+	var verbs = new[] { typeof(FileOptions), typeof(ModuleOptions) };
 
 	var parsedArguments = new Parser(with =>
 	{
@@ -107,7 +107,7 @@ static void CompileFile(FileOptions opts)
 	// compiler.CleanupUnusedFiles();
 }
 
-static void CompileRegistry(RegistryOptions opts)
+static void CompileModule(ModuleOptions opts)
 {
 	if (opts.Registry == null)
 	{
@@ -172,8 +172,8 @@ public record FileOptions : CommonOptions
 	public bool NoRaiseClangErrors { get; init; } = false;
 }
 
-[Verb("registry")]
-public record RegistryOptions : CommonOptions
+[Verb("module")]
+public record ModuleOptions : CommonOptions
 {
 
 }
