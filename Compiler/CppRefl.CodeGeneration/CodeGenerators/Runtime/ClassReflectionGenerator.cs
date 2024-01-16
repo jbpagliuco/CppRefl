@@ -12,13 +12,18 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
         {
             name ??= classInfo.Type.QualifiedName();
 
-            writer.ForwardDeclare(classInfo);
-
-			if (classInfo.Type.Template?.IsGeneric == true)
+            if (classInfo.Type.IsTemplated)
             {
-	            // Just forward declare generic templates to make life a little easier.
+	            if (classInfo.Type.Template!.IsGeneric)
+				{
+					// Just forward declare generic templates to make life a little easier.
+					writer.ForwardDeclare(classInfo);
+	            }
+
 	            return;
             }
+
+			writer.ForwardDeclare(classInfo);
 
 			// Specialize the templated GetReflectedXX functions.
 			using (writer.WithNamespace(CppDefines.Namespaces.Public))
@@ -36,6 +41,11 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
         private void WriteClassSource(CppWriter writer, ClassInfo classInfo, string? name = null)
         {
             name ??= classInfo.Type.QualifiedName();
+
+            if (classInfo.Type.IsTemplated)
+            {
+	            return;
+            }
 
             using (writer.WithNamespace(CppDefines.Namespaces.Public))
             {

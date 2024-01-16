@@ -16,8 +16,8 @@ namespace CppRefl.Compiler.Tests
 			Assert.That(classInfo.Metadata.Tags[1], Is.EqualTo("Another Tag"));
 			Assert.That(classInfo.Metadata.SourceLocation.Filepath, Is.EqualTo(ReflectionFile));
 			Assert.That(classInfo.Metadata.SourceLocation.Filename, Is.EqualTo("MetadataCode.h"));
-			Assert.That(classInfo.Metadata.SourceLocation.Line, Is.EqualTo(13));
-			Assert.That(classInfo.GeneratedBodyLine, Is.EqualTo(15));
+			Assert.That(classInfo.Metadata.SourceLocation.Line, Is.EqualTo(17));
+			Assert.That(classInfo.GeneratedBodyLine, Is.EqualTo(19));
 
 			Assert.That(classInfo.Metadata.Attributes.Count, Is.EqualTo(2));
 			Assert.That(classInfo.Metadata.Attributes["SomeAttr"], Is.EqualTo("\"MyValue\""));

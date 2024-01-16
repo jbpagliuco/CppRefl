@@ -153,25 +153,29 @@ namespace CppRefl.CodeGeneration
 			// Write all of the class bodies.
 			foreach (var (classInfo, writer) in ClassDeclarationWriters)
 			{
-				string generatedBodyMacroName = $"{CppDefines.InternalReflectionMacroPrefix}_{classInfo.Metadata.SourceLocation.FilenameNoExt}{classInfo.GeneratedBodyLine}";
-				sb.AppendLine($"""
-			                  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-			                  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-			                  // {classInfo.Type.QualifiedName()} class declaration
-			                  
-			                  #if !{CppDefines.BuildReflection}
-			                  // Macro to be added inside the definition of a reflected class.
-			                  	#define {generatedBodyMacroName}()\
-			                  {writer}
-			                  
-			                  #else
-			                  	// Define empty macro when building reflection.
-			                  	#define {generatedBodyMacroName}()
-			                  #endif
-			                  
-			                  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-			                  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-			                  """);
+				if (classInfo.GeneratedBodyLine != null)
+				{
+					string generatedBodyMacroName =
+						$"{CppDefines.InternalReflectionMacroPrefix}_{classInfo.Metadata.SourceLocation.FilenameNoExt}{classInfo.GeneratedBodyLine}";
+					sb.AppendLine($"""
+					               ////////////////////////////////////////////////////////////////////////////////////////////////////////
+					               ////////////////////////////////////////////////////////////////////////////////////////////////////////
+					               // {classInfo.Type.QualifiedName()} class declaration
+
+					               #if !{CppDefines.BuildReflection}
+					               // Macro to be added inside the definition of a reflected class.
+					               	#define {generatedBodyMacroName}()\
+					               {writer}
+
+					               #else
+					               	// Define empty macro when building reflection.
+					               	#define {generatedBodyMacroName}()
+					               #endif
+
+					               ////////////////////////////////////////////////////////////////////////////////////////////////////////
+					               ////////////////////////////////////////////////////////////////////////////////////////////////////////
+					               """);
+				}
 			}
 
 			return sb.ToString();

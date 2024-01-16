@@ -18,7 +18,7 @@ set(REFLECTED_FILES
 	# FunctionCode
 	MetadataCode
 	# SerializerCode
-	# TemplateCode
+	TemplateCode
 	TypesCode
 )
 set(REFLECTED_MODULE_FILES

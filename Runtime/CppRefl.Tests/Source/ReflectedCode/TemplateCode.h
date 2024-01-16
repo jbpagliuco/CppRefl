@@ -1,6 +1,6 @@
 #pragma once
 
-#define REFLECT_TEMPLATE_CODE() 0
+#define REFLECT_TEMPLATE_CODE() 1
 
 #if REFLECT_TEMPLATE_CODE()
 
