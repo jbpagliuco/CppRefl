@@ -11,16 +11,14 @@ namespace CppRefl.Compiler;
 public record CompilerParams
 {
 	// Entrypoint of the program. Should be a .cpp of .h file.
-	public required string SourceFileEntrypoint { get; init; }
+	public required FileInfo SourceFileEntrypoint { get; init; }
 
 	// Name of the module we're generating reflection for (Game, Engine, Core, etc.)
 	public required string ModuleName { get; init; }
 
 	// Base file path of the module. Any symbols defined outside of this filepath are ignored.
-	public required string ModulePath { get; init; }
-
-	public string ModuleDirectory => Path.GetFullPath(ModulePath);
-
+	public required DirectoryInfo ModuleDirectory { get; init; }
+	
 	// List of arguments to pass to clang.
 	public IEnumerable<string> ClangArgs { get; init; } = Enumerable.Empty<string>();
 
@@ -37,8 +35,7 @@ public record CompilerParams
 	public bool RaiseClangErrors { get; init; } = true;
 
 	// Output directory containing generated code.
-	private readonly string _outputDirectory = string.Empty;
-	public required string OutputDirectory { get => _outputDirectory; init => _outputDirectory = Path.GetFullPath(value); }
+	public required DirectoryInfo OutputDirectory { get; init; }
 	
 	// Deletes empty header files after compilation.
 	public bool DeleteEmptyHeaderFiles { get; set; } = false;
@@ -110,7 +107,7 @@ public class Compiler
 	/// <summary>
 	/// List of output files that will be generated.
 	/// </summary>
-	private string[] OutputFiles { get; }
+	private FileInfo[] OutputFiles { get; }
 
 	/// <summary>
 	/// Mapping of TypeInfo data to their original cursor.
@@ -140,32 +137,28 @@ public class Compiler
 	/// </summary>
 	public void GenerateEmptyFiles()
 	{
-		Directory.CreateDirectory(Params.OutputDirectory);
+		Params.OutputDirectory.Create();
 
 		// Delete our specific files (we'll recreate them after this).
 		foreach (var file in OutputFiles)
 		{
-			if (File.Exists(file))
-			{
-				File.Delete(file);
-			}
+			file.Delete();
 		}
 
 		// Create empty "reflgen.h" files for everything.
-		var headerFiles = Directory.EnumerateFiles(Params.ModulePath, "*.h", SearchOption.AllDirectories);
+		var headerFiles = Params.ModuleDirectory.EnumerateFiles("*.h", SearchOption.AllDirectories);
 		foreach (var headerFile in headerFiles)
 		{
-			if (!headerFile.EndsWith(CodeGenerator.FileHeaderExt))
+			if (headerFile.Extension != CodeGenerator.FileHeaderExt)
 			{
-				string outputFile = CodeGenerator.GetOutputFilename(headerFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.FileHeaderExt);
-				if (!File.Exists(outputFile))
+				var outputFile = CodeGenerator.GetOutputFilename(headerFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.FileHeaderExt);
+				if (!outputFile.Exists)
 				{
-					Directory.CreateDirectory(Path.GetDirectoryName(outputFile)!);
+					outputFile.Directory!.Create();
+
 					try
 					{
-						using (File.CreateText(outputFile))
-						{
-						}
+						outputFile.CreateText().Close();
 					}
 					catch (IOException)
 					{
@@ -183,13 +176,13 @@ public class Compiler
 		GenerateEmptyFiles();
 
 		Index = CXIndex.Create();
-		TranslationUnit = ClangUtils.CreateTranslationUnit(Index, Params.SourceFileEntrypoint, ClangArgs, Params.RaiseClangWarnings, Params.RaiseClangErrors);
+		TranslationUnit = ClangUtils.CreateTranslationUnit(Index, Params.SourceFileEntrypoint.FullName, ClangArgs, Params.RaiseClangWarnings, Params.RaiseClangErrors);
 
 		ClangUtils.VisitCursorChildren(TranslationUnit.Cursor, ReflectCursor);
 
 		if (Params.RegistryFilename != null)
 		{
-			RegistryFile.AppendRegistry(Params.RegistryFilename, Params.SourceFileEntrypoint, Registry);
+			RegistryFile.AppendRegistry(Params.RegistryFilename, Params.SourceFileEntrypoint.FullName, Registry);
 		}
 	}
 
@@ -199,7 +192,7 @@ public class Compiler
 	/// <param name="extension"></param>
 	private void CleanupFiles(string extension)
 	{
-		foreach (var file in Directory.EnumerateFiles(Params.OutputDirectory, $"*{extension}"))
+		foreach (var file in Directory.EnumerateFiles(Params.OutputDirectory.FullName, $"*{extension}"))
 		{
 			var fileInfo = new FileInfo(file);
 			if (fileInfo.Exists && fileInfo.Length == 0)
@@ -226,7 +219,7 @@ public class Compiler
 
 		if (Params.DeleteEmptyDirectories)
 		{
-			foreach (var dir in Directory.EnumerateDirectories(Params.OutputDirectory))
+			foreach (var dir in Directory.EnumerateDirectories(Params.OutputDirectory.FullName))
 			{
 				var dirInfo = new DirectoryInfo(dir);
 				if (dirInfo.GetFiles().Length == 0)
@@ -326,7 +319,7 @@ public class Compiler
 
 		// Exclude anything outside of the given module.
 		var filename = Path.GetFullPath(file.ToString());
-		if (!filename.StartsWith(Params.ModuleDirectory))
+		if (!filename.StartsWith(Params.ModuleDirectory.FullName))
 		{
 			return false;
 		}

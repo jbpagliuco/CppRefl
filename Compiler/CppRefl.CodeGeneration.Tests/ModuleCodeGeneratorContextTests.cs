@@ -17,8 +17,8 @@ namespace CppRefl.CodeGeneration.Tests
 				{
 					ModuleName = "ModuleName",
 					Registry = new(),
-					ModuleDirectory = $@"{root}Source",
-					OutputDirectory = $@"{root}Generated"
+					ModuleDirectory = new DirectoryInfo($@"{root}Source"),
+					OutputDirectory = new DirectoryInfo($@"{root}Generated")
 				}
 			};
 		}

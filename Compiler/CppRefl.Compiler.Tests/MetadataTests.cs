@@ -1,10 +1,8 @@
-﻿using CppRefl.CodeGeneration.Reflection;
-
-namespace CppRefl.Compiler.Tests
+﻿namespace CppRefl.Compiler.Tests
 {
 	internal class MetadataTests : CompilerTestBase
 	{
-		protected override string ReflectionFile => Path.Combine(TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory, "MetadataCode.h");
+		protected override string ReflectionFile => Path.Combine(TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory.FullName, "MetadataCode.h");
 
 		[Test]
 		public void MetadataTest()
@@ -14,8 +12,7 @@ namespace CppRefl.Compiler.Tests
 			Assert.That(classInfo.Metadata.Tags.Count, Is.EqualTo(2));
 			Assert.That(classInfo.Metadata.Tags[0], Is.EqualTo("SomeTag"));
 			Assert.That(classInfo.Metadata.Tags[1], Is.EqualTo("Another Tag"));
-			Assert.That(classInfo.Metadata.SourceLocation.Filepath, Is.EqualTo(ReflectionFile));
-			Assert.That(classInfo.Metadata.SourceLocation.Filename, Is.EqualTo("MetadataCode.h"));
+			Assert.That(classInfo.Metadata.SourceLocation.FileInfo.FullName, Is.EqualTo(ReflectionFile));
 			Assert.That(classInfo.Metadata.SourceLocation.Line, Is.EqualTo(17));
 			Assert.That(classInfo.GeneratedBodyLine, Is.EqualTo(19));
 

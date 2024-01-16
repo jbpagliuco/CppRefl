@@ -363,11 +363,7 @@ namespace CppRefl.Compiler
 		{
 			cursor.Location.GetFileLocation(out var file, out var line, out var _, out _);
 
-			return new SourceLocation()
-			{
-				Filepath = file.Name.ToString(),
-				Line = line
-			};
+			return new SourceLocation(file.Name.ToString(), line);
 		}
 
 		/// <summary>

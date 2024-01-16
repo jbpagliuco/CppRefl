@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using CppRefl.CodeGeneration.CodeGenerators.Optional;
 using CppRefl.CodeGeneration.CodeGenerators.Runtime;
 using CppRefl.CodeGeneration.CodeGenerators.STL;
@@ -17,14 +16,12 @@ namespace CppRefl.CodeGeneration
 		/// <summary>
 		/// Module directory.
 		/// </summary>
-		private readonly string _moduleDirectory = string.Empty;
-		public required string ModuleDirectory { get => _moduleDirectory; init => _moduleDirectory = Path.GetFullPath(value); }
+		public required DirectoryInfo ModuleDirectory { get; init; }
 
 		/// <summary>
 		/// Output directory that will contain the generated files.
 		/// </summary>
-		private readonly string _outputDirectory = string.Empty;
-		public required string OutputDirectory { get => _outputDirectory; init => _outputDirectory = Path.GetFullPath(value); }
+		public required DirectoryInfo OutputDirectory { get; init; }
 	}
 
 	/// <summary>
@@ -35,7 +32,7 @@ namespace CppRefl.CodeGeneration
 		/// <summary>
 		/// Input source filename.
 		/// </summary>
-		public required string InputFilename { get; init; }
+		public required FileInfo InputFilename { get; init; }
 	}
 
 	/// <summary>
@@ -54,7 +51,7 @@ namespace CppRefl.CodeGeneration
 		/// <summary>
 		/// The filename containing our results.
 		/// </summary>
-		public required string Filename { get; init; }
+		public required FileInfo Filename { get; init; }
 
 		/// <summary>
 		/// The stream containing our file contents.
@@ -99,8 +96,14 @@ namespace CppRefl.CodeGeneration
 		public List<IFileCodeGenerator> FileGenerators { get; } = new();
 		public List<IModuleCodeGenerator> ModuleGenerators { get; } = new();
 
-		public static string GetOutputFilename(string file, string moduleDirectory, string outputDirectory, string extension) => Path.Combine(outputDirectory, Path.GetRelativePath(moduleDirectory, Path.GetDirectoryName(file)!),
-				$"{Path.GetFileNameWithoutExtension(file)}{extension}");
+		public static FileInfo GetOutputFilename(FileInfo file, DirectoryInfo moduleDirectory, DirectoryInfo outputDirectory, string extension)
+		{
+			return new(
+				Path.Combine(
+					outputDirectory.FullName,
+					Path.GetRelativePath(moduleDirectory.FullName, file.DirectoryName!),
+					$"{Path.GetFileNameWithoutExtension(file.Name)}{extension}"));
+		}
 
 		//private string RegistryInitializerSignature(string moduleName) => $"void Registry{moduleName}Reflection()";
 
@@ -170,15 +173,15 @@ namespace CppRefl.CodeGeneration
 		/// Generate code pertaining to a single file.
 		/// </summary>
 		/// <param name="params"></param>
-		public FileCodeGeneratorResult GenerateFileCode(CodeGeneratorFileParams @params, Func<string, Stream>? streamCreator = null)
+		public FileCodeGeneratorResult GenerateFileCode(CodeGeneratorFileParams @params, Func<FileInfo, Stream>? streamCreator = null)
 		{
-			streamCreator ??= filename => new FileStream(filename, FileMode.Create, FileAccess.ReadWrite);
+			streamCreator ??= fileInfo => new FileStream(fileInfo.FullName, FileMode.Create, FileAccess.ReadWrite);
 
 			IEnumerable<T> FindFileObjects<T>(IEnumerable<T> items) where T : ObjectInfo
 			{
 				return items.Where(x =>
 					x.Metadata.IsReflected && 
-					x.Metadata.SourceLocation.Filepath == @params.InputFilename);
+					x.Metadata.SourceLocation.FileInfo == @params.InputFilename);
 			}
 
 			// Find all reflected classes in our input file.
@@ -236,17 +239,17 @@ namespace CppRefl.CodeGeneration
 		/// Generate code pertaining to the module registry.
 		/// </summary>
 		/// <param name="params"></param>
-		public ModuleCodeGeneratorResult GenerateModuleCode(CodeGeneratorModuleParams @params, Func<string, Stream>? streamCreator = null)
+		public ModuleCodeGeneratorResult GenerateModuleCode(CodeGeneratorModuleParams @params, Func<FileInfo, Stream>? streamCreator = null)
 		{
-			streamCreator ??= filename => new FileStream(filename, FileMode.Create, FileAccess.ReadWrite);
+			streamCreator ??= fileInfo => new FileStream(fileInfo.FullName, FileMode.Create, FileAccess.ReadWrite);
 
 			ModuleCodeGeneratorContext context = new()
 			{
 				Parameters = @params
 			};
 
-			string headerFilename = Path.Combine(@params.OutputDirectory, $"{@params.ModuleName}{FileHeaderExt}");
-			string sourceFilename = Path.Combine(@params.OutputDirectory, $"{@params.ModuleName}{FileSourceExt}");
+			FileInfo headerFilename = new(Path.Combine(@params.OutputDirectory.FullName, $"{@params.ModuleName}{FileHeaderExt}"));
+			FileInfo sourceFilename = new(Path.Combine(@params.OutputDirectory.FullName, $"{@params.ModuleName}{FileSourceExt}"));
 			ModuleCodeGeneratorResult result = new()
 			{
 				Header = new()

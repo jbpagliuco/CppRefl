@@ -4,24 +4,40 @@ namespace CppRefl.CodeGeneration.Reflection
 {
 	public class SourceLocation
 	{
+		[JsonConstructor]
+		public SourceLocation(string filename, uint line)
+		{
+			FileInfo = new(filename);
+			Line = line;
+		}
+
+		public SourceLocation(FileInfo fileInfo, uint line)
+		{
+			FileInfo = fileInfo;
+			Line = line;
+		}
+
 		/// <summary>
-		/// Filepath where this object was defined.
+		/// FileInfo where this object was defined.
 		/// </summary>
-		private readonly string _filepath = string.Empty;
-		public required string Filepath { get => _filepath; init => _filepath = Path.GetFullPath(value); }
+		[JsonIgnore]
+		public FileInfo FileInfo { get; init; }
 
 		/// <summary>
 		/// The line where this object was defined.
 		/// </summary>
-		public required uint Line { get; init; }
+		public uint Line { get; }
+
+		public string Filename
+		{
+			get => FileInfo.FullName;
+			init => FileInfo = new FileInfo(value);
+		}
 
 		[JsonIgnore]
-		public string Filename => Path.GetFileName(Filepath);
-
+		public string FilenameNoExt => Path.GetFileNameWithoutExtension(FileInfo.FullName);
+		
 		[JsonIgnore]
-		public string FilenameNoExt => Path.GetFileNameWithoutExtension(Filepath);
-
-		[JsonIgnore]
-		public string IdeDiagnostic => $"{Filepath}({Line}):";
+		public string IdeDiagnostic => $"{FileInfo.FullName}({Line}):";
 	}
 }

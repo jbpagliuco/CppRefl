@@ -20,11 +20,7 @@ namespace CppRefl.CodeGeneration.Tests
 				Metadata = new()
 				{
 					IsReflected = true,
-					SourceLocation = new()
-					{
-						Filepath = Path.Combine(Path.GetTempPath(), "Class.h"),
-						Line = 123
-					}
+					SourceLocation = new(Path.Combine(Path.GetTempPath(), "Class.h"), 123)
 				},
 				ClassType = ClassType.Class,
 				IsAbstract = false,

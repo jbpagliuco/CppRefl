@@ -57,7 +57,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// <param name="collection"></param>
 		/// <returns></returns>
 		private IEnumerable<T> GetObjectsWithinModule<T>(DirectoryInfo module, IDictionary<string, T> collection) where T : ObjectInfo => 
-			collection.Values.Where(x => x.Metadata.SourceLocation.Filepath.StartsWith(module.FullName));
+			collection.Values.Where(x => x.Metadata.SourceLocation.FileInfo.FullName.StartsWith(module.FullName));
 
 
 

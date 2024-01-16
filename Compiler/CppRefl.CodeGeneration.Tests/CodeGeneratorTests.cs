@@ -36,9 +36,9 @@ namespace CppRefl.CodeGeneration.Tests
 			return new()
 			{
 				Registry = new(),
-				InputFilename = $@"{root}Source/Subfolder/File.h",
-				ModuleDirectory = $@"{root}Source",
-				OutputDirectory = $@"{root}Generated"
+				InputFilename = new($@"{root}Source/Subfolder/File.h"),
+				ModuleDirectory = new DirectoryInfo($@"{root}Source"),
+				OutputDirectory = new DirectoryInfo($@"{root}Generated")
 			};
 		}
 
@@ -49,8 +49,8 @@ namespace CppRefl.CodeGeneration.Tests
 			{
 				Registry = new(),
 				ModuleName = "ModuleName",
-				ModuleDirectory = $@"{root}Source",
-				OutputDirectory = $@"{root}Generated"
+				ModuleDirectory = new DirectoryInfo($@"{root}Source"),
+				OutputDirectory = new DirectoryInfo($@"{root}Generated")
 			};
 		}
 		
@@ -63,18 +63,18 @@ namespace CppRefl.CodeGeneration.Tests
 			{
 				var result = generator.GenerateFileCode(CreateFileGeneratorParams(), _ => new MemoryStream());
 
-				Assert.That(result.Header.Filename,
+				Assert.That(result.Header.Filename.FullName,
 					Is.EqualTo($@"{Path.GetTempPath()}Generated\Subfolder\File.reflgen.h"));
-				Assert.That(result.Source.Filename,
+				Assert.That(result.Source.Filename.FullName,
 					Is.EqualTo($@"{Path.GetTempPath()}Generated\Subfolder\File.reflgen.cpp"));
 			}
 
 			{
 				var result = generator.GenerateModuleCode(CreateModuleGeneratorParams(), _ => new MemoryStream());
 
-				Assert.That(result.Header.Filename,
+				Assert.That(result.Header.Filename.FullName,
 					Is.EqualTo($@"{Path.GetTempPath()}Generated\ModuleName.reflgen.h"));
-				Assert.That(result.Source.Filename,
+				Assert.That(result.Source.Filename.FullName,
 					Is.EqualTo($@"{Path.GetTempPath()}Generated\ModuleName.reflgen.cpp"));
 			}
 		}

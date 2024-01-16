@@ -6,20 +6,20 @@ namespace CppRefl.Compiler.Tests
 	{
 		internal static class Const
 		{
-			public static string SolutionDirectory => Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", ".."));
-			public static string CompilerDirectory => Path.Combine(SolutionDirectory, "Compiler");
+			public static DirectoryInfo SolutionDirectory => new(Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "..")));
+			public static DirectoryInfo CompilerDirectory => new(Path.Combine(SolutionDirectory.FullName, "Compiler"));
 
 			internal static class Runtime
 			{
 				/// <summary>
 				/// Directory containing the "Runtime" modules.
 				/// </summary>
-				public static string Directory => Path.Combine(SolutionDirectory, "Runtime");
+				public static DirectoryInfo Directory => new(Path.Combine(SolutionDirectory.FullName, "Runtime"));
 
 				/// <summary>
 				/// Directory containing the "CppRefl" runtime source code.
 				/// </summary>
-				public static string SourceDirectory => Path.Combine(Directory, "CppRefl", "Source");
+				public static DirectoryInfo SourceDirectory => new(Path.Combine(Directory.FullName, "CppRefl", "Source"));
 
 				internal static class Tests
 				{
@@ -31,30 +31,30 @@ namespace CppRefl.Compiler.Tests
 					/// <summary>
 					/// Directory containing the "CppRefl.Tests" source code.
 					/// </summary>
-					public static string SourceDirectory => Path.Combine(Directory, "CppRefl.Tests", "Source");
+					public static DirectoryInfo SourceDirectory => new(Path.Combine(Directory.FullName, "CppRefl.Tests", "Source"));
 
 					/// <summary>
 					/// Directory containing the "CppRefl.Tests" reflected headers.
 					/// </summary>
-					public static string ReflectedHeadersDirectory = Path.Combine(SourceDirectory, "ReflectedCode");
+					public static DirectoryInfo ReflectedHeadersDirectory = new(Path.Combine(SourceDirectory.FullName, "ReflectedCode"));
 
 					/// <summary>
 					/// Directory containing the "CppRefl.Tests" generated code.
 					/// </summary>
-					public static string GeneratedCodeDirectory => Path.Combine(Directory, "CppRefl.Tests", "GeneratedCode");
+					public static DirectoryInfo GeneratedCodeDirectory => new(Path.Combine(Directory.FullName, "CppRefl.Tests", "GeneratedCode"));
 				}
 			}
 		}
 
-		public static CompilerParams CompilerParams(string file) => new()
+		public static CompilerParams CompilerParams(FileInfo file) => new()
 		{
 			SourceFileEntrypoint = file,
-			ModulePath = Const.Runtime.Tests.ReflectedHeadersDirectory,
+			ModuleDirectory = Const.Runtime.Tests.ReflectedHeadersDirectory,
 			ModuleName = "CppReflUnitTest",
 			IncludePaths = new[]
 			{
-				Const.Runtime.SourceDirectory,
-				Const.Runtime.Tests.SourceDirectory
+				Const.Runtime.SourceDirectory.FullName,
+				Const.Runtime.Tests.SourceDirectory.FullName
 			},
 			OutputDirectory = Const.Runtime.Tests.GeneratedCodeDirectory,
 			RegistryFilename = @"D:\test.json"

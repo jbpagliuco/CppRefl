@@ -13,22 +13,22 @@ namespace CppRefl.Compiler.Tests.CppRefl.Tests
         [Test]
         public void Generate()
         {
-            var reflectedFiles = Directory.EnumerateFiles(TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory);
+            var reflectedFiles = TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory.EnumerateFiles();
 
-            string registryFilename = Path.Combine(TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory, $"{TestUtil.Const.Runtime.Tests.ModuleName}.reflregistry.json");
+            string registryFilename = Path.Combine(TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory.FullName, $"{TestUtil.Const.Runtime.Tests.ModuleName}.reflregistry.json");
             foreach (var file in reflectedFiles)
             {
                 // Compile
                 CompilerParams compilerParams = new()
                 {
                     SourceFileEntrypoint = file,
-                    ModulePath = TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory,
+                    ModuleDirectory = TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory,
                     ModuleName = TestUtil.Const.Runtime.Tests.ModuleName,
                     IncludePaths = new[]
                     {
-                        TestUtil.Const.Runtime.SourceDirectory,
-                        TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory,
-                        TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory,
+                        TestUtil.Const.Runtime.SourceDirectory.FullName,
+                        TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory.FullName,
+                        TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory.FullName,
                     },
                     OutputDirectory = TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory,
                     RegistryFilename = registryFilename

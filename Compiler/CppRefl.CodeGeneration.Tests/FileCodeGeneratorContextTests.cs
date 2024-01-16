@@ -16,10 +16,10 @@ namespace CppRefl.CodeGeneration.Tests
 				Objects = new(),
 				Parameters = new()
 				{
-					InputFilename = $@"{root}Source/File.h",
+					InputFilename = new($@"{root}Source/File.h"),
 					Registry = new(),
-					ModuleDirectory = $@"{root}Source",
-					OutputDirectory = $@"{root}Generated"
+					ModuleDirectory = new DirectoryInfo($@"{root}Source"),
+					OutputDirectory = new DirectoryInfo($@"{root}Generated")
 				}
 			};
 		}

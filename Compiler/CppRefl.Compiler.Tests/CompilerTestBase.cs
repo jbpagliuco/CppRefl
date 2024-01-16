@@ -14,14 +14,14 @@ namespace CppRefl.Compiler.Tests
 		{
 			CompilerParams compilerParams = new()
 			{
-				SourceFileEntrypoint = ReflectionFile,
-				ModulePath = TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory,
+				SourceFileEntrypoint = new FileInfo(ReflectionFile),
+				ModuleDirectory = TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory,
 				ModuleName = TestUtil.Const.Runtime.Tests.ModuleName,
 				IncludePaths = new[]
 				{
-					TestUtil.Const.Runtime.SourceDirectory,
-					TestUtil.Const.Runtime.Tests.SourceDirectory,
-					TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory
+					TestUtil.Const.Runtime.SourceDirectory.FullName,
+					TestUtil.Const.Runtime.Tests.SourceDirectory.FullName,
+					TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory.FullName
 				},
 				// TODO: Create a "no output" mode.
 				OutputDirectory = TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory

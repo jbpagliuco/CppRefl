@@ -132,7 +132,7 @@ namespace CppRefl.CodeGeneration
 			StringBuilder sb = new();
 
 			// Write the include guard at the top, as well as the file id which makes the GENERATED_REFLECTION_CODE macros work.
-			string fileId = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(Parameters.InputFilename));
+			string fileId = Path.GetFileNameWithoutExtension(Parameters.InputFilename.Name);
 			string headerGuard = $"{fileId}_REFLGEN_H";
 			sb.AppendLine($"""
 			               #undef {CppDefines.FileId}
@@ -186,7 +186,7 @@ namespace CppRefl.CodeGeneration
 			StringBuilder sb = new();
 
 			// Include the original source file.
-			string originalFilenameRelative = Path.GetRelativePath(Parameters.ModuleDirectory, Parameters.InputFilename).Replace("\\", "/");
+			string originalFilenameRelative = Path.GetRelativePath(Parameters.ModuleDirectory.FullName, Parameters.InputFilename.FullName).Replace("\\", "/");
 			sb.AppendLine($"""#include "{originalFilenameRelative}" """);
 
 			// Write the base data.

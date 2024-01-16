@@ -4,7 +4,7 @@ namespace CppRefl.Compiler.Tests
 {
 	internal class TypeTests : CompilerTestBase
 	{
-		protected override string ReflectionFile => Path.Combine(TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory, "TypesCode.h");
+		protected override string ReflectionFile => Path.Combine(TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory.FullName, "TypesCode.h");
 
 		[Test]
 		public void PrimitiveTypes()

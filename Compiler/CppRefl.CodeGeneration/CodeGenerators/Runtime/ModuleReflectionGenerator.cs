@@ -11,7 +11,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
 	        HashSet<ObjectInfo> reflectedObjects = new();
 
 			// Classes
-			var classes = context.Parameters.Registry.GetClassesWithinModule(new DirectoryInfo(context.Parameters.ModuleDirectory))
+			var classes = context.Parameters.Registry.GetClassesWithinModule(context.Parameters.ModuleDirectory)
 	            .Where(x => x.Type.IsInstantiable && 
 	                        x.Metadata.IsReflected && 
 	                        x.GeneratedBodyLine != null);
@@ -22,7 +22,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
             }
 
             // Enums
-            var enums = context.Parameters.Registry.GetEnumsWithinModule(new DirectoryInfo(context.Parameters.ModuleDirectory))
+            var enums = context.Parameters.Registry.GetEnumsWithinModule(context.Parameters.ModuleDirectory)
 	            .Where(x => x.Metadata.IsReflected);
             reflectedObjects.UnionWith(enums);
 			foreach (var enumInfo in enums)
@@ -31,7 +31,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
             }
 
 			// Functions
-            var functions = context.Parameters.Registry.GetFunctionsWithinModule(new DirectoryInfo(context.Parameters.ModuleDirectory))
+            var functions = context.Parameters.Registry.GetFunctionsWithinModule(context.Parameters.ModuleDirectory)
 	            .Where(x => x.Metadata.IsReflected);
             reflectedObjects.UnionWith(functions);
 			foreach (var functionInfo in functions)
@@ -44,7 +44,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
             {
 	            var includes = reflectedObjects
 		            .Select(x =>
-			            Path.GetRelativePath(context.Parameters.ModuleDirectory, x.Metadata.SourceLocation.Filepath))
+			            Path.GetRelativePath(context.Parameters.ModuleDirectory.FullName, x.Metadata.SourceLocation.FileInfo.FullName))
 		            .ToHashSet();
 
 	            foreach (var include in includes)
