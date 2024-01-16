@@ -22,12 +22,13 @@ namespace CppRefl.CodeGeneration.Tests
 					IsReflected = true,
 					SourceLocation = new()
 					{
-						Filepath = "D:",
+						Filepath = Path.Combine(Path.GetTempPath(), "Class.h"),
 						Line = 123
 					}
 				},
 				ClassType = ClassType.Class,
-				IsAbstract = false
+				IsAbstract = false,
+				GeneratedBodyLine = 125
 			};
 		}
 	}

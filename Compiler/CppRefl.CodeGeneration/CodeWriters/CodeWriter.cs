@@ -237,7 +237,7 @@ namespace CppRefl.CodeGeneration.CodeWriters
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        public CodeWriterCodeBlock WithCodeBlock(string text, string start = "{", string end = "}")
+        public CodeWriterCodeBlock WithCodeBlock(string text, string start, string end)
         {
             return new(this, text, start, end);
         }
