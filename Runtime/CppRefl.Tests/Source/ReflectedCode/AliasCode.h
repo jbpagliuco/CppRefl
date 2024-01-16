@@ -1,6 +1,6 @@
 #pragma once
 
-#define REFLECT_ALIAS_CODE() 0
+#define REFLECT_ALIAS_CODE() 1
 
 #if REFLECT_ALIAS_CODE()
 

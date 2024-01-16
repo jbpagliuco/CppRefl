@@ -112,21 +112,21 @@ namespace cpprefl
 
 #if CPPREFL_CONCEPTS()
 	template <typename T>
-	concept ReflectedType = requires(T v)
+	concept ReflectedType = requires(T t)
 	{
-		{ cpprefl::GetReflectedType<T>() } -> std::convertible_to<const cpprefl::TypeInfo&>;
+		GetReflectedType<T>();
 	};
 
 	template <typename T>
-	concept ReflectedClass = requires(T v)
+	concept ReflectedClass = requires(T t)
 	{
-		{ cpprefl::GetReflectedClass<T>() } -> std::convertible_to<const cpprefl::ClassInfo&>;
+		GetReflectedClass<T>();
 	};
 
 	template <typename T>
-	concept ReflectedEnum = requires(T v)
+	concept ReflectedEnum = requires(T t)
 	{
-		{ cpprefl::GetReflectedEnum<T>() } -> std::convertible_to<const cpprefl::EnumInfo&>;
+		GetReflectedEnum<T>();
 	};
 #endif
 }

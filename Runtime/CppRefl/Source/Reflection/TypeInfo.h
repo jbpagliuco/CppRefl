@@ -58,10 +58,10 @@ namespace cpprefl
 
 	public:
 		// Returns the class info represented by this type.
-		const ClassInfo& GetClassInfo()const;
+		const ClassInfo* GetClassInfo()const;
 
 		// Returns the enum info represented by this type.
-		const EnumInfo& GetEnumInfo()const;
+		const EnumInfo* GetEnumInfo()const;
 	};
 
 	template <typename IntType, typename T>

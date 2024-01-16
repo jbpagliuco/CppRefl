@@ -27,6 +27,7 @@ namespace cpprefl
 
 		EnumInfo& AddEnum(EnumInfo&& enumInfo);
 		const EnumInfo& GetEnum(const char* name);
+		const EnumInfo* TryGetEnum(const char* name);
 
 		FunctionInfo& AddFunction(FunctionInfo&& functionInfo);
 		const FunctionInfo& GetFunction(const char* name);

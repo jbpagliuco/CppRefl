@@ -1,6 +1,6 @@
 #pragma once
 
-#define TEST_SERIALIZER_CODE() 0
+#define TEST_SERIALIZER_CODE() 1
 
 #if TEST_SERIALIZER_CODE()
 

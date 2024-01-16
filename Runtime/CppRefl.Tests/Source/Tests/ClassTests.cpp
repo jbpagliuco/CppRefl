@@ -10,7 +10,7 @@ using namespace cpprefl;
 
 TEST(ClassTests, Names)
 {
-	EXPECT_STREQ(cpprefl::GetTypeName<ReflectedClass>(), "ReflectedClass");
+	EXPECT_STREQ(cpprefl::GetTypeName<::ReflectedClass>(), "ReflectedClass");
 	EXPECT_STREQ(cpprefl::GetTypeName<ReflectedStruct>(), "ReflectedStruct");
 	EXPECT_STREQ(cpprefl::GetTypeName<TestNamespace::ReflectedClass>(), "TestNamespace::ReflectedClass");
 }
@@ -42,10 +42,10 @@ TEST(ClassTests, DerivedClasses)
 
 TEST(ClassTests, Constructors)
 {
-	void* obj = alloca(sizeof(ReflectedClass));
+	void* obj = alloca(sizeof(::ReflectedClass));
 	ReflectedClass::StaticReflectedClass().Construct(obj);
 
-	const auto typedObject = (ReflectedClass*)obj;
+	const auto typedObject = (::ReflectedClass*)obj;
 	EXPECT_EQ(typedObject->mPublicInt, 1234);
 
 	ReflectedClass::StaticReflectedClass().Destruct(obj);

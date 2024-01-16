@@ -1,5 +1,4 @@
-﻿using CppRefl.CodeGeneration.CodeWriters;
-using CppRefl.CodeGeneration.Reflection;
+﻿using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration.CodeGenerators.STL
 {
@@ -7,23 +6,25 @@ namespace CppRefl.CodeGeneration.CodeGenerators.STL
 	{
 		public void Execute(FileCodeGeneratorContext context)
 		{
-		}
-
-		public void WriteClassSource(CppWriter writer, ClassInfo classInfo, Registry registry)
-		{
-			var dynamicArrayFields = classInfo.Fields.Where(x => x.Type.QualifiedName().StartsWith("std::vector<"));
-			if (dynamicArrayFields.Any())
+			context.WriteSource(writer =>
 			{
-				using (writer.WithNamespace("CppReflPrivate"))
+				foreach (var classInfo in context.Objects.Classes)
 				{
-					foreach (var fieldInfo in dynamicArrayFields)
+					var dynamicArrayFields = classInfo.Fields.Where(x => x.Type.QualifiedName().StartsWith("std::vector<"));
+					if (dynamicArrayFields.Any())
 					{
-						string elementType = fieldInfo.Type.Template!.Arguments.First().ToString();
-						string dynamicArrayFunctions = $"cpprefl::StdVectorFunctionsFactory::Create<{elementType}>(\"{elementType}\")";
-						writer.WriteLine(CodeGeneratorUtil.RegisterDynamicArrayFunctions(classInfo, fieldInfo, dynamicArrayFunctions));
+						using (writer.WithNamespace(CppDefines.Namespaces.Private))
+						{
+							foreach (var fieldInfo in dynamicArrayFields)
+							{
+								string elementType = fieldInfo.Type.Template!.Arguments.First().ToString();
+								string dynamicArrayFunctions = $"{CppDefines.Namespaces.Public}::StdVectorFunctionsFactory::Create<{elementType}>(\"{elementType}\")";
+								writer.WriteLine(CodeGeneratorUtil.RegisterDynamicArrayFunctions(classInfo, fieldInfo, dynamicArrayFunctions));
+							}
+						}
 					}
 				}
-			}
+			});
 		}
 	}
 }

@@ -1,7 +1,7 @@
 project("CppRefl.Tests")
 
 # C++17 is the minimum supported language version.
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_executable("CppRefl.Tests" "")
@@ -12,12 +12,12 @@ target_include_directories("CppRefl.Tests" PRIVATE "${CMAKE_CURRENT_LIST_DIR}/Ge
 target_include_directories("CppRefl.Tests" PRIVATE "${CMAKE_CURRENT_LIST_DIR}/Source/ReflectedCode")
 
 set(REFLECTED_FILES
-	# AliasCode
+	AliasCode
 	ClassCode
 	EnumCode
 	FunctionCode
 	MetadataCode
-	# SerializerCode
+	SerializerCode
 	TemplateCode
 	TypesCode
 )

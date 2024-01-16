@@ -37,13 +37,13 @@ namespace cpprefl
 		}
 	}
 
-	const ClassInfo& TypeInfo::GetClassInfo() const
+	const ClassInfo* TypeInfo::GetClassInfo() const
 	{
-		return Registry::GetSystemRegistry().GetClass(mName);
+		return Registry::GetSystemRegistry().TryGetClass(mName);
 	}
 
-	const EnumInfo& TypeInfo::GetEnumInfo() const
+	const EnumInfo* TypeInfo::GetEnumInfo() const
 	{
-		return Registry::GetSystemRegistry().GetEnum(mName);
+		return Registry::GetSystemRegistry().TryGetEnum(mName);
 	}
 }

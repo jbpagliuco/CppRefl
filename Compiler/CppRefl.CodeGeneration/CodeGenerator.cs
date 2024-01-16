@@ -130,13 +130,13 @@ namespace CppRefl.CodeGeneration
 			AddFileCodeGenerator<ClassReflectionGenerator>();
 			AddFileCodeGenerator<EnumReflectionGenerator>();
 			AddFileCodeGenerator<FunctionReflectionGenerator>();
-			AddFileCodeGenerator<VectorDynamicArrayGenerator>();
 			AddModuleCodeGenerator<ModuleReflectionGenerator>();
 
 			// Optional
 			AddFileCodeGenerator<ClassSuperGenerator>();
 			AddFileCodeGenerator<ClassMemberTypeGetters>();
 			AddFileCodeGenerator<ClassStaticTypeGetters>();
+			AddFileCodeGenerator<VectorDynamicArrayGenerator>();
 		}
 
 		public List<IFileCodeGenerator> FileGenerators { get; } = new();

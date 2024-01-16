@@ -70,6 +70,16 @@ namespace cpprefl
 		return mEnums.at(name);
 	}
 
+	const EnumInfo* Registry::TryGetEnum(const char* name)
+	{
+		if (mEnums.find(name) != mEnums.end())
+		{
+			return &GetEnum(name);
+		}
+
+		return nullptr;
+	}
+
 	FunctionInfo& Registry::AddFunction(FunctionInfo&& functionInfo)
 	{
 		return mFunctions.emplace(functionInfo.mName, functionInfo).first->second;

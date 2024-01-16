@@ -66,10 +66,8 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
 			});
 		}
 
-	    public void WriteClassHeader(CppWriter writer, ClassInfo classInfo, string? name = null)
+	    public void WriteClassHeader(CppWriter writer, ClassInfo classInfo)
         {
-            name ??= classInfo.Type.QualifiedName();
-
             if (classInfo.Type.IsTemplated)
             {
 	            if (classInfo.Type.Template!.IsGeneric)
@@ -87,19 +85,17 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
 			using (writer.WithNamespace(CppDefines.Namespaces.Public))
             {
                 writer.WriteLine("template <>");
-                writer.WriteLine($"const TypeInfo& GetReflectedType<{name}>();");
+                writer.WriteLine($"const TypeInfo& GetReflectedType<{classInfo.Type.GloballyQualifiedName()}>();");
 
                 writer.WriteLine();
 
                 writer.WriteLine("template <>");
-                writer.WriteLine($"const ClassInfo& GetReflectedClass<{name}>();");
+                writer.WriteLine($"const ClassInfo& GetReflectedClass<{classInfo.Type.GloballyQualifiedName()}>();");
             }
         }
 
-	    private void WriteClassSource(CppWriter writer, ClassInfo classInfo, string? name = null)
+	    private void WriteClassSource(CppWriter writer, ClassInfo classInfo)
         {
-            name ??= classInfo.Type.QualifiedName();
-
             if (classInfo.Type.IsTemplated)
             {
 	            return;
@@ -109,10 +105,10 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
             {
                 // Static type
                 writer.WriteLine("template <>");
-                using (writer.WithFunction($"const TypeInfo& GetReflectedType<{name}>()"))
+                using (writer.WithFunction($"const TypeInfo& GetReflectedType<{classInfo.Type.GloballyQualifiedName()}>()"))
                 {
                     writer.WriteLine(
-                        $"static auto& type = cpprefl::Registry::GetSystemRegistry().AddType(cpprefl::TypeInfo(\"{name}\", cpprefl::TypeKind::Class, sizeof({name})));");
+                        $"static auto& type = cpprefl::Registry::GetSystemRegistry().AddType(cpprefl::TypeInfo(\"{classInfo.Type.QualifiedName()}\", cpprefl::TypeKind::Class, sizeof({classInfo.Type.GloballyQualifiedName()})));");
                     writer.WriteLine("return type;");
                 }
 
@@ -121,7 +117,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                 // Static class
                 writer.WriteLine("template <>");
                 using (writer.WithFunction(
-                           $"const ClassInfo& GetReflectedClass<{name}>()"))
+                           $"const ClassInfo& GetReflectedClass<{classInfo.Type.GloballyQualifiedName()}>()"))
                 {
                     string classTags = CodeGeneratorUtil.WriteTagDefinitions(writer, "Class", classInfo.Metadata);
                     string classAttributes =
@@ -148,8 +144,8 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                             {
                                 writer.WriteLine($"""
 									                  cpprefl::FieldInfo(
-									                  	cpprefl::MakeTypeInstance<decltype({name}::{field.Name})>({CodeGeneratorUtil.MaybeCreateReflectedType(field.Type)}),
-									                  	offsetof({name}, {field.Name}),
+									                  	cpprefl::MakeTypeInstance<decltype({classInfo.Type.GloballyQualifiedName()}::{field.Name})>({CodeGeneratorUtil.MaybeCreateReflectedType(field.Type)}),
+									                  	offsetof({classInfo.Type.GloballyQualifiedName()}, {field.Name}),
 									                  	"{field.Name}",
 									                  	{fieldTags[field]},
 									                  	{fieldAttributes[field]}
@@ -171,10 +167,10 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                                 baseClass = baseClass.BaseClasses.FirstOrDefault();
                             }
 
-                            var ctor = classInfo.IsAbstract ? "nullptr" : $"[](void * obj) {{ new(obj) {name}(); }}";
-                            var dtor = classInfo.IsAbstract ? "nullptr" : $"[](void * obj) {{ (({name}*)obj)->~{classInfo.Type.Name}(); }}";
+                            var ctor = classInfo.IsAbstract ? "nullptr" : $"[](void * obj) {{ new(obj) {classInfo.Type.GloballyQualifiedName()}(); }}";
+                            var dtor = classInfo.IsAbstract ? "nullptr" : $"[](void * obj) {{ (({classInfo.Type.GloballyQualifiedName()}*)obj)->~{classInfo.Type.Name}(); }}";
 
-                            writer.WriteLine($"GetReflectedType<{name}>()");
+                            writer.WriteLine($"GetReflectedType<{classInfo.Type.GloballyQualifiedName()}>()");
                             writer.WriteLine(
                                 baseClass != null && baseClass.Metadata.IsReflected && !baseClass.Type.IsTemplated
                                     ? $"&GetReflectedClass<{baseClass.Type.GloballyQualifiedName()}>()"

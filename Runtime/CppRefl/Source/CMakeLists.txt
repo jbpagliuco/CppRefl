@@ -10,3 +10,4 @@ target_sources(CppRefl
 
 add_subdirectory("Private")
 add_subdirectory("Reflection")
+add_subdirectory("Serialization")

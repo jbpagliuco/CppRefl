@@ -60,7 +60,7 @@ TEST(FunctionTests, Invokers)
 	{
 		ReflectedFunctionCalled = false;
 		const auto& func = Registry::GetSystemRegistry().GetFunction("ReflectedFunction");
-		func.Invoke<decltype(ReflectedFunction)>();
+		func.Invoke<decltype(::ReflectedFunction)>();
 		EXPECT_TRUE(ReflectedFunctionCalled);
 	}
 
