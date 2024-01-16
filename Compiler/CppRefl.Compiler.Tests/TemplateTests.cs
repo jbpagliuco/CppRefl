@@ -4,7 +4,7 @@ namespace CppRefl.Compiler.Tests
 {
 	internal class TemplateTests : CompilerTestBase
 	{
-		protected override string ReflectionFile => Path.Combine(TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory.FullName, "TemplateCode.h");
+		protected override string ReflectionFile => Path.Combine(Const.Runtime.Tests.ReflectedHeadersDirectory.FullName, "TemplateCode.h");
 
 		[Test]
 		public void TemplateClass()

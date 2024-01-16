@@ -2,7 +2,7 @@
 {
 	internal class MetadataTests : CompilerTestBase
 	{
-		protected override string ReflectionFile => Path.Combine(TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory.FullName, "MetadataCode.h");
+		protected override string ReflectionFile => Path.Combine(Const.Runtime.Tests.ReflectedHeadersDirectory.FullName, "MetadataCode.h");
 
 		[Test]
 		public void MetadataTest()

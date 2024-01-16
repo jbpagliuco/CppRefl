@@ -4,7 +4,7 @@ namespace CppRefl.Compiler.Tests
 {
     internal class AliasTests : CompilerTestBase
     {
-	    protected override string ReflectionFile => Path.Combine(TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory.FullName, "AliasCode.h");
+	    protected override string ReflectionFile => Path.Combine(Const.Runtime.Tests.ReflectedHeadersDirectory.FullName, "AliasCode.h");
 
 	    [Test]
         public void BuiltinAlias()

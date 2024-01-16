@@ -4,7 +4,7 @@ namespace CppRefl.Compiler.Tests
 {
 	internal class ClassTests : CompilerTestBase
 	{
-		protected override string ReflectionFile => Path.Combine(TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory.FullName, "ClassCode.h");
+		protected override string ReflectionFile => Path.Combine(Const.Runtime.Tests.ReflectedHeadersDirectory.FullName, "ClassCode.h");
 
 		[Test]
 		public void ClassType()

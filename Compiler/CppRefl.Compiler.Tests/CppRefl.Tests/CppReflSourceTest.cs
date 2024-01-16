@@ -13,24 +13,24 @@ namespace CppRefl.Compiler.Tests.CppRefl.Tests
 	    [Test]
         public void Generate()
         {
-            var reflectedFiles = TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory.EnumerateFiles();
+            var reflectedFiles = Const.Runtime.Tests.ReflectedHeadersDirectory.EnumerateFiles();
 
-            string registryFilename = Path.Combine(TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory.FullName, $"{TestUtil.Const.Runtime.Tests.ModuleName}.reflregistry.json");
+            string registryFilename = Path.Combine(Const.Runtime.Tests.GeneratedCodeDirectory.FullName, $"{Const.Runtime.Tests.ModuleName}.reflregistry.json");
             foreach (var file in reflectedFiles)
             {
                 // Compile
                 CompilerParams compilerParams = new()
                 {
                     InputFile = file,
-                    ModuleDirectory = TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory,
-                    ModuleName = TestUtil.Const.Runtime.Tests.ModuleName,
+                    ModuleDirectory = Const.Runtime.Tests.ReflectedHeadersDirectory,
+                    ModuleName = Const.Runtime.Tests.ModuleName,
                     IncludePaths = new[]
                     {
-                        TestUtil.Const.Runtime.SourceDirectory.FullName,
-                        TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory.FullName,
-                        TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory.FullName,
+                        Const.Runtime.SourceDirectory.FullName,
+                        Const.Runtime.Tests.ReflectedHeadersDirectory.FullName,
+                        Const.Runtime.Tests.GeneratedCodeDirectory.FullName,
                     },
-                    OutputDirectory = TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory
+                    OutputDirectory = Const.Runtime.Tests.GeneratedCodeDirectory
                 };
                 var compiler = new Compiler(compilerParams);
                 compiler.GenerateRegistry();
@@ -41,8 +41,8 @@ namespace CppRefl.Compiler.Tests.CppRefl.Tests
                 {
                     Registry = compiler.Registry,
                     InputFilename = file,
-                    ModuleDirectory = TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory,
-                    OutputDirectory = TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory
+                    ModuleDirectory = Const.Runtime.Tests.ReflectedHeadersDirectory,
+                    OutputDirectory = Const.Runtime.Tests.GeneratedCodeDirectory
                 };
                 codeGenerator.GenerateFileCode(codeGeneratorFileParams);
             }
@@ -51,10 +51,10 @@ namespace CppRefl.Compiler.Tests.CppRefl.Tests
             {
                 CodeGeneratorModuleParams codeGeneratorRegistryParams = new()
                 {
-                    Registry = Registry.CollectFileRegistries(TestUtil.Const.Runtime.Tests.ModuleName, TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory, TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory),
-                    ModuleName = TestUtil.Const.Runtime.Tests.ModuleName,
-                    ModuleDirectory = TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory,
-                    OutputDirectory = TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory,
+                    Registry = Registry.CollectFileRegistries(Const.Runtime.Tests.ModuleName, Const.Runtime.Tests.ReflectedHeadersDirectory, Const.Runtime.Tests.GeneratedCodeDirectory),
+                    ModuleName = Const.Runtime.Tests.ModuleName,
+                    ModuleDirectory = Const.Runtime.Tests.ReflectedHeadersDirectory,
+                    OutputDirectory = Const.Runtime.Tests.GeneratedCodeDirectory,
                 };
                 var codeGenerator = new CodeGenerator();
                 codeGenerator.GenerateModuleCode(codeGeneratorRegistryParams);

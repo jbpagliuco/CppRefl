@@ -15,16 +15,16 @@ namespace CppRefl.Compiler.Tests
 			CompilerParams compilerParams = new()
 			{
 				InputFile = new FileInfo(ReflectionFile),
-				ModuleDirectory = TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory,
-				ModuleName = TestUtil.Const.Runtime.Tests.ModuleName,
+				ModuleDirectory = Const.Runtime.Tests.ReflectedHeadersDirectory,
+				ModuleName = Const.Runtime.Tests.ModuleName,
 				IncludePaths = new[]
 				{
-					TestUtil.Const.Runtime.SourceDirectory.FullName,
-					TestUtil.Const.Runtime.Tests.SourceDirectory.FullName,
-					TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory.FullName
+					Const.Runtime.SourceDirectory.FullName,
+					Const.Runtime.Tests.SourceDirectory.FullName,
+					Const.Runtime.Tests.GeneratedCodeDirectory.FullName
 				},
 				// TODO: Create a "no output" mode.
-				OutputDirectory = TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory
+				OutputDirectory = Const.Runtime.Tests.GeneratedCodeDirectory
 			};
 			Compiler = new Compiler(compilerParams);
 

@@ -4,7 +4,7 @@ namespace CppRefl.Compiler.Tests
 {
 	internal class EnumTests : CompilerTestBase
 	{
-		protected override string ReflectionFile => Path.Combine(TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory.FullName, "EnumCode.h");
+		protected override string ReflectionFile => Path.Combine(Const.Runtime.Tests.ReflectedHeadersDirectory.FullName, "EnumCode.h");
 
 		[Test]
 		public void EnumTypes()

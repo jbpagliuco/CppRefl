@@ -4,7 +4,7 @@ namespace CppRefl.Compiler.Tests
 {
 	internal class FunctionTests : CompilerTestBase
 	{
-		protected override string ReflectionFile => Path.Combine(TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory.FullName, "FunctionCode.h");
+		protected override string ReflectionFile => Path.Combine(Const.Runtime.Tests.ReflectedHeadersDirectory.FullName, "FunctionCode.h");
 
 		[Test]
 		public void FunctionInfo()
