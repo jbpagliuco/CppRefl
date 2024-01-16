@@ -85,8 +85,7 @@ static void CompileFile(FileOptions opts)
 		Definitions = opts.Definitions,
 		RaiseClangWarnings = !opts.NoRaiseClangWarnings,
 		RaiseClangErrors = !opts.NoRaiseClangErrors,
-		OutputDirectory = new(opts.OutputDirectory),
-		RegistryFilename = opts.Registry
+		OutputDirectory = new(opts.OutputDirectory)
 	});
 
 	// Compile the program.
@@ -109,27 +108,20 @@ static void CompileFile(FileOptions opts)
 
 static void CompileModule(ModuleOptions opts)
 {
-	if (opts.Registry == null)
+	var moduleRegistry = Registry.CollectFileRegistries(opts.ModuleName, new DirectoryInfo(opts.ModuleDirectory),
+		new DirectoryInfo(opts.OutputDirectory));
+	
+	// Generate module code.
+	CodeGeneratorModuleParams @params = new()
 	{
-		throw new ArgumentNullException(nameof(opts.Registry));
-	}
+		Registry = moduleRegistry,
+		ModuleName = opts.ModuleName,
+		ModuleDirectory = new(opts.ModuleDirectory),
+		OutputDirectory = new(opts.OutputDirectory)
+	};
 
-	if (File.Exists(opts.Registry))
-	{
-		string registryJson = File.ReadAllText(opts.Registry);
-		var registry = Registry.FromJson(registryJson)!;
-
-		CodeGeneratorModuleParams @params = new()
-		{
-			Registry = registry,
-			ModuleName = opts.ModuleName,
-			ModuleDirectory = new(opts.ModuleDirectory),
-			OutputDirectory = new(opts.OutputDirectory)
-		};
-
-		var codeGenerator = new CodeGenerator();
-		codeGenerator.GenerateModuleCode(@params);
-	}
+	var codeGenerator = new CodeGenerator();
+	codeGenerator.GenerateModuleCode(@params);
 }
 
 public record CommonOptions
@@ -139,9 +131,6 @@ public record CommonOptions
 
 	[Option(Required = true, HelpText = "Base file path of the module. Any symbols defined outside of this filepath are ignored.")]
 	public string ModuleDirectory { get; init; } = string.Empty;
-
-	[Option(HelpText = "Output filename to contain reflection registry information.")]
-	public string? Registry { get; init; }
 
 	[Option(Required = true, HelpText = "The directory to generate output files under.")]
 	public required string OutputDirectory { get; init; }

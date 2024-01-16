@@ -247,7 +247,7 @@ namespace CppRefl.CodeGeneration
 			StringBuilder sb = new();
 			
 			sb.AppendLine($$"""
-			               #include "{{Parameters.ModuleName}}{{CodeGenerator.FileHeaderExt}}"
+			               #include "{{Parameters.ModuleName}}{{CodeGenerator.GeneratedHeaderExtension}}"
 
 			               #include "CppReflStatics.h"
 

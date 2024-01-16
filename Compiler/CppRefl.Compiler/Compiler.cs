@@ -6,9 +6,6 @@ namespace CppRefl.Compiler;
 
 public record CompilerParams
 {
-	// Filename where metadata will be written to.
-	private readonly string? _registryFilename;
-
 	// Entrypoint of the program. Should be a .cpp of .h file.
 	public required FileInfo InputFile { get; init; }
 
@@ -44,7 +41,6 @@ public record CompilerParams
 
 	// Deletes empty directories after compilation.
 	public bool DeleteEmptyDirectories { get; set; } = true;
-	public string? RegistryFilename { get => _registryFilename; init => _registryFilename = value != null ? Path.GetFullPath(value) : null; }
 }
 
 internal record TemplatedFieldInfo
@@ -69,8 +65,9 @@ public class Compiler
 
 		OutputFiles = new[]
 		{
-			CodeGenerator.GetOutputFilename(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.FileHeaderExt),
-			CodeGenerator.GetOutputFilename(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.FileSourceExt),
+			CodeGenerator.SourceToGenerated(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.GeneratedHeaderExtension),
+			CodeGenerator.SourceToGenerated(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.GeneratedSourceExtension),
+			CodeGenerator.SourceToGenerated(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, Registry.RegistryExtension),
 		};
 	}
 
@@ -94,7 +91,6 @@ public class Compiler
 	/// </summary>
 	public static IReadOnlyCollection<string> DefaultClangArgs { get; } = new[]
 	{
-		"-std=c++1z",
 		"-fms-compatibility",
 		"-fms-compatibility-version=19.26",
 		"-fms-extensions",
@@ -145,9 +141,9 @@ public class Compiler
 		var headerFiles = Params.ModuleDirectory.EnumerateFiles("*.h", SearchOption.AllDirectories);
 		foreach (var headerFile in headerFiles)
 		{
-			if (headerFile.Extension != CodeGenerator.FileHeaderExt)
+			if (headerFile.Extension != CodeGenerator.GeneratedHeaderExtension)
 			{
-				var outputFile = CodeGenerator.GetOutputFilename(headerFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.FileHeaderExt);
+				var outputFile = CodeGenerator.SourceToGenerated(headerFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.GeneratedHeaderExtension);
 				if (!outputFile.Exists)
 				{
 					outputFile.Directory!.Create();
@@ -175,11 +171,6 @@ public class Compiler
 		TranslationUnit = ClangUtils.CreateTranslationUnit(Index, Params.InputFile.FullName, ClangArgs, Params.RaiseClangWarnings, Params.RaiseClangErrors);
 
 		ClangUtils.VisitCursorChildren(TranslationUnit.Cursor, ReflectCursor);
-
-		if (Params.RegistryFilename != null)
-		{
-			RegistryFile.AppendRegistry(Params.RegistryFilename, Params.InputFile.FullName, Registry);
-		}
 	}
 
 	/// <summary>
@@ -205,12 +196,12 @@ public class Compiler
 	{
 		if (Params.DeleteEmptyHeaderFiles)
 		{
-			CleanupFiles(CodeGenerator.FileHeaderExt);
+			CleanupFiles(CodeGenerator.GeneratedHeaderExtension);
 		}
 
 		if (Params.DeleteEmptySourceFiles)
 		{
-			CleanupFiles(CodeGenerator.FileSourceExt);
+			CleanupFiles(CodeGenerator.GeneratedSourceExtension);
 		}
 
 		if (Params.DeleteEmptyDirectories)

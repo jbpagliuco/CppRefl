@@ -14,8 +14,7 @@ namespace CppRefl.Compiler.Tests
 				Const.Runtime.SourceDirectory.FullName,
 				Const.Runtime.Tests.SourceDirectory.FullName
 			},
-			OutputDirectory = Const.Runtime.Tests.GeneratedCodeDirectory,
-			RegistryFilename = @"D:\test.json"
+			OutputDirectory = Const.Runtime.Tests.GeneratedCodeDirectory
 		};
 
 		/// <summary>

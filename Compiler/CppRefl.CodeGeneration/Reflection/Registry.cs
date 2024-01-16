@@ -41,6 +41,11 @@ namespace CppRefl.CodeGeneration.Reflection
 	public class Registry
 	{
 		/// <summary>
+		/// Extension for a serialized registry.
+		/// </summary>
+		public const string RegistryExtension = ".reflregistry.json";
+
+		/// <summary>
 		/// Json serialization options.
 		/// </summary>
 		private static readonly JsonSerializerOptions JsonSerializerOptions = new()
@@ -296,6 +301,60 @@ namespace CppRefl.CodeGeneration.Reflection
 		public static Registry? FromJson(string json)
 		{
 			return JsonSerializer.Deserialize<Registry>(json, JsonSerializerOptions);
+		}
+
+		/// <summary>
+		/// Deserialize a registry from a JSON file.
+		/// </summary>
+		/// <param name="filename"></param>
+		/// <returns></returns>
+		public static Registry? FromJsonFile(string filename)
+		{
+			return FromJson(File.ReadAllText(filename));
+		}
+
+		/// <summary>
+		/// Reads and combines all individual file registries under a folder.
+		/// </summary>
+		/// <param name="moduleName"></param>
+		/// <param name="moduleDirectory"></param>
+		/// <param name="outputDirectory"></param>
+		/// <returns></returns>
+		public static Registry CollectFileRegistries(string moduleName, DirectoryInfo moduleDirectory, DirectoryInfo outputDirectory)
+		{
+			Registry moduleRegistry = new();
+
+			// Collect file registries.
+			var registryFiles = outputDirectory.EnumerateFiles($"*{RegistryExtension}", SearchOption.AllDirectories);
+			foreach (var registryFile in registryFiles)
+			{
+				// Skip it if this the previously generated module registry.
+				if (registryFile.Name == $"{moduleName}{RegistryExtension}")
+				{
+					continue;
+				}
+
+				// Ensure the source file still exists.
+				var sourceFile = CodeGenerator.GeneratedToSource(registryFile, moduleDirectory, outputDirectory, ".h");
+				if (!sourceFile.Exists)
+				{
+					// Doesn't exist, don't merge this file in. In fact, let's delete it.
+					registryFile.Delete();
+					continue;
+				}
+
+				// Load the registry.
+				var fileRegistry = FromJsonFile(registryFile.FullName);
+				if (fileRegistry == null)
+				{
+					throw new Exception($"Failed to load registry from '{registryFile.FullName}'.");
+				}
+
+				// Merge it in.
+				moduleRegistry.Merge(fileRegistry);
+			}
+
+			return moduleRegistry;
 		}
 	}
 }

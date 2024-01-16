@@ -54,7 +54,6 @@ namespace CppRefl.CodeGeneration.Tests
 			};
 		}
 
-
 		[Test]
 		public void ShouldProduceCorrectFilenames()
 		{
@@ -67,6 +66,8 @@ namespace CppRefl.CodeGeneration.Tests
 					Is.EqualTo($@"{Path.GetTempPath()}Generated\Subfolder\File.reflgen.h"));
 				Assert.That(result.Source.Filename.FullName,
 					Is.EqualTo($@"{Path.GetTempPath()}Generated\Subfolder\File.reflgen.cpp"));
+				Assert.That(result.Registry.Filename.FullName,
+					Is.EqualTo($@"{Path.GetTempPath()}Generated\Subfolder\File.reflregistry.json"));
 			}
 
 			{
@@ -76,6 +77,8 @@ namespace CppRefl.CodeGeneration.Tests
 					Is.EqualTo($@"{Path.GetTempPath()}Generated\ModuleName.reflgen.h"));
 				Assert.That(result.Source.Filename.FullName,
 					Is.EqualTo($@"{Path.GetTempPath()}Generated\ModuleName.reflgen.cpp"));
+				Assert.That(result.Registry.Filename.FullName,
+					Is.EqualTo($@"{Path.GetTempPath()}Generated\ModuleName.reflregistry.json"));
 			}
 		}
 

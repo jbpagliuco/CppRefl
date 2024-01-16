@@ -30,8 +30,7 @@ namespace CppRefl.Compiler.Tests.CppRefl.Tests
                         TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory.FullName,
                         TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory.FullName,
                     },
-                    OutputDirectory = TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory,
-                    RegistryFilename = registryFilename
+                    OutputDirectory = TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory
                 };
                 var compiler = new Compiler(compilerParams);
                 compiler.GenerateRegistry();
@@ -52,7 +51,7 @@ namespace CppRefl.Compiler.Tests.CppRefl.Tests
             {
                 CodeGeneratorModuleParams codeGeneratorRegistryParams = new()
                 {
-                    Registry = Registry.FromJson(File.ReadAllText(registryFilename))!,
+                    Registry = Registry.CollectFileRegistries(TestUtil.Const.Runtime.Tests.ModuleName, TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory, TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory),
                     ModuleName = TestUtil.Const.Runtime.Tests.ModuleName,
                     ModuleDirectory = TestUtil.Const.Runtime.Tests.ReflectedHeadersDirectory,
                     OutputDirectory = TestUtil.Const.Runtime.Tests.GeneratedCodeDirectory,
