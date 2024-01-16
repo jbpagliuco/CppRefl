@@ -1,9 +1,43 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace CppRefl.CodeGeneration.Reflection
 {
+	/// <summary>
+	/// Objects defined in a single file.
+	/// </summary>
+	public record FileObjects
+	{
+		/// <summary>
+		/// List of reflected classes in the given file.
+		/// </summary>
+		public IEnumerable<ClassInfo> Classes { get; init; } = Enumerable.Empty<ClassInfo>();
+
+		/// <summary>
+		/// List of reflected enums in the given file.
+		/// </summary>
+		public IEnumerable<EnumInfo> Enums { get; init; } = Enumerable.Empty<EnumInfo>();
+
+		/// <summary>
+		/// List of reflected aliases in the given file.
+		/// </summary>
+		public IEnumerable<AliasInfo> Aliases { get; init; } = Enumerable.Empty<AliasInfo>();
+
+		/// <summary>
+		/// List of reflected functions in the given file.
+		/// </summary>
+		public IEnumerable<FunctionInfo> Functions { get; init; } = Enumerable.Empty<FunctionInfo>();
+
+		/// <summary>
+		/// Did this file define any reflected objects?
+		/// </summary>
+		/// <returns></returns>
+		public bool Any() => Classes.Any() || Enums.Any() || Aliases.Any() || Functions.Any();
+	}
+
+	/// <summary>
+	/// A collection of all the reflected objects in a program.
+	/// </summary>
 	public class Registry
 	{
 		/// <summary>
@@ -185,6 +219,31 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// <returns></returns>
 		public IEnumerable<FunctionInfo> GetFunctionsWithinModule(DirectoryInfo moduleDirectory) =>
 			GetObjectsWithinModule(moduleDirectory, Functions);
+
+
+		/// <summary>
+		/// Returns all the objects defined in a file.
+		/// </summary>
+		/// <param name="file"></param>
+		/// <param name="reflectedOnly"></param>
+		/// <returns></returns>
+		public FileObjects GetObjectsInFile(FileInfo file, bool reflectedOnly = false)
+		{
+			IEnumerable<T> FindFileObjects<T>(IEnumerable<T> items) where T : ObjectInfo
+			{
+				return items.Where(x =>
+					(!reflectedOnly || x.Metadata.IsReflected) &&
+					x.Metadata.SourceLocation.FileInfo.FullName == file.FullName);
+			}
+
+			return new FileObjects()
+			{
+				Classes = FindFileObjects(Classes.Values),
+				Enums = FindFileObjects(Enums.Values),
+				Aliases = FindFileObjects(Aliases.Values),
+				Functions = FindFileObjects(Functions.Values),
+			};
+		}
 
 
 

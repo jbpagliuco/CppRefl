@@ -176,26 +176,10 @@ namespace CppRefl.CodeGeneration
 		public FileCodeGeneratorResult GenerateFileCode(CodeGeneratorFileParams @params, Func<FileInfo, Stream>? streamCreator = null)
 		{
 			streamCreator ??= fileInfo => new FileStream(fileInfo.FullName, FileMode.Create, FileAccess.ReadWrite);
-
-			IEnumerable<T> FindFileObjects<T>(IEnumerable<T> items) where T : ObjectInfo
-			{
-				return items.Where(x =>
-					x.Metadata.IsReflected && 
-					x.Metadata.SourceLocation.FileInfo.FullName == @params.InputFilename.FullName);
-			}
-
-			// Find all reflected classes in our input file.
-			FileObjects objects = new()
-			{
-				Classes = FindFileObjects(@params.Registry.GetClasses()),
-				Enums = FindFileObjects(@params.Registry.GetEnums()),
-				Aliases = FindFileObjects(@params.Registry.GetAliases()),
-				Functions = FindFileObjects(@params.Registry.GetFunctions())
-			};
-
+			
 			FileCodeGeneratorContext context = new()
 			{
-				Objects = objects,
+				Objects = @params.Registry.GetObjectsInFile(@params.InputFilename),
 				Parameters = @params
 			};
 

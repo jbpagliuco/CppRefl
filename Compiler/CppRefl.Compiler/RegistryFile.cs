@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using CppRefl.CodeGeneration.Reflection;
+﻿using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.Compiler
 {
