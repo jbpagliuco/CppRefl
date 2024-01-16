@@ -52,4 +52,18 @@ TEST(ClassTests, Constructors)
 	EXPECT_EQ(typedObject->mPublicInt, 666);
 }
 
+#if CPPREFL_CONCEPTS()
+TEST(ClassTests, Concepts)
+{
+	static_assert(cpprefl::ReflectedType<::ReflectedClass>);
+	static_assert(!cpprefl::ReflectedType<::NonReflectedClass>);
+
+	static_assert(cpprefl::ReflectedClass<::ReflectedClass>);
+	static_assert(!cpprefl::ReflectedClass<::NonReflectedClass>);
+
+	static_assert(!cpprefl::ReflectedEnum<::ReflectedClass>);
+	static_assert(!cpprefl::ReflectedEnum<::NonReflectedClass>);
+}
+#endif
+
 #endif

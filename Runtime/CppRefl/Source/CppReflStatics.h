@@ -44,28 +44,13 @@ namespace CppReflPrivate
 
 namespace cpprefl
 {
+	class ClassInfo;
 	class EnumInfo;
 	class FunctionInfo;
 
 	// Returns a static type known at compile time.
 	template <typename T>
-	const TypeInfo& GetReflectedType();
-
-	// Returns a static type known at compile-time.
-	template <typename T>
-	const TypeInfo& GetReflectedType()
-	{
-		if constexpr (!std::is_class_v<T> && !std::is_enum_v<T>)
-		{
-			const TypeInfo& type = CppReflPrivate::MaybeCreateReflectedType<T>("");
-			assert(type.mName[0] != 0 && "Type info was never created. This is illegal.");
-
-			return type;
-		}
-
-		static_assert(!std::is_class_v<T>, "This class doesn't implement GetReflectedType<>()");
-		static_assert(!std::is_enum_v<T>, "This enum doesn't implement StaticEnum<>()");
-	}
+	const TypeInfo& GetReflectedType() = delete;
 
 	// Static types for primitive types.
 	template <> inline const TypeInfo& GetReflectedType<bool>()					{ return CppReflPrivate::MaybeCreateReflectedType<bool>("bool"); }
@@ -86,15 +71,15 @@ namespace cpprefl
 
 	// Returns a static enum known at compile time.
 	template <typename T>
-	const EnumInfo& GetReflectedEnum();
+	const EnumInfo& GetReflectedEnum() = delete;
 
 	// Returns a static class known at compile time.
 	template <typename T>
-	const ClassInfo& GetReflectedClass();
+	const ClassInfo& GetReflectedClass() = delete;
 
 	// Returns a static function known at compile time.
 	template <void* FunctionAddress>
-	const FunctionInfo& GetReflectedFunction();
+	const FunctionInfo& GetReflectedFunction() = delete;
 
 
 	// Returns the name of a reflected class.

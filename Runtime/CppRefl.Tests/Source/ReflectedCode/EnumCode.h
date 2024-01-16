@@ -15,6 +15,12 @@ enum class REFLECTED ReflectedEnum
 	Foo,
 };
 
+enum class NonReflectedEnum
+{
+	V1,
+	V2
+};
+
 namespace TestNamespace
 {
 	enum class REFLECTED NamespacedEnum
