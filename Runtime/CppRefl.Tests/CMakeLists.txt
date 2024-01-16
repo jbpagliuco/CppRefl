@@ -15,7 +15,7 @@ set(REFLECTED_FILES
 	# AliasCode
 	ClassCode
 	EnumCode
-	# FunctionCode
+	FunctionCode
 	MetadataCode
 	# SerializerCode
 	TemplateCode

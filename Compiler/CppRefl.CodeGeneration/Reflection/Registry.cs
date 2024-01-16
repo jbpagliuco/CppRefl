@@ -178,6 +178,14 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// <returns></returns>
 		public ICollection<FunctionInfo> GetFunctions() => Functions.Values;
 
+		/// <summary>
+		/// Returns all the functions within a module.
+		/// </summary>
+		/// <param name="moduleDirectory"></param>
+		/// <returns></returns>
+		public IEnumerable<FunctionInfo> GetFunctionsWithinModule(DirectoryInfo moduleDirectory) =>
+			GetObjectsWithinModule(moduleDirectory, Functions);
+
 
 
 		private void MergeDictionary<T>(IDictionary<string, T> baseDictionary, IDictionary<string, T> newDictionary)

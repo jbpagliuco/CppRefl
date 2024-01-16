@@ -68,5 +68,16 @@ namespace CppRefl.CodeGeneration.CodeWriters
 			WriteLine($"enum class {enumInfo.Type.Name};");
 			namespaceDec?.Dispose();
 		}
+
+		/// <summary>
+		/// Forward declare a function. NB: This MUST be called from the global namespace.
+		/// </summary>
+		/// <param name="functionInfo"></param>
+		public void ForwardDeclare(FunctionInfo functionInfo)
+		{
+			var namespaceDec = functionInfo.IsInGlobalNamespace() ? null : WithNamespace(functionInfo.Namespace);
+			WriteLine($"{functionInfo.Signature};");
+			namespaceDec?.Dispose();
+		}
 	}
 }

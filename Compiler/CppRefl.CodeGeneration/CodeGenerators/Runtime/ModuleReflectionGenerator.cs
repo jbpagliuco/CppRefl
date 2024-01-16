@@ -25,9 +25,18 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
             var enums = context.Parameters.Registry.GetEnumsWithinModule(new DirectoryInfo(context.Parameters.ModuleDirectory))
 	            .Where(x => x.Metadata.IsReflected);
             reflectedObjects.UnionWith(enums);
-			foreach (var classInfo in classes)
+			foreach (var enumInfo in enums)
             {
-	            context.WriteInitializer(writer => writer.WriteLine($"cpprefl::GetReflectedClass<{classInfo.Type.QualifiedName()}>();"));
+	            context.WriteInitializer(writer => writer.WriteLine($"cpprefl::GetReflectedEnum<{enumInfo.Type.QualifiedName()}>();"));
+            }
+
+			// Functions
+            var functions = context.Parameters.Registry.GetFunctionsWithinModule(new DirectoryInfo(context.Parameters.ModuleDirectory))
+	            .Where(x => x.Metadata.IsReflected);
+            reflectedObjects.UnionWith(functions);
+			foreach (var functionInfo in functions)
+            {
+	            context.WriteInitializer(writer => writer.WriteLine($"cpprefl::GetReflectedFunction<&{functionInfo.QualifiedName()}>();"));
             }
 
             // Add includes.

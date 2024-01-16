@@ -94,7 +94,7 @@ namespace cpprefl
 
 	// Returns a static function known at compile time.
 	template <void* FunctionAddress>
-	const FunctionInfo& StaticFunction();
+	const FunctionInfo& GetReflectedFunction();
 
 
 	// Returns the name of a reflected class.

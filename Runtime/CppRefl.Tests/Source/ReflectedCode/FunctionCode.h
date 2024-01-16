@@ -1,6 +1,6 @@
 #pragma once
 
-#define TEST_FUNCTION_CODE() 0
+#define TEST_FUNCTION_CODE() 1
 
 #if TEST_FUNCTION_CODE()
 

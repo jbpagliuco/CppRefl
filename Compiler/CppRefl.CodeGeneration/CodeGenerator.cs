@@ -109,7 +109,7 @@ namespace CppRefl.CodeGeneration
 			// Essential
 			AddFileCodeGenerator<ClassReflectionGenerator>();
 			AddFileCodeGenerator<EnumReflectionGenerator>();
-			//AddCodeGenerator<FunctionStaticGenerator>();
+			AddFileCodeGenerator<FunctionReflectionGenerator>();
 			AddFileCodeGenerator<VectorDynamicArrayGenerator>();
 			AddModuleCodeGenerator<ModuleReflectionGenerator>();
 
