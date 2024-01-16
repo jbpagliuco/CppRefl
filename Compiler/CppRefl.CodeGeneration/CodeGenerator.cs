@@ -181,7 +181,7 @@ namespace CppRefl.CodeGeneration
 			{
 				return items.Where(x =>
 					x.Metadata.IsReflected && 
-					x.Metadata.SourceLocation.FileInfo == @params.InputFilename);
+					x.Metadata.SourceLocation.FileInfo.FullName == @params.InputFilename.FullName);
 			}
 
 			// Find all reflected classes in our input file.
