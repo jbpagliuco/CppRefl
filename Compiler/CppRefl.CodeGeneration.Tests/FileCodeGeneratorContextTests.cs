@@ -27,17 +27,15 @@ namespace CppRefl.CodeGeneration.Tests
 		private static FileCodeGeneratorContext CreateFileCodeGeneratorContext()
 		{
 			var root = Path.GetTempPath();
-			return new()
+			var parameters = new CodeGeneratorFileParams()
 			{
-				Objects = new(),
-				Parameters = new()
-				{
-					InputFilename = new($@"{root}Source/File.h"),
-					Registry = new(),
-					ModuleDirectory = new DirectoryInfo($@"{root}Source"),
-					OutputDirectory = new DirectoryInfo($@"{root}Generated")
-				}
+				InputFilename = new($@"{root}Source/File.h"),
+				Registry = new(),
+				ModuleDirectory = new DirectoryInfo($@"{root}Source"),
+				OutputDirectory = new DirectoryInfo($@"{root}Generated")
 			};
+
+			return new(parameters, new FileObjects());
 		}
 
 		[Test]
@@ -60,7 +58,44 @@ namespace CppRefl.CodeGeneration.Tests
 			                                                     // {{classInfo.Type.QualifiedName()}} class declaration
 
 			                                                     #if !{{CppDefines.BuildReflection}}
-			                                                     // Macro to be added inside the definition of a reflected class.
+			                                                     	// Macro to be added inside the definition of a reflected class.
+			                                                     	#define {{generatedBodyMacroName}}()\
+			                                                     		Line #1\
+			                                                     		Line #2\
+			                                                     
+			                                                     
+			                                                     #else
+			                                                     	// Define empty macro when building reflection.
+			                                                     	#define {{generatedBodyMacroName}}()
+			                                                     #endif
+
+			                                                     ////////////////////////////////////////////////////////////////////////////////////////////////////////
+			                                                     ////////////////////////////////////////////////////////////////////////////////////////////////////////
+			                                                     """));
+			Assert.That(context.DumpSource().Trim(), Is.EqualTo(ExpectedSourcePrefix.Trim()));
+		}
+
+		[Test]
+		public void ShouldWriteEnumDeclaration()
+		{
+			FileCodeGeneratorContext context = CreateFileCodeGeneratorContext();
+			EnumInfo enumInfo = CodeGeneratorTestHelpers.CreateEnumInfo();
+			context.WriteEnumDeclaration(enumInfo, writer =>
+			{
+				writer.WriteLine("Line #1");
+				writer.WriteLine("Line #2");
+			});
+
+			string generatedBodyMacroName = $"{CppDefines.InternalReflectionMacroPrefix}_{enumInfo.Metadata.SourceLocation.FilenameNoExt}{enumInfo.GeneratedBodyLine}";
+			Assert.That(context.DumpHeader().Trim(), Is.EqualTo($$"""
+			                                                     {{ExpectedHeaderPrefix}}
+			                                                     
+			                                                     ////////////////////////////////////////////////////////////////////////////////////////////////////////
+			                                                     ////////////////////////////////////////////////////////////////////////////////////////////////////////
+			                                                     // {{enumInfo.Type.QualifiedName()}} enum declaration
+
+			                                                     #if !{{CppDefines.BuildReflection}}
+			                                                     	// Macro to be added inside the definition of a reflected enum.
 			                                                     	#define {{generatedBodyMacroName}}()\
 			                                                     		Line #1\
 			                                                     		Line #2\

@@ -21,9 +21,10 @@
 		public const string FileId = "CPPREFL_INTERNAL_FILE_ID";
 
 		/// <summary>
-		/// String that marks where the GENERATED_REFLECTION_CODE() macro is inside the class definition. We use this to determine which line its on (which lets us do the expansion of the macro).
+		/// Macro name for GENERATED_REFLECTION_CODE(), which can be placed inside enum and class declarations.
+		/// We use this to determine which line its on (which lets us do the expansion of the macro).
 		/// </summary>
-		public const string GeneratedReflectionCodeMarker = "__CppReflGeneratedReflectionCodeMarker";
+		public const string GeneratedReflectionCodeMacro = "GENERATED_REFLECTION_CODE()";
 
 		/// <summary>
 		/// Prefix of the GENERATED_REFLECTION_CODE() body expands to.

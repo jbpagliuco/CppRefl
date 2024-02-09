@@ -27,5 +27,27 @@ namespace CppRefl.CodeGeneration.Tests
 				GeneratedBodyLine = 125
 			};
 		}
+
+		/// <summary>
+		/// Creates an empty class info.
+		/// </summary>
+		/// <returns></returns>
+		public static EnumInfo CreateEnumInfo()
+		{
+			return new()
+			{
+				Type = new()
+				{
+					Name = "Enum",
+					Namespace = "Namespace"
+				},
+				Metadata = new()
+				{
+					IsReflected = true,
+					SourceLocation = new(Path.Combine(Path.GetTempPath(), "Enum.h"), 123)
+				},
+				GeneratedBodyLine = 246
+			};
+		}
 	}
 }

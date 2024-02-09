@@ -77,17 +77,26 @@ namespace CppRefl.CodeGeneration
 	/// </summary>
 	public class FileCodeGeneratorContext : CodeGeneratorContext
 	{
+		public FileCodeGeneratorContext(CodeGeneratorFileParams parameters, FileObjects objects)
+		{
+			Parameters = parameters;
+			Objects = objects;
+			ClassDeclarationWriters = Objects.Classes.ToDictionary(x => x, _ => new CppWriter());
+			EnumDeclarationWriters = Objects.Enums.ToDictionary(x => x, _ => new CppWriter());
+		}
+
 		/// <summary>
 		/// The original code generator parameters.
 		/// </summary>
-		public required CodeGeneratorFileParams Parameters { get; init; }
+		public CodeGeneratorFileParams Parameters { get; }
 
 		/// <summary>
 		/// The objects declared in this file.
 		/// </summary>
-		public required FileObjects Objects { get; init; }
+		public FileObjects Objects { get; }
 
-		private IDictionary<ClassInfo, CppWriter> ClassDeclarationWriters { get; } = new Dictionary<ClassInfo, CppWriter>();
+		private IDictionary<ClassInfo, CppWriter> ClassDeclarationWriters { get; }
+		private IDictionary<EnumInfo, CppWriter> EnumDeclarationWriters { get; }
 
 		/// <summary>
 		/// Invoke a writer action.
@@ -115,6 +124,26 @@ namespace CppRefl.CodeGeneration
 		public void WriteClassDeclaration(ClassInfo classInfo, Action<CppWriter> action)
 		{
 			InvokeWriterAction(ClassDeclarationWriters, classInfo, writer =>
+			{
+				// Postfix everything with a backslash since this code goes into a macro.
+				using (writer.WithPostfix("\\"))
+				{
+					using (writer.WithIndent(2))
+					{
+						action(writer);
+					}
+				}
+			});
+		}
+
+		/// <summary>
+		/// Writes code to the body of a enum declaration.
+		/// </summary>
+		/// <param name="enumInfo"></param>
+		/// <param name="action"></param>
+		public void WriteEnumDeclaration(EnumInfo enumInfo, Action<CppWriter> action)
+		{
+			InvokeWriterAction(EnumDeclarationWriters, enumInfo, writer =>
 			{
 				// Postfix everything with a backslash since this code goes into a macro.
 				using (writer.WithPostfix("\\"))
@@ -163,7 +192,35 @@ namespace CppRefl.CodeGeneration
 					               // {classInfo.Type.QualifiedName()} class declaration
 
 					               #if !{CppDefines.BuildReflection}
-					               // Macro to be added inside the definition of a reflected class.
+					               	// Macro to be added inside the definition of a reflected class.
+					               	#define {generatedBodyMacroName}()\
+					               {writer}
+
+					               #else
+					               	// Define empty macro when building reflection.
+					               	#define {generatedBodyMacroName}()
+					               #endif
+
+					               ////////////////////////////////////////////////////////////////////////////////////////////////////////
+					               ////////////////////////////////////////////////////////////////////////////////////////////////////////
+					               """);
+				}
+			}
+
+			// Write all of the enum bodies.
+			foreach (var (enumInfo, writer) in EnumDeclarationWriters)
+			{
+				if (enumInfo.GeneratedBodyLine != null)
+				{
+					string generatedBodyMacroName =
+						$"{CppDefines.InternalReflectionMacroPrefix}_{enumInfo.Metadata.SourceLocation.FilenameNoExt}{enumInfo.GeneratedBodyLine}";
+					sb.AppendLine($"""
+					               ////////////////////////////////////////////////////////////////////////////////////////////////////////
+					               ////////////////////////////////////////////////////////////////////////////////////////////////////////
+					               // {enumInfo.Type.QualifiedName()} enum declaration
+
+					               #if !{CppDefines.BuildReflection}
+					               	// Macro to be added inside the definition of a reflected enum.
 					               	#define {generatedBodyMacroName}()\
 					               {writer}
 

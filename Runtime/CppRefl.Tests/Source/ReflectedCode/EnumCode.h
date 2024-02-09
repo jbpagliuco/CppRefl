@@ -13,6 +13,8 @@ enum class REFLECTED ReflectedEnum
 	EnumValue1 = 0,
 	Bar = 10,
 	Foo,
+
+	GENERATED_REFLECTION_CODE()
 };
 
 enum class NonReflectedEnum

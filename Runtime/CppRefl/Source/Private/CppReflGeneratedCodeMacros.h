@@ -23,14 +23,20 @@
 #endif
 
 #if CPPREFL_BUILD_REFLECTION()
-	// Define a special marker so the reflection compiler can find which line this macro is used at.
-#define GENERATED_REFLECTION_CODE() void CPPREFL_INTERNAL_GENERATED_REFLECTION_CODE_MARKER();
-#elif defined(CPPREFL_INTERNAL_FILE_ID)
-	// Calls a special macro defined in the .reflgen.h file. This uses the line number so we can have multiple reflected classes in one file.
-#define GENERATED_REFLECTION_CODE() CPPREFL_INTERNAL_COMBINE(__CPPREFLPRIVATE_REFLECTION_CODE_, CPPREFL_INTERNAL_FILE_ID, __LINE__)()
-#else
-	// Define an empty macro so classes can always have it defined, regardless of whether or not the reflection compiler has been run.
+
+// Define a special marker so the reflection compiler can find which line this macro is used at.
 #define GENERATED_REFLECTION_CODE()
+
+#elif defined(CPPREFL_INTERNAL_FILE_ID)
+
+// Calls a special macro defined in the .reflgen.h file. This uses the line number so we can have multiple reflected classes in one file.
+#define GENERATED_REFLECTION_CODE() CPPREFL_INTERNAL_COMBINE(__CPPREFLPRIVATE_REFLECTION_CODE_, CPPREFL_INTERNAL_FILE_ID, __LINE__)()
+
+#else
+
+// Define an empty macro so classes can always have it defined, regardless of whether or not the reflection compiler has been run.
+#define GENERATED_REFLECTION_CODE()
+
 #endif
 
 namespace cpprefl

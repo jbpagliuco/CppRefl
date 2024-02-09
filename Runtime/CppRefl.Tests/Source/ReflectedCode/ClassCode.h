@@ -49,7 +49,7 @@ namespace TestNamespace
 		GENERATED_REFLECTION_CODE()
 
 	private:
-		int mField REFLECTED;
+		[[maybe_unused]] int mField REFLECTED;
 	};
 }
 

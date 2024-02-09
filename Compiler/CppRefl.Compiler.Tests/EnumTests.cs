@@ -44,5 +44,12 @@ namespace CppRefl.Compiler.Tests
 				Assert.That(enumInfo.Values[1].Value, Is.EqualTo(1));
 			}
 		}
+
+		[Test]
+		public void EnumGeneratedBody()
+		{
+			Assert.That(Registry.GetEnum("ReflectedEnum")!.GeneratedBodyLine, Is.EqualTo(17));
+			Assert.Null(Registry.GetEnum("TestNamespace::NamespacedEnum")!.GeneratedBodyLine);
+		}
 	}
 }

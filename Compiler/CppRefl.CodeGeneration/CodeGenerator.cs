@@ -218,12 +218,8 @@ namespace CppRefl.CodeGeneration
 		public FileCodeGeneratorResult GenerateFileCode(CodeGeneratorFileParams @params, Func<FileInfo, Stream>? streamCreator = null)
 		{
 			streamCreator ??= fileInfo => new FileStream(fileInfo.FullName, FileMode.Create, FileAccess.ReadWrite);
-			
-			FileCodeGeneratorContext context = new()
-			{
-				Objects = @params.Registry.GetObjectsInFile(@params.InputFilename),
-				Parameters = @params
-			};
+
+			FileCodeGeneratorContext context = new(@params, @params.Registry.GetObjectsInFile(@params.InputFilename));
 
 			foreach (var generator in FileGenerators)
 			{

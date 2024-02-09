@@ -27,5 +27,10 @@
 		/// Enum values.
 		/// </summary>
 		public IList<EnumValueInfo> Values { get; } = new List<EnumValueInfo>();
+
+		/// <summary>
+		/// Line number where the GENERATED_REFLECTION_CODE() macro is defined in this enum.
+		/// </summary>
+		public uint? GeneratedBodyLine { get; set; }
 	}
 }

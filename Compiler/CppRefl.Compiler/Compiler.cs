@@ -91,16 +91,12 @@ public class Compiler
 	/// </summary>
 	public static IReadOnlyCollection<string> DefaultClangArgs { get; } = new[]
 	{
-		"-fms-compatibility",
-		"-fms-compatibility-version=19.26",
-		"-fms-extensions",
-		"-Wall",
-		"-Wmicrosoft",
 		"-Wno-c++98-compat",
 		"-Wno-c++98-compat-pedantic",
 		"-Wno-newline-eof",
 		"-Wno-pragma-once-outside-header",
 		"-Wno-unused-variable",
+		"-Wno-unused-private-field",
 		"--language=c++",
 	};
 
@@ -123,6 +119,11 @@ public class Compiler
 	/// Mapping of TypeInfo data to their original cursor.
 	/// </summary>
 	private IDictionary<TypeInfo, CXCursor> TypeCursors { get; } = new Dictionary<TypeInfo, CXCursor>();
+
+	/// <summary>
+	/// All the instances of "GENERATED_REFLECTION_CODE()" line numbers.
+	/// </summary>
+	private IList<uint> GeneratedReflectionCodeLines { get; } = new List<uint>();
 
 	/// <summary>
 	/// Generates empty files that are included for reflection.
@@ -161,11 +162,29 @@ public class Compiler
 	}
 
 	/// <summary>
+	/// Collect all the "GENERATED_REFLECTION_CODE()" lines.
+	/// </summary>
+	private void CollectGeneratedReflectionCodeLines()
+	{
+		var lines = File.ReadAllLines(Params.InputFile.FullName);
+		for (int i = 0; i < lines.Length; ++i)
+		{
+			var line = lines[i];
+			if (line.Contains(CppDefines.GeneratedReflectionCodeMacro))
+			{
+				GeneratedReflectionCodeLines.Add((uint)i + 1);
+			}
+		}
+	}
+
+	/// <summary>
 	/// Generates the reflection registry of the given program.
 	/// </summary>
 	public void GenerateRegistry()
 	{
 		GenerateEmptyFiles();
+
+		CollectGeneratedReflectionCodeLines();
 
 		Index = CXIndex.Create();
 		TranslationUnit = ClangUtils.CreateTranslationUnit(Index, Params.InputFile.FullName, ClangArgs, Params.RaiseClangWarnings, Params.RaiseClangErrors);
@@ -312,6 +331,27 @@ public class Compiler
 		}
 
 		return true;
+	}
+
+	/// <summary>
+	/// Checks if the cursor represents a line that contains our GENERATED_REFLECTION_CODE() macro.
+	/// </summary>
+	/// <param name="cursor"></param>
+	/// <returns></returns>
+	private uint? MaybeGetGeneratedReflectionBodyLine(CXCursor cursor)
+	{
+		cursor.SourceRange.Start.GetFileLocation(out var _, out var startLine, out var _, out var _);
+		cursor.SourceRange.End.GetFileLocation(out var _, out var endLine, out var _, out var _);
+
+		foreach (var line in GeneratedReflectionCodeLines)
+		{
+			if (line >= startLine && line <= endLine)
+			{
+				return line;
+			}
+		}
+
+		return null;
 	}
 
 	/// <summary>
@@ -484,14 +524,6 @@ public class Compiler
 	/// <exception cref="NotImplementedException"></exception>
 	private CXChildVisitResult ReflectClassMember(CXCursor cursor, ClassInfo classInfo)
 	{
-		// See if this is the GENERATED_REFLECTION_CODE() macro. We need the line number to properly generate the class body.
-		if (cursor.Kind == CXCursorKind.CXCursor_CXXMethod && cursor.Spelling.ToString() == CppDefines.GeneratedReflectionCodeMarker)
-		{
-			cursor.Location.GetFileLocation(out var _, out var line, out var _, out var _);
-			classInfo.GeneratedBodyLine = line;
-			return CXChildVisitResult.CXChildVisit_Continue;
-		}
-
 		// Collect base classes.
 		if (cursor.Kind == CXCursorKind.CXCursor_CXXBaseSpecifier)
 		{
@@ -629,6 +661,7 @@ public class Compiler
 		var classInfo = Registry.GetClass(qualifiedName);
 		if (classInfo == null)
 		{
+
 			classInfo = new()
 			{
 				Type = ReflectType(type),
@@ -681,7 +714,8 @@ public class Compiler
 				Type = ReflectType(cursor),
 				Metadata = metadata,
 				ClassType = ClangUtils.GetClassType(cursor),
-				IsAbstract = cursor.CXXRecord_IsAbstract
+				IsAbstract = cursor.CXXRecord_IsAbstract,
+				GeneratedBodyLine = MaybeGetGeneratedReflectionBodyLine(cursor)
 			};
 			
 			ClangUtils.VisitCursorChildren(cursor, c => ReflectClassMember(c, classInfo));
@@ -727,7 +761,8 @@ public class Compiler
 			enumInfo = new()
 			{
 				Type = ReflectType(cursor.Type),
-				Metadata = metadata
+				Metadata = metadata,
+				GeneratedBodyLine = MaybeGetGeneratedReflectionBodyLine(cursor)
 			};
 
 			CXChildVisitResult Visitor(CXCursor child)
