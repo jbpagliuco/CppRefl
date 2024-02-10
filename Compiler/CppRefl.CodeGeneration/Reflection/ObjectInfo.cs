@@ -24,6 +24,11 @@
 		/// Source information.
 		/// </summary>
 		public required SourceLocation SourceLocation { get; init; }
+
+		/// <summary>
+		/// Comments attached to this object.
+		/// </summary>
+		public required string? Comment { get; init; }
 	}
 
 	/// <summary>

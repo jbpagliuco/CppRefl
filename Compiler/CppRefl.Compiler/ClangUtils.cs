@@ -126,12 +126,19 @@ namespace CppRefl.Compiler
 
 			VisitCursorChildren(cursor, Visitor);
 
+			string? comment = cursor.BriefCommentText.ToString();
+			if (comment == "")
+			{
+				comment = null;
+			}
+
 			metadata = new MetadataInfo()
 			{
 				IsReflected = isReflected,
 				Tags = tags,
 				Attributes = attributes,
-				SourceLocation = GetSourceLocation(cursor)
+				SourceLocation = GetSourceLocation(cursor),
+				Comment = comment
 			};
 		}
 

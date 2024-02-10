@@ -13,8 +13,8 @@
 			Assert.That(classInfo.Metadata.Tags[0], Is.EqualTo("SomeTag"));
 			Assert.That(classInfo.Metadata.Tags[1], Is.EqualTo("Another Tag"));
 			Assert.That(classInfo.Metadata.SourceLocation.FileInfo.FullName, Is.EqualTo(ReflectionFile));
-			Assert.That(classInfo.Metadata.SourceLocation.Line, Is.EqualTo(17));
-			Assert.That(classInfo.GeneratedBodyLine, Is.EqualTo(19));
+			Assert.That(classInfo.Metadata.SourceLocation.Line, Is.EqualTo(18));
+			Assert.That(classInfo.GeneratedBodyLine, Is.EqualTo(20));
 
 			Assert.That(classInfo.Metadata.Attributes.Count, Is.EqualTo(2));
 			Assert.That(classInfo.Metadata.Attributes["SomeAttr"], Is.EqualTo("\"MyValue\""));
@@ -31,6 +31,25 @@
 			Assert.That(methodInfo.Metadata.Tags[0], Is.EqualTo("FunctionTag"));
 			Assert.That(methodInfo.Metadata.Attributes.Count, Is.EqualTo(1));
 			Assert.That(methodInfo.Metadata.Attributes["FunctionAttr"], Is.EqualTo("\"Function\""));
+		}
+
+		[Test]
+		public void CommentTests()
+		{
+			// No comments
+			{
+				var classInfo = Registry.GetClass("ClassWithNoAttributes")!;
+				Assert.IsNull(classInfo.Metadata.Comment);
+			}
+
+			// With comments
+			{
+				var classInfo = Registry.GetClass("ClassWithAttributes")!;
+				Assert.That(classInfo.Metadata.Comment, Is.EqualTo("Class comment."));
+				Assert.That(classInfo.Fields[0].Metadata.Comment, Is.EqualTo("Field comment."));
+				Assert.That(classInfo.Methods[0].Metadata.Comment, Is.EqualTo("Multline function comment."));
+			}
+
 		}
 	}
 }

@@ -20,7 +20,8 @@ namespace CppRefl.CodeGeneration.Tests
 				Metadata = new()
 				{
 					IsReflected = true,
-					SourceLocation = new(Path.Combine(Path.GetTempPath(), "Class.h"), 123)
+					SourceLocation = new(Path.Combine(Path.GetTempPath(), "Class.h"), 123),
+					Comment = ""
 				},
 				ClassType = ClassType.Class,
 				IsAbstract = false,
@@ -44,7 +45,8 @@ namespace CppRefl.CodeGeneration.Tests
 				Metadata = new()
 				{
 					IsReflected = true,
-					SourceLocation = new(Path.Combine(Path.GetTempPath(), "Enum.h"), 123)
+					SourceLocation = new(Path.Combine(Path.GetTempPath(), "Enum.h"), 123),
+					Comment = ""
 				},
 				GeneratedBodyLine = 246
 			};

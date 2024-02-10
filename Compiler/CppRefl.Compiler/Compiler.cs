@@ -97,6 +97,7 @@ public class Compiler
 		"-Wno-pragma-once-outside-header",
 		"-Wno-unused-variable",
 		"-Wno-unused-private-field",
+		"-fparse-all-comments",
 		"--language=c++",
 	};
 
