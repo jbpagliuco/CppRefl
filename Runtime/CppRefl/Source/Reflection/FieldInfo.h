@@ -11,8 +11,8 @@ namespace cpprefl
 	class FieldInfo : public ObjectInfo
 	{
 	public:
-		FieldInfo(TypeInstanceInfo type, size_t offset, const char* name, TagView&& tags, AttributeView&& attributes) :
-			ObjectInfo(std::move(tags), std::move(attributes)),
+		FieldInfo(TypeInstanceInfo type, size_t offset, const char* name, const MetadataTagView& tags, const MetadataAttributeView& attributes) :
+			ObjectInfo(tags, attributes),
 			mTypeInstance(std::move(type)),
 			mOffset(offset),
 			mName(name)

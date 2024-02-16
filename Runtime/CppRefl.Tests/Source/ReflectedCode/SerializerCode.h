@@ -76,9 +76,9 @@ class REFLECTED DeserializeMetadata
 
 public:
 	bool enableDamage REFLECTED;
-	float damage REFL_ATTR("enable", enableDamage) = 0.0f;
+	float damage REFL_META_RUNTIME("enable", enableDamage) = 0.0f;
 
-	int mult REFL_ATTR("multiplier", 2);
+	int mult REFL_META_RUNTIME("multiplier", 2);
 };
 
 

@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using ClangSharp;
 using ClangSharp.Interop;
 using CppRefl.CodeGeneration;
 using CppRefl.CodeGeneration.Reflection;
@@ -93,30 +94,57 @@ namespace CppRefl.Compiler
 		private static void GetMetadataInfo(CXCursor cursor, out MetadataInfo metadata)
 		{
 			bool isReflected = false;
-			var tags = new List<string>();
-			var attributes = new Dictionary<string, string>();
+			var metadataValues = new List<MetadataValue>();
+			var metadataNamedValues = new Dictionary<string, MetadataValue>();
 
 			CXChildVisitResult Visitor(CXCursor child)
 			{
 				if (child.Kind == CXCursorKind.CXCursor_AnnotateAttr)
 				{
 					string annotation = child.Spelling.ToString();
-					if (annotation.Contains(CppDefines.Annotation))
+					if (annotation.StartsWith(CppDefines.Annotation))
 					{
 						isReflected = true;
 
-						// Attributes are split by a special separator. e.g.:
-						// annotate(cpprefl)
-						// annotate(cpprefl,just_a_tag)
-						// annotate(cpprefl,tag_with_a_value,the_value)
-						var split = annotation.Split(CppDefines.AnnotationSeparator, 3);
-						if (split.Length == 2)
+						// Example annotations:
+						// cpprefl
+						// cpprefl-meta-{lifetime},Key,PossiblyEmptyValue
+						
+						var annotationItems = annotation.Split(':', 2);
+						
+						var annotationTypeItems = annotationItems[0].Split("-");
+						if (annotationTypeItems.Length == 1)
 						{
-							tags.Add(split[1]);
+							// Just a plain REFLECTED object.
+							return CXChildVisitResult.CXChildVisit_Continue;
 						}
-						else if (split.Length == 3)
+
+						if (annotationTypeItems.Length != 3)
 						{
-							attributes.Add(split[1], split[2]);
+							throw new Exception($"Unknown annotation type: {annotationItems[0]}");
+						}
+
+						// Parse the lifetime.
+						var lifetime = Enum.Parse<MetadataValueLifetime>(annotationTypeItems[2], true);
+
+						var annotationValueItems = annotationItems[1].Split(',', 2);
+						var name = annotationValueItems[0];
+						var value = annotationValueItems[1];
+						if (value == "")
+						{
+							metadataValues.Add(new MetadataValue()
+							{
+								Lifetime = lifetime,
+								Value = name
+							});
+						}
+						else
+						{
+							metadataNamedValues.Add(name, new MetadataValue()
+							{
+								Lifetime = lifetime,
+								Value = value
+							});
 						}
 					}
 				}
@@ -135,8 +163,8 @@ namespace CppRefl.Compiler
 			metadata = new MetadataInfo()
 			{
 				IsReflected = isReflected,
-				Tags = tags,
-				Attributes = attributes,
+				Tags = metadataValues,
+				Attributes = metadataNamedValues,
 				SourceLocation = GetSourceLocation(cursor),
 				Comment = comment
 			};

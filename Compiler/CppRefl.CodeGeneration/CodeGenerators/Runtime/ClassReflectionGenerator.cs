@@ -119,9 +119,9 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                 using (writer.WithFunction(
                            $"const ClassInfo& GetReflectedClass<{classInfo.Type.GloballyQualifiedName()}>()"))
                 {
-                    string classTags = CodeGeneratorUtil.WriteTagDefinitions(writer, "Class", classInfo.Metadata);
+                    string classTags = CodeGeneratorUtil.WriteMetadataTagDefinitions(writer, "Class", classInfo.Metadata);
                     string classAttributes =
-                        CodeGeneratorUtil.WriteAttributeDefinitions(writer, "Class", classInfo.Metadata);
+                        CodeGeneratorUtil.WriteMetadataAttributeDefinitions(writer, "Class", classInfo.Metadata);
 
                     // Write field info data.
                     if (classInfo.Fields.Count > 0)
@@ -131,9 +131,9 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                         foreach (var field in classInfo.Fields)
                         {
                             fieldTags[field] =
-                                CodeGeneratorUtil.WriteTagDefinitions(writer, field.Name, field.Metadata);
+                                CodeGeneratorUtil.WriteMetadataTagDefinitions(writer, field.Name, field.Metadata);
                             fieldAttributes[field] =
-                                CodeGeneratorUtil.WriteAttributeDefinitions(writer, field.Name, field.Metadata);
+                                CodeGeneratorUtil.WriteMetadataAttributeDefinitions(writer, field.Name, field.Metadata);
                         }
 
                         using (writer.WithCodeBlock(

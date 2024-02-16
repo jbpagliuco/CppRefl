@@ -22,9 +22,9 @@ namespace cpprefl
 			const ClassInfo* baseClass,
 			ClassConstructor ctor,
 			ClassDestructor dtor,
-			FieldView&& fields, 
-			TagView&& tags, 
-			AttributeView&& attributes) : ObjectInfo(std::move(tags), std::move(attributes)), mType(type), mBaseClass(baseClass), mConstructor(ctor), mDestructor(dtor), mFields(fields)
+			const FieldView& fields, 
+			const MetadataTagView& tags, 
+			const MetadataAttributeView& attributes) : ObjectInfo(tags, attributes), mType(type), mBaseClass(baseClass), mConstructor(ctor), mDestructor(dtor), mFields(fields)
 		{
 		}
 

@@ -70,8 +70,8 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                 writer.WriteLine("template <>");
                 using (writer.WithFunction($"const EnumInfo& GetReflectedEnum<{enumInfo.Type.GloballyQualifiedName()}>()"))
                 {
-                    string enumTags = CodeGeneratorUtil.WriteTagDefinitions(writer, "Enum", enumInfo.Metadata);
-                    string enumAttributes = CodeGeneratorUtil.WriteAttributeDefinitions(writer, "Enum", enumInfo.Metadata);
+                    string enumTags = CodeGeneratorUtil.WriteMetadataTagDefinitions(writer, "Enum", enumInfo.Metadata);
+                    string enumAttributes = CodeGeneratorUtil.WriteMetadataAttributeDefinitions(writer, "Enum", enumInfo.Metadata);
 
                     // List of enum info values
                     using (writer.WithCodeBlock(
@@ -80,9 +80,9 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                     {
                         foreach (var value in enumInfo.Values)
                         {
-                            string tags = value.Metadata.Tags.Count > 0 ? $"{enumInfo.Type.Name}::{value.Name}Tags" : "cpprefl::TagView()";
-                            string attributes = value.Metadata.Attributes.Count > 0 ? $"{enumInfo.Type.Name}::{value.Name}Attributes" : "cpprefl::AttributeView()";
-                            writer.WriteLine($"cpprefl::EnumValueInfo(\"{value.Name}\", (int){enumInfo.Type.GloballyQualifiedName()}::{value.Name}, {tags}, {attributes}),");
+	                        string enumValueTags = CodeGeneratorUtil.WriteMetadataTagDefinitions(writer, value.Name, value.Metadata);
+	                        string enumValueAttributes = CodeGeneratorUtil.WriteMetadataAttributeDefinitions(writer, value.Name, value.Metadata);
+                            writer.WriteLine($"cpprefl::EnumValueInfo(\"{value.Name}\", (int){enumInfo.Type.GloballyQualifiedName()}::{value.Name}, {enumValueTags}, {enumValueAttributes}),");
                         }
                     }
 

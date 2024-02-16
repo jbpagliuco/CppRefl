@@ -47,8 +47,8 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                 writer.WriteLine("template <>");
                 using (writer.WithFunction($"const FunctionInfo& GetReflectedFunction<&{functionInfo.GloballyQualifiedName()}>()"))
                 {
-                    string functionTags = CodeGeneratorUtil.WriteTagDefinitions(writer, "Function", functionInfo.Metadata);
-                    string functionAttributes = CodeGeneratorUtil.WriteAttributeDefinitions(writer, "Function", functionInfo.Metadata);
+                    string functionTags = CodeGeneratorUtil.WriteMetadataTagDefinitions(writer, "Function", functionInfo.Metadata);
+                    string functionAttributes = CodeGeneratorUtil.WriteMetadataAttributeDefinitions(writer, "Function", functionInfo.Metadata);
 
                     // Function arguments
                     if (functionInfo.ArgumentTypes.Any())

@@ -9,27 +9,44 @@
 #include "MetadataCode.reflgen.h"
 
 
-class REFLECTED ClassWithNoAttributes
+class REFLECTED ClassWithNoMetadata
 {
 	GENERATED_REFLECTION_CODE()
 };
 
 // Class comment.
-class REFL_TAG("SomeTag") REFL_TAG("Another Tag") REFL_ATTR("SomeAttr", "MyValue") REFL_ATTR("Second Attr", 12) ClassWithAttributes
+class
+	REFL_META_RUNTIME("TagNoSpaces")
+	REFL_META_RUNTIME("Tag Spaces")
+	REFL_META_RUNTIME("Attr", "Value")
+	REFL_META_RUNTIME("Attr 2", "Value 2")
+	REFL_META_RUNTIME("Attr Number", 12)
+	REFL_META_RUNTIME("Attr Unquoted String", ClassWithNoMetadata)
+	REFL_META_RUNTIME("Attr Multiple", 1, 2, 3)
+	REFL_META_COMPILE("Compile Only Tag")
+	REFL_META_COMPILE("Compile Only Attr", "Compile Only Value")
+	ClassWithMetadata
 {
 	GENERATED_REFLECTION_CODE()
 
 public:
 	/** Field comment. */
-	REFL_TAG("FieldTag") REFL_ATTR("FieldAttr", "Value") REFL_ATTR("NoQuotes", ClassWithAttributes)
+	REFL_META_RUNTIME("Field Tag") REFL_META_RUNTIME("Field Attr", "Value")
+	REFL_META_COMPILE("Compile Tag") REFL_META_COMPILE("Compile Attr", "Compile Value")
 	bool mBool;
 
 	/** Multline
 	 * function
 	 * comment.
 	 */
-	REFL_TAG("FunctionTag") REFL_ATTR("FunctionAttr", "Function")
+	REFL_META_RUNTIME("Method Tag") REFL_META_RUNTIME("Method Attr", "Value")
+	REFL_META_COMPILE("Compile Tag") REFL_META_COMPILE("Compile Attr", "Compile Value")
 	double Func(int param1, short param2);
+};
+
+enum class REFLECTED EnumWithMetadata
+{
+	GENERATED_REFLECTION_CODE()
 };
 
 #endif

@@ -17,9 +17,9 @@ namespace cpprefl
 			const char* name,
 			void* functionAddress,
 			const TypeInfo& returnType,
-			FunctionArgTypesView&& argumentTypes,
-			TagView&& tags,
-			AttributeView&& attributes) : ObjectInfo(std::move(tags), std::move(attributes)), mName(name), mFunctionAddress(functionAddress), mReturnType(returnType), mArgumentTypes(std::move(argumentTypes))
+			const FunctionArgTypesView& argumentTypes,
+			const MetadataTagView& tags,
+			const MetadataAttributeView& attributes) : ObjectInfo(tags, attributes), mName(name), mFunctionAddress(functionAddress), mReturnType(returnType), mArgumentTypes(argumentTypes)
 		{
 		}
 

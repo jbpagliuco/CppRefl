@@ -14,13 +14,13 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		/// <param name="name"></param>
 		/// <param name="metadata"></param>
 		/// <returns></returns>
-		public static string GetTagDefinitions(string name, MetadataInfo metadata)
+		public static string GetMetadataTagDefinitions(string name, MetadataInfo metadata)
 		{
 			StringBuilder sb = new();
-			sb.Append($"static constexpr std::array<cpprefl::TagType, {metadata.Tags.Count}> {name}Tags = {{");
-			foreach (var tag in metadata.Tags)
+			sb.Append($"static constexpr std::array<cpprefl::MetadataTag, {metadata.RuntimeMetadataTags.Count()}> {name}Tags = {{");
+			foreach (var value in metadata.RuntimeMetadataTags)
 			{
-				sb.Append($"\"{StripQuotes(tag)}\",");
+				sb.Append($"\"{StripQuotes(value.Value)}\",");
 			}
 			sb.Append("};");
 
@@ -34,15 +34,15 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		/// <param name="name"></param>
 		/// <param name="metadata"></param>
 		/// <returns></returns>
-		public static string WriteTagDefinitions(CodeWriter writer, string name, MetadataInfo metadata)
+		public static string WriteMetadataTagDefinitions(CodeWriter writer, string name, MetadataInfo metadata)
 		{
-			if (metadata.Tags.Count > 0)
+			if (metadata.RuntimeMetadataTags.Any())
 			{
-				writer.WriteLine(GetTagDefinitions(name, metadata));
+				writer.WriteLine(GetMetadataTagDefinitions(name, metadata));
 				return $"{name}Tags";
 			}
 
-			return "cpprefl::TagView()";
+			return "cpprefl::MetadataTagView()";
 		}
 
 		/// <summary>
@@ -51,13 +51,13 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		/// <param name="name"></param>
 		/// <param name="metadata"></param>
 		/// <returns></returns>
-		public static string GetAttributeDefinitions(string name, MetadataInfo metadata)
+		public static string GetMetadataAttributeDefinitions(string name, MetadataInfo metadata)
 		{
 			StringBuilder sb = new();
-			sb.Append($"static constexpr std::array<cpprefl::AttributeType, {metadata.Attributes.Count}> {name}Attributes = {{");
-			foreach (var attribute in metadata.Attributes)
+			sb.Append($"static constexpr std::array<cpprefl::MetadataAttribute, {metadata.RuntimeMetadataAttributes.Count()}> {name}Attributes = {{");
+			foreach (var pair in metadata.RuntimeMetadataAttributes)
 			{
-				var value = attribute.Value;
+				var value = pair.Value.Value;
 				
 				// If this attribute doesn't have quotes, then see if it's convertable to a number. If not, add quotes.
 				if (value[0] != '"')
@@ -68,7 +68,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 					}
 				}
 
-				sb.Append($"std::make_pair(\"{attribute.Key}\",{value}),");
+				sb.Append($"std::make_pair(\"{pair.Key}\",MetadataAttributeValue({value})),");
 			}
 			sb.Append("};");
 
@@ -82,15 +82,15 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		/// <param name="name"></param>
 		/// <param name="metadata"></param>
 		/// <returns></returns>
-		public static string WriteAttributeDefinitions(CodeWriter writer, string name, MetadataInfo metadata)
+		public static string WriteMetadataAttributeDefinitions(CodeWriter writer, string name, MetadataInfo metadata)
 		{
-			if (metadata.Attributes.Count > 0)
+			if (metadata.RuntimeMetadataAttributes.Any())
 			{
-				writer.WriteLine(GetAttributeDefinitions(name, metadata));
+				writer.WriteLine(GetMetadataAttributeDefinitions(name, metadata));
 				return $"{name}Attributes";
 			}
 
-			return "cpprefl::AttributeView()";
+			return "cpprefl::MetadataAttributeView()";
 		}
 
 		/// <summary>
