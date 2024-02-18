@@ -11,6 +11,9 @@
 
 namespace cpprefl
 {
+	template <typename Key, typename Value>
+	using RegistryHashMap = std::map<Key, Value>;
+
 	// Contains all the reflected information in a program.
 	class Registry
 	{
@@ -42,21 +45,21 @@ namespace cpprefl
 
 	private:
 		// Reflected types.
-		std::map<Name, TypeInfo> mTypes;
+		RegistryHashMap<Name, TypeInfo> mTypes;
 
 		// Reflected classes.
-		std::map<Name, ClassInfo> mClasses;
+		RegistryHashMap<Name, ClassInfo> mClasses;
 
 		// Reflected enums.
-		std::map<Name, EnumInfo> mEnums;
+		RegistryHashMap<Name, EnumInfo> mEnums;
 
 		// Reflected functions.
-		std::map<Name, FunctionInfo> mFunctions;
+		RegistryHashMap<Name, FunctionInfo> mFunctions;
 
 		// Dynamic array accessors.
-		std::map<Name, DynamicArrayFunctions> mDynamicArrayFunctions;
+		RegistryHashMap<Name, DynamicArrayFunctions> mDynamicArrayFunctions;
 
 		// Base classes.
-		std::map<const ClassInfo*, std::vector<const ClassInfo*>> mClassHierarchy;
+		RegistryHashMap<const ClassInfo*, std::vector<const ClassInfo*>> mClassHierarchy;
 	};
 }
