@@ -8,7 +8,7 @@ namespace cpprefl
 		return SystemRegistry;
 	}
 
-	TypeInfo& Registry::AddType(TypeInfo&& type)
+	const TypeInfo& Registry::AddType(TypeInfo&& type)
 	{
 		return mTypes.emplace(type.mName, type).first->second;
 	}

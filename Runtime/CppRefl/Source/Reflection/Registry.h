@@ -20,7 +20,7 @@ namespace cpprefl
 	public:
 		static Registry& GetSystemRegistry();
 
-		TypeInfo& AddType(TypeInfo&& type);
+		const TypeInfo& AddType(TypeInfo&& type);
 		const TypeInfo& GetType(const Name& name);
 
 		const ClassInfo& AddClass(ClassInfo&& classInfo);
