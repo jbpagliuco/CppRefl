@@ -32,7 +32,7 @@ namespace cpprefl
 	class EnumInfo : public ObjectInfo
 	{
 	public:
-		constexpr EnumInfo(const TypeInfo& type, EnumValueView values, MetadataTagView&& tags, MetadataAttributeView&& attributes) : ObjectInfo(std::move(tags), std::move(attributes)), mType(type), mValues(values)
+		constexpr EnumInfo(const TypeInfo& type, EnumValueView values, const MetadataTagView& tags, const MetadataAttributeView& attributes) : ObjectInfo(tags, attributes), mType(type), mValues(values)
 		{
 		}
 
