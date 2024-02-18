@@ -21,7 +21,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Optional
 							writer.WriteLine($$"""
 	                                            virtual const cpprefl::TypeInfo& GetReflectedType()const { return cpprefl::GetReflectedType<{{classInfo.Type.Name}}>(); }
 	                                            virtual const cpprefl::ClassInfo& GetReflectedClass()const { return cpprefl::GetReflectedClass<{{classInfo.Type.Name}}>(); }
-	                                            virtual const char* GetClassName()const { return cpprefl::GetTypeName<{{classInfo.Type.Name}}>(); }
+	                                            virtual const cpprefl::Name GetClassName()const { return cpprefl::GetTypeName<{{classInfo.Type.Name}}>(); }
 	                                            """);
 						}
 					}

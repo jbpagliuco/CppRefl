@@ -2,6 +2,8 @@
 
 #include <type_traits>
 
+#include "../CppReflHash.h"
+
 namespace cpprefl
 {
 	class ClassInfo;
@@ -34,7 +36,7 @@ namespace cpprefl
 	};
 
 	bool IsIntegerType(TypeKind typeKind);
-	bool IsRealType(TypeKind typeKind);
+	bool IsFloatingPointType(TypeKind typeKind);
 
 	template <typename T>
 	bool IsSameType(TypeKind typeKind);
@@ -43,12 +45,12 @@ namespace cpprefl
 	class TypeInfo
 	{
 	public:
-		TypeInfo(const char* name, TypeKind kind, size_t size) : mName(name), mKind(kind), mSize(size)
+		TypeInfo(const Name& name, TypeKind kind, size_t size) : mName(name), mKind(kind), mSize(size)
 		{
 		}
 
 		// Name of this type (fully qualified).
-		const char* mName;
+		Name mName;
 
 		// Type kind.
 		TypeKind mKind;

@@ -30,11 +30,11 @@ namespace cpprefl
 		return false;
 	}
 
-	const FieldInfo* ClassInfo::GetField(const char* fieldName) const
+	const FieldInfo* ClassInfo::GetField(const Name& fieldName) const
 	{
 		for (const auto& fieldInfo : mFields)
 		{
-			if (strcmp(fieldInfo.mName, fieldName) == 0)
+			if (fieldInfo.mName == fieldName)
 			{
 				return &fieldInfo;
 			}

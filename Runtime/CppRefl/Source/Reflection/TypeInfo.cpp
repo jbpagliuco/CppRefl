@@ -23,7 +23,7 @@ namespace cpprefl
 		}
 	}
 
-	bool IsRealType(TypeKind typeKind)
+	bool IsFloatingPointType(TypeKind typeKind)
 	{
 		switch (typeKind)
 		{

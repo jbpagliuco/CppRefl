@@ -1,10 +1,13 @@
 target_sources(CppRefl 
 	PUBLIC
+	CppReflConfig.h
+	CppReflHash.h
 	CppReflMarkup.h
 	CppReflMemory.h
 	CppReflStatics.h
 
 	PRIVATE
+	CppReflConfig.cpp
 	CppReflMemory.cpp
 )
 

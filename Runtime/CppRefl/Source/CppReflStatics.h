@@ -3,18 +3,14 @@
 #include <type_traits>
 
 #include "Reflection/TypeInfo.h"
-
-#if __cplusplus >= 202002L || _MSVC_LANG >= 202002L
-#define CPPREFL_CONCEPTS() 1
-#else
-#define CPPREFL_CONCEPTS() 0
-#endif
+#include "CppReflConfig.h"
+#include "CppReflHash.h"
 
 namespace CppReflPrivate
 {
 	// Creates a static type if it doesn't already exist.
 	template <typename T>
-	const cpprefl::TypeInfo& MaybeCreateReflectedType(const char* typeName);
+	const cpprefl::TypeInfo& MaybeCreateReflectedType(const cpprefl::Name& typeName);
 }
 
 namespace cpprefl
@@ -56,14 +52,14 @@ namespace cpprefl
 	template <void* FunctionAddress>
 	const FunctionInfo& GetReflectedFunction() = delete;
 
-
 	// Returns the name of a reflected class.
 	template <typename T>
-	const char* GetTypeName()
+	Name GetTypeName()
 	{
 		return GetReflectedType<T>().mName;
 	}
 
+	// Returns true if the given type represents the template parameter.
 	template <typename T>
 	bool IsSameType(const TypeInfo& type)
 	{
@@ -106,7 +102,7 @@ namespace cpprefl
 namespace CppReflPrivate
 {
 	template <typename T>
-	const cpprefl::TypeInfo& MaybeCreateReflectedType(const char* typeName)
+	const cpprefl::TypeInfo& MaybeCreateReflectedType(const cpprefl::Name& typeName)
 	{
 #if CPPREFL_CONCEPTS()
 		if constexpr (std::is_class_v<T> && cpprefl::ReflectedType<T>)

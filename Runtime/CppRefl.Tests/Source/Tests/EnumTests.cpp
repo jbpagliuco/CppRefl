@@ -8,7 +8,7 @@
 
 TEST(EnumTests, EnumTypes)
 {
-	EXPECT_STREQ(cpprefl::GetReflectedType<ReflectedEnum>().mName, "ReflectedEnum");
+	EXPECT_EQ(cpprefl::GetReflectedType<ReflectedEnum>().mName, cpprefl::Name("ReflectedEnum"));
 	EXPECT_EQ(&cpprefl::GetReflectedEnum<ReflectedEnum>().mType, &cpprefl::GetReflectedType<ReflectedEnum>());
 }
 
@@ -18,13 +18,13 @@ TEST(EnumTests, EnumValues)
 
 	EXPECT_EQ(enumInfo.mValues.size(), 3);
 
-	EXPECT_STREQ(enumInfo.mValues[0].mName, "EnumValue1");
+	EXPECT_EQ(enumInfo.mValues[0].mName, cpprefl::Name("EnumValue1"));
 	EXPECT_EQ(enumInfo.mValues[0].mValue, (int)ReflectedEnum::EnumValue1);
 
-	EXPECT_STREQ(enumInfo.mValues[1].mName, "Bar");
+	EXPECT_EQ(enumInfo.mValues[1].mName, cpprefl::Name("Bar"));
 	EXPECT_EQ(enumInfo.mValues[1].mValue, (int)ReflectedEnum::Bar);
 
-	EXPECT_STREQ(enumInfo.mValues[2].mName, "Foo");
+	EXPECT_EQ(enumInfo.mValues[2].mName, cpprefl::Name("Foo"));
 	EXPECT_EQ(enumInfo.mValues[2].mValue, (int)ReflectedEnum::Foo);
 }
 

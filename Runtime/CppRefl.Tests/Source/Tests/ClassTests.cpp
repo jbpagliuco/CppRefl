@@ -10,9 +10,9 @@ using namespace cpprefl;
 
 TEST(ClassTests, Names)
 {
-	EXPECT_STREQ(cpprefl::GetTypeName<::ReflectedClass>(), "ReflectedClass");
-	EXPECT_STREQ(cpprefl::GetTypeName<ReflectedStruct>(), "ReflectedStruct");
-	EXPECT_STREQ(cpprefl::GetTypeName<TestNamespace::ReflectedClass>(), "TestNamespace::ReflectedClass");
+	EXPECT_EQ(cpprefl::GetTypeName<::ReflectedClass>(), Name("ReflectedClass"));
+	EXPECT_EQ(cpprefl::GetTypeName<ReflectedStruct>(), Name("ReflectedStruct"));
+	EXPECT_EQ(cpprefl::GetTypeName<TestNamespace::ReflectedClass>(), Name("TestNamespace::ReflectedClass"));
 }
 
 TEST(ClassTests, Super)

@@ -13,7 +13,7 @@ namespace cpprefl
 		return mTypes.emplace(type.mName, type).first->second;
 	}
 
-	const TypeInfo& Registry::GetType(const char* name)
+	const TypeInfo& Registry::GetType(const Name& name)
 	{
 		return mTypes.at(name);
 	}
@@ -45,12 +45,12 @@ namespace cpprefl
 		return classInfo;
 	}
 
-	const ClassInfo& Registry::GetClass(const char* name)
+	const ClassInfo& Registry::GetClass(const Name& name)
 	{
 		return mClasses.at(name);
 	}
 
-	const ClassInfo* Registry::TryGetClass(const char* name)
+	const ClassInfo* Registry::TryGetClass(const Name& name)
 	{
 		if (mClasses.find(name) != mClasses.end())
 		{
@@ -65,12 +65,12 @@ namespace cpprefl
 		return mEnums.emplace(enumInfo.mType.mName, enumInfo).first->second;
 	}
 
-	const EnumInfo& Registry::GetEnum(const char* name)
+	const EnumInfo& Registry::GetEnum(const Name& name)
 	{
 		return mEnums.at(name);
 	}
 
-	const EnumInfo* Registry::TryGetEnum(const char* name)
+	const EnumInfo* Registry::TryGetEnum(const Name& name)
 	{
 		if (mEnums.find(name) != mEnums.end())
 		{
@@ -85,12 +85,12 @@ namespace cpprefl
 		return mFunctions.emplace(functionInfo.mName, functionInfo).first->second;
 	}
 
-	const FunctionInfo& Registry::GetFunction(const char* name)
+	const FunctionInfo& Registry::GetFunction(const Name& name)
 	{
 		return mFunctions.at(name);
 	}
 
-	const DynamicArrayFunctions& Registry::AddDynamicArrayFunctions(const char* name, const DynamicArrayFunctions& functions)
+	const DynamicArrayFunctions& Registry::AddDynamicArrayFunctions(const Name& name, const DynamicArrayFunctions& functions)
 	{
 		if (mDynamicArrayFunctions.find(name) == mDynamicArrayFunctions.end())
 		{
@@ -100,7 +100,7 @@ namespace cpprefl
 		return *GetDynamicArrayFunctions(name);
 	}
 
-	const DynamicArrayFunctions* Registry::GetDynamicArrayFunctions(const char* name)
+	const DynamicArrayFunctions* Registry::GetDynamicArrayFunctions(const Name& name)
 	{
 		if (mDynamicArrayFunctions.find(name) != mDynamicArrayFunctions.end())
 		{

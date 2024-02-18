@@ -1,7 +1,6 @@
 #pragma once
 
 #include <map>
-#include <string>
 
 #include "ClassInfo.h"
 #include "DynamicArray.h"
@@ -19,21 +18,21 @@ namespace cpprefl
 		static Registry& GetSystemRegistry();
 
 		TypeInfo& AddType(TypeInfo&& type);
-		const TypeInfo& GetType(const char* name);
+		const TypeInfo& GetType(const Name& name);
 
 		ClassInfo& AddClass(ClassInfo&& classInfo);
-		const ClassInfo& GetClass(const char* name);
-		const ClassInfo* TryGetClass(const char* name);
+		const ClassInfo& GetClass(const Name& name);
+		const ClassInfo* TryGetClass(const Name& name);
 
 		EnumInfo& AddEnum(EnumInfo&& enumInfo);
-		const EnumInfo& GetEnum(const char* name);
-		const EnumInfo* TryGetEnum(const char* name);
+		const EnumInfo& GetEnum(const Name& name);
+		const EnumInfo* TryGetEnum(const Name& name);
 
 		FunctionInfo& AddFunction(FunctionInfo&& functionInfo);
-		const FunctionInfo& GetFunction(const char* name);
+		const FunctionInfo& GetFunction(const Name& name);
 
-		const DynamicArrayFunctions& AddDynamicArrayFunctions(const char* name, const DynamicArrayFunctions& functions);
-		const DynamicArrayFunctions* GetDynamicArrayFunctions(const char* name);
+		const DynamicArrayFunctions& AddDynamicArrayFunctions(const Name& name, const DynamicArrayFunctions& functions);
+		const DynamicArrayFunctions* GetDynamicArrayFunctions(const Name& name);
 
 		// Get a list of a derived classes.
 		Span<const ClassInfo*> GetDerivedClasses(const ClassInfo& baseClass)const;
@@ -43,19 +42,19 @@ namespace cpprefl
 
 	private:
 		// Reflected types.
-		std::map<std::string, TypeInfo> mTypes;
+		std::map<Name, TypeInfo> mTypes;
 
 		// Reflected classes.
-		std::map<std::string, ClassInfo> mClasses;
+		std::map<Name, ClassInfo> mClasses;
 
 		// Reflected enums.
-		std::map<std::string, EnumInfo> mEnums;
+		std::map<Name, EnumInfo> mEnums;
 
 		// Reflected functions.
-		std::map<std::string, FunctionInfo> mFunctions;
+		std::map<Name, FunctionInfo> mFunctions;
 
 		// Dynamic array accessors.
-		std::map<std::string, DynamicArrayFunctions> mDynamicArrayFunctions;
+		std::map<Name, DynamicArrayFunctions> mDynamicArrayFunctions;
 
 		// Base classes.
 		std::map<const ClassInfo*, std::vector<const ClassInfo*>> mClassHierarchy;

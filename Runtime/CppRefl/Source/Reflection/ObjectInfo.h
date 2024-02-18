@@ -1,7 +1,6 @@
 #pragma once
 
-#include <string_view>
-
+#include "CppReflHash.h"
 #include "Span.h"
 
 namespace cpprefl
@@ -9,26 +8,26 @@ namespace cpprefl
 	// Value associated with an attribute.
 	struct MetadataAttributeValue
 	{
-		explicit constexpr MetadataAttributeValue(const char* value) : mString(value) {}
+		explicit constexpr MetadataAttributeValue(const Name& value) : mString(value) {}
 		explicit constexpr MetadataAttributeValue(int value) : mInt(value) {}
 		explicit constexpr MetadataAttributeValue(float value) : mFloat(value) {}
 
-		constexpr operator const char*() const { return mString; }
+		constexpr operator Name() const { return mString; }
 		constexpr operator int() const { return mInt; }
 		constexpr operator float() const { return mFloat; }
 
 		union
 		{
-			const char* mString;
+			Name mString;
 			int mInt;
 			float mFloat;
 		};
 	};
 
-	using MetadataTag = const char*;
+	using MetadataTag = Name;
 	using MetadataTagView = Span<MetadataTag>;
 
-	using MetadataAttributeKey = const char*;
+	using MetadataAttributeKey = Name;
 	using MetadataAttribute = std::pair<MetadataAttributeKey, MetadataAttributeValue>;
 	using MetadataAttributeView = Span<MetadataAttribute>;
 
@@ -59,7 +58,7 @@ namespace cpprefl
 		}
 
 	private:
-		static constexpr bool TagEquals(const MetadataTag& tag1, const MetadataTag& tag2) { return std::string_view(tag1) == std::string_view(tag2); }
-		static constexpr bool AttributeKeyEquals(const MetadataAttribute& attr1, const MetadataAttributeKey& attr2) { return std::string_view(attr1.first) == std::string_view(attr2); }
+		static constexpr bool TagEquals(const MetadataTag& tag1, const MetadataTag& tag2) { return tag1 == tag2; }
+		static constexpr bool AttributeKeyEquals(const MetadataAttribute& attr1, const MetadataAttributeKey& attr2) { return attr1.first == attr2; }
 	};
 }

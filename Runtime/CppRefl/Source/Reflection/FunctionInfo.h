@@ -14,7 +14,7 @@ namespace cpprefl
 	{
 	public:
 		FunctionInfo(
-			const char* name,
+			const Name& name,
 			void* functionAddress,
 			const TypeInfo& returnType,
 			const FunctionArgTypesView& argumentTypes,
@@ -24,7 +24,7 @@ namespace cpprefl
 		}
 
 		// Enum value name.
-		const char* mName;
+		Name mName;
 
 		// Function address.
 		void* mFunctionAddress;

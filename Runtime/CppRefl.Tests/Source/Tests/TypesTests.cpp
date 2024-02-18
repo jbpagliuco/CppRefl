@@ -11,9 +11,9 @@
 #include "Reflection/TypeInfo.h"
 
 template <typename T>
-void TestType(const char* expectedName, const cpprefl::TypeInfo& typeInfo = cpprefl::GetReflectedType<T>())
+void TestType(const cpprefl::Name& expectedName, const cpprefl::TypeInfo& typeInfo = cpprefl::GetReflectedType<T>())
 {
-	EXPECT_STREQ(typeInfo.mName, expectedName);
+	EXPECT_EQ(typeInfo.mName, expectedName);
 	EXPECT_EQ(typeInfo.mSize, sizeof(T));
 }
 
@@ -43,7 +43,7 @@ TEST(StaticTests, PrimitiveTypes)
 	TestType<char>("char", PrimitiveTypes::StaticReflectedClass().GetField("mString")->GetType());
 	TestType<int>("int", PrimitiveTypes::StaticReflectedClass().GetField("mIntArray")->GetType());
 
-	EXPECT_STREQ(cpprefl::GetReflectedType<void>().mName, "void");
+	EXPECT_EQ(cpprefl::GetReflectedType<void>().mName, cpprefl::Name("void"));
 }
 
 TEST(StaticTests, TypeInstance)
@@ -79,7 +79,7 @@ TEST(StaticTests, TypeInstance)
 
 TEST(StaticTests, ClassTypes)
 {
-	EXPECT_STREQ(cpprefl::GetReflectedType<PrimitiveTypes>().mName, "PrimitiveTypes");
+	EXPECT_EQ(cpprefl::GetReflectedType<PrimitiveTypes>().mName, cpprefl::Name("PrimitiveTypes"));
 	EXPECT_EQ(&PrimitiveTypes::StaticReflectedType(), &cpprefl::GetReflectedType<PrimitiveTypes>());
 	EXPECT_EQ(&PrimitiveTypes::StaticReflectedClass().mType, &cpprefl::GetReflectedType<PrimitiveTypes>());
 
@@ -89,9 +89,9 @@ TEST(StaticTests, ClassTypes)
 
 TEST(StaticTests, NameTests)
 {
-	EXPECT_STREQ(cpprefl::GetTypeName<int>(), "int");
-	EXPECT_STREQ(cpprefl::GetTypeName<PrimitiveTypes>(), "PrimitiveTypes");
-	EXPECT_STREQ(cpprefl::GetTypeName<ReflectedEnum>(), "ReflectedEnum");
+	EXPECT_EQ(cpprefl::GetTypeName<int>(), cpprefl::Name("int"));
+	EXPECT_EQ(cpprefl::GetTypeName<PrimitiveTypes>(), cpprefl::Name("PrimitiveTypes"));
+	EXPECT_EQ(cpprefl::GetTypeName<ReflectedEnum>(), cpprefl::Name("ReflectedEnum"));
 }
 
 #endif
