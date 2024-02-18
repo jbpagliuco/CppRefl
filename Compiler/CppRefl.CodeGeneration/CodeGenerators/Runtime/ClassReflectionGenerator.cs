@@ -156,7 +156,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                     }
 
                     using (writer.WithCodeBlock(
-                               "static ClassInfo& classInfo = cpprefl::Registry::GetSystemRegistry().AddClass(ClassInfo",
+                               "static const auto& classInfo = cpprefl::Registry::GetSystemRegistry().AddClass(ClassInfo",
                                "(", "));"))
                     {
                         using (writer.WithPostfix(","))

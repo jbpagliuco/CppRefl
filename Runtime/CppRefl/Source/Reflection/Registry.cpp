@@ -18,7 +18,7 @@ namespace cpprefl
 		return mTypes.at(name);
 	}
 
-	ClassInfo& Registry::AddClass(ClassInfo&& inClassInfo)
+	const ClassInfo& Registry::AddClass(ClassInfo&& inClassInfo)
 	{
 		auto& classInfo = mClasses.emplace(inClassInfo.mType->mName, inClassInfo).first->second;
 
@@ -60,7 +60,7 @@ namespace cpprefl
 		return nullptr;
 	}
 
-	EnumInfo& Registry::AddEnum(EnumInfo&& enumInfo)
+	const EnumInfo& Registry::AddEnum(EnumInfo&& enumInfo)
 	{
 		return mEnums.emplace(enumInfo.mType->mName, enumInfo).first->second;
 	}
@@ -80,7 +80,7 @@ namespace cpprefl
 		return nullptr;
 	}
 
-	FunctionInfo& Registry::AddFunction(FunctionInfo&& functionInfo)
+	const FunctionInfo& Registry::AddFunction(FunctionInfo&& functionInfo)
 	{
 		return mFunctions.emplace(functionInfo.mName, functionInfo).first->second;
 	}

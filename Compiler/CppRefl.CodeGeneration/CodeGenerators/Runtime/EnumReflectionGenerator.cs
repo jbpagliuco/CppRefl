@@ -86,7 +86,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                         }
                     }
 
-                    using (writer.WithCodeBlock("static EnumInfo& enumInfo = cpprefl::Registry::GetSystemRegistry().AddEnum(EnumInfo", "(", "));"))
+                    using (writer.WithCodeBlock("static const auto& enumInfo = cpprefl::Registry::GetSystemRegistry().AddEnum(EnumInfo", "(", "));"))
                     {
                         using (writer.WithPostfix(","))
                         {
