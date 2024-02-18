@@ -9,3 +9,19 @@
 #else
 #define CPPREFL_CONCEPTS() 0
 #endif
+
+namespace cpprefl
+{
+	// Class to configure CppRefl.
+	class IConfig
+	{
+	public:
+		static IConfig& Get();
+		static void Set(IConfig* config);
+
+		virtual ~IConfig() = default;
+
+		virtual void* AllocateMemory(size_t numBytes) = 0;
+		virtual void FreeMemory(void* memory) = 0;
+	};
+}
