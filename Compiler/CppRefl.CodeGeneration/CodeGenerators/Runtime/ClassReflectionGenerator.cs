@@ -170,7 +170,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                             var ctor = classInfo.IsAbstract ? "nullptr" : $"[](void * obj) {{ new(obj) {classInfo.Type.GloballyQualifiedName()}(); }}";
                             var dtor = classInfo.IsAbstract ? "nullptr" : $"[](void * obj) {{ (({classInfo.Type.GloballyQualifiedName()}*)obj)->~{classInfo.Type.Name}(); }}";
 
-                            writer.WriteLine($"GetReflectedType<{classInfo.Type.GloballyQualifiedName()}>()");
+                            writer.WriteLine($"&GetReflectedType<{classInfo.Type.GloballyQualifiedName()}>()");
                             writer.WriteLine(
                                 baseClass != null && baseClass.Metadata.IsReflected && !baseClass.Type.IsTemplated
                                     ? $"&GetReflectedClass<{baseClass.Type.GloballyQualifiedName()}>()"

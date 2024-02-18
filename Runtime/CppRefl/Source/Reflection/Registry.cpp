@@ -20,7 +20,7 @@ namespace cpprefl
 
 	ClassInfo& Registry::AddClass(ClassInfo&& inClassInfo)
 	{
-		auto& classInfo = mClasses.emplace(inClassInfo.mType.mName, inClassInfo).first->second;
+		auto& classInfo = mClasses.emplace(inClassInfo.mType->mName, inClassInfo).first->second;
 
 		// Update the class heirarchy.
 		mClassHierarchy[&classInfo] = {};
@@ -62,7 +62,7 @@ namespace cpprefl
 
 	EnumInfo& Registry::AddEnum(EnumInfo&& enumInfo)
 	{
-		return mEnums.emplace(enumInfo.mType.mName, enumInfo).first->second;
+		return mEnums.emplace(enumInfo.mType->mName, enumInfo).first->second;
 	}
 
 	const EnumInfo& Registry::GetEnum(const Name& name)

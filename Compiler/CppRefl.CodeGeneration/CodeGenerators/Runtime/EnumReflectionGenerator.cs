@@ -90,7 +90,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                     {
                         using (writer.WithPostfix(","))
                         {
-                            writer.WriteLine($"GetReflectedType<{enumInfo.Type.GloballyQualifiedName()}>()");
+                            writer.WriteLine($"&GetReflectedType<{enumInfo.Type.GloballyQualifiedName()}>()");
                             writer.WriteLine($"{enumInfo.Type.Name}Values");
                             writer.WriteLine(enumTags);
                         }

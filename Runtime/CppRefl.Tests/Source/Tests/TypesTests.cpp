@@ -81,7 +81,7 @@ TEST(StaticTests, ClassTypes)
 {
 	EXPECT_EQ(cpprefl::GetReflectedType<PrimitiveTypes>().mName, cpprefl::Name("PrimitiveTypes"));
 	EXPECT_EQ(&PrimitiveTypes::StaticReflectedType(), &cpprefl::GetReflectedType<PrimitiveTypes>());
-	EXPECT_EQ(&PrimitiveTypes::StaticReflectedClass().mType, &cpprefl::GetReflectedType<PrimitiveTypes>());
+	EXPECT_EQ(PrimitiveTypes::StaticReflectedClass().mType, &cpprefl::GetReflectedType<PrimitiveTypes>());
 
 	PrimitiveTypes p;
 	EXPECT_EQ(&PrimitiveTypes::StaticReflectedClass(), &p.GetReflectedClass());

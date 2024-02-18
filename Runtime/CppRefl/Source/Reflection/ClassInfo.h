@@ -18,7 +18,7 @@ namespace cpprefl
 	{
 	public:
 		ClassInfo(
-			const TypeInfo& type,
+			const TypeInfo* type,
 			const ClassInfo* baseClass,
 			ClassConstructor ctor,
 			ClassDestructor dtor,
@@ -29,7 +29,7 @@ namespace cpprefl
 		}
 
 		// The type of this class.
-		const TypeInfo& mType;
+		const TypeInfo* mType;
 
 		// Base class.
 		const ClassInfo* mBaseClass;

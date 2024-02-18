@@ -9,7 +9,7 @@
 TEST(EnumTests, EnumTypes)
 {
 	EXPECT_EQ(cpprefl::GetReflectedType<ReflectedEnum>().mName, cpprefl::Name("ReflectedEnum"));
-	EXPECT_EQ(&cpprefl::GetReflectedEnum<ReflectedEnum>().mType, &cpprefl::GetReflectedType<ReflectedEnum>());
+	EXPECT_EQ(cpprefl::GetReflectedEnum<ReflectedEnum>().mType, &cpprefl::GetReflectedType<ReflectedEnum>());
 }
 
 TEST(EnumTests, EnumValues)
