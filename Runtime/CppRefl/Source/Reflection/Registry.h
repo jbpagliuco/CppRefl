@@ -20,18 +20,22 @@ namespace cpprefl
 	public:
 		static Registry& GetSystemRegistry();
 
-		const TypeInfo& AddType(TypeInfo type);
+		template <typename... Params>
+		const TypeInfo& EmplaceType(Name name, Params&&... params);
 		const TypeInfo& GetType(const Name& name);
 
-		const ClassInfo& AddClass(ClassInfo classInfo);
+		template <typename... Params>
+		const ClassInfo& EmplaceClass(const TypeInfo* typeInfo, Params&&... params);
 		const ClassInfo& GetClass(const Name& name);
 		const ClassInfo* TryGetClass(const Name& name);
 
-		const EnumInfo& AddEnum(EnumInfo enumInfo);
+		template <typename... Params>
+		const EnumInfo& EmplaceEnum(const TypeInfo* typeInfo, Params&&... params);
 		const EnumInfo& GetEnum(const Name& name);
 		const EnumInfo* TryGetEnum(const Name& name);
 
-		const FunctionInfo& AddFunction(FunctionInfo functionInfo);
+		template <typename... Params>
+		const FunctionInfo& EmplaceFunction(Name name, Params&&... params);
 		const FunctionInfo& GetFunction(const Name& name);
 
 		const DynamicArrayFunctions& AddDynamicArrayFunctions(const Name& name, DynamicArrayFunctions functions);
@@ -62,4 +66,50 @@ namespace cpprefl
 		// Base classes.
 		RegistryHashMap<const ClassInfo*, std::vector<const ClassInfo*>> mClassHierarchy;
 	};
+
+	template <typename ... Params>
+	const TypeInfo& Registry::EmplaceType(Name name, Params&&... params)
+	{
+		return mTypes.try_emplace(name, name, std::forward<Params>(params)...).first->second;
+	}
+
+	template <typename ... Params>
+	const ClassInfo& Registry::EmplaceClass(const TypeInfo* typeInfo, Params&&... params)
+	{
+		auto& classInfo = mClasses.try_emplace(typeInfo->mName, typeInfo, std::forward<Params>(params)...).first->second;
+
+		// Update the class heirarchy.
+		mClassHierarchy[&classInfo] = {};
+
+		// Update all base classes.
+		const ClassInfo* baseClass = classInfo.mBaseClass;
+		while (baseClass != nullptr)
+		{
+			if (mClassHierarchy.find(baseClass) == mClassHierarchy.end())
+			{
+				mClassHierarchy[baseClass] = { &classInfo };
+			}
+			else
+			{
+				mClassHierarchy[baseClass].push_back(&classInfo);
+			}
+
+			baseClass = baseClass->mBaseClass;
+		}
+
+
+		return classInfo;
+	}
+
+	template <typename ... Params>
+	const EnumInfo& Registry::EmplaceEnum(const TypeInfo* typeInfo, Params&&... params)
+	{
+		return mEnums.try_emplace(typeInfo->mName, typeInfo, std::forward<Params>(params)...).first->second;
+	}
+
+	template <typename ... Params>
+	const FunctionInfo& Registry::EmplaceFunction(Name name, Params&&... params)
+	{
+		return mFunctions.try_emplace(name, name, std::forward<Params>(params)...).first->second;
+	}
 }

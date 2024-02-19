@@ -8,41 +8,9 @@ namespace cpprefl
 		return SystemRegistry;
 	}
 
-	const TypeInfo& Registry::AddType(TypeInfo type)
-	{
-		return mTypes.emplace(type.mName, type).first->second;
-	}
-
 	const TypeInfo& Registry::GetType(const Name& name)
 	{
 		return mTypes.at(name);
-	}
-
-	const ClassInfo& Registry::AddClass(ClassInfo inClassInfo)
-	{
-		auto& classInfo = mClasses.emplace(inClassInfo.mType->mName, inClassInfo).first->second;
-
-		// Update the class heirarchy.
-		mClassHierarchy[&classInfo] = {};
-
-		// Update all base classes.
-		const ClassInfo* baseClass = classInfo.mBaseClass;
-		while (baseClass != nullptr)
-		{
-			if (mClassHierarchy.find(baseClass) == mClassHierarchy.end())
-			{
-				mClassHierarchy[baseClass] = { &classInfo };
-			}
-			else
-			{
-				mClassHierarchy[baseClass].push_back(&classInfo);
-			}
-
-			baseClass = baseClass->mBaseClass;
-		}
-
-
-		return classInfo;
 	}
 
 	const ClassInfo& Registry::GetClass(const Name& name)
@@ -60,11 +28,6 @@ namespace cpprefl
 		return nullptr;
 	}
 
-	const EnumInfo& Registry::AddEnum(EnumInfo enumInfo)
-	{
-		return mEnums.emplace(enumInfo.mType->mName, enumInfo).first->second;
-	}
-
 	const EnumInfo& Registry::GetEnum(const Name& name)
 	{
 		return mEnums.at(name);
@@ -78,11 +41,6 @@ namespace cpprefl
 		}
 
 		return nullptr;
-	}
-
-	const FunctionInfo& Registry::AddFunction(FunctionInfo functionInfo)
-	{
-		return mFunctions.emplace(functionInfo.mName, functionInfo).first->second;
 	}
 
 	const FunctionInfo& Registry::GetFunction(const Name& name)

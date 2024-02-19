@@ -108,7 +108,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                 using (writer.WithFunction($"const TypeInfo& GetReflectedType<{classInfo.Type.GloballyQualifiedName()}>()"))
                 {
                     writer.WriteLine(
-                        $"static auto& type = cpprefl::Registry::GetSystemRegistry().AddType(cpprefl::TypeInfo(\"{classInfo.Type.QualifiedName()}\", cpprefl::TypeKind::Class, sizeof({classInfo.Type.GloballyQualifiedName()})));");
+                        $"static auto& type = cpprefl::Registry::GetSystemRegistry().EmplaceType(\"{classInfo.Type.QualifiedName()}\", cpprefl::TypeKind::Class, sizeof({classInfo.Type.GloballyQualifiedName()}));");
                     writer.WriteLine("return type;");
                 }
 
@@ -156,8 +156,8 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                     }
 
                     using (writer.WithCodeBlock(
-                               "static const auto& classInfo = cpprefl::Registry::GetSystemRegistry().AddClass(ClassInfo",
-                               "(", "));"))
+                               "static const auto& classInfo = cpprefl::Registry::GetSystemRegistry().EmplaceClass",
+                               "(", ");"))
                     {
                         using (writer.WithPostfix(","))
                         {
