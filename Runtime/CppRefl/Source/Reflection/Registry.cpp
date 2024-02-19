@@ -8,7 +8,7 @@ namespace cpprefl
 		return SystemRegistry;
 	}
 
-	const TypeInfo& Registry::AddType(TypeInfo&& type)
+	const TypeInfo& Registry::AddType(TypeInfo type)
 	{
 		return mTypes.emplace(type.mName, type).first->second;
 	}
@@ -18,7 +18,7 @@ namespace cpprefl
 		return mTypes.at(name);
 	}
 
-	const ClassInfo& Registry::AddClass(ClassInfo&& inClassInfo)
+	const ClassInfo& Registry::AddClass(ClassInfo inClassInfo)
 	{
 		auto& classInfo = mClasses.emplace(inClassInfo.mType->mName, inClassInfo).first->second;
 
@@ -60,7 +60,7 @@ namespace cpprefl
 		return nullptr;
 	}
 
-	const EnumInfo& Registry::AddEnum(EnumInfo&& enumInfo)
+	const EnumInfo& Registry::AddEnum(EnumInfo enumInfo)
 	{
 		return mEnums.emplace(enumInfo.mType->mName, enumInfo).first->second;
 	}
@@ -80,7 +80,7 @@ namespace cpprefl
 		return nullptr;
 	}
 
-	const FunctionInfo& Registry::AddFunction(FunctionInfo&& functionInfo)
+	const FunctionInfo& Registry::AddFunction(FunctionInfo functionInfo)
 	{
 		return mFunctions.emplace(functionInfo.mName, functionInfo).first->second;
 	}
@@ -90,7 +90,7 @@ namespace cpprefl
 		return mFunctions.at(name);
 	}
 
-	const DynamicArrayFunctions& Registry::AddDynamicArrayFunctions(const Name& name, const DynamicArrayFunctions& functions)
+	const DynamicArrayFunctions& Registry::AddDynamicArrayFunctions(const Name& name, DynamicArrayFunctions functions)
 	{
 		if (mDynamicArrayFunctions.find(name) == mDynamicArrayFunctions.end())
 		{

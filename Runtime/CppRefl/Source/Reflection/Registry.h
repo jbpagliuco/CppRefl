@@ -20,21 +20,21 @@ namespace cpprefl
 	public:
 		static Registry& GetSystemRegistry();
 
-		const TypeInfo& AddType(TypeInfo&& type);
+		const TypeInfo& AddType(TypeInfo type);
 		const TypeInfo& GetType(const Name& name);
 
-		const ClassInfo& AddClass(ClassInfo&& classInfo);
+		const ClassInfo& AddClass(ClassInfo classInfo);
 		const ClassInfo& GetClass(const Name& name);
 		const ClassInfo* TryGetClass(const Name& name);
 
-		const EnumInfo& AddEnum(EnumInfo&& enumInfo);
+		const EnumInfo& AddEnum(EnumInfo enumInfo);
 		const EnumInfo& GetEnum(const Name& name);
 		const EnumInfo* TryGetEnum(const Name& name);
 
-		const FunctionInfo& AddFunction(FunctionInfo&& functionInfo);
+		const FunctionInfo& AddFunction(FunctionInfo functionInfo);
 		const FunctionInfo& GetFunction(const Name& name);
 
-		const DynamicArrayFunctions& AddDynamicArrayFunctions(const Name& name, const DynamicArrayFunctions& functions);
+		const DynamicArrayFunctions& AddDynamicArrayFunctions(const Name& name, DynamicArrayFunctions functions);
 		const DynamicArrayFunctions* GetDynamicArrayFunctions(const Name& name);
 
 		// Get a list of a derived classes.
