@@ -22,10 +22,10 @@ namespace cpprefl
 	{
 	public:
 		constexpr StringHash(const char* str, size_t length) :
-			mHash(HashFunction(str, length))
 #if CPPREFL_STORE_NAMES()
-			, mString(str)
+			mString(str),
 #endif
+			mHash(HashFunction(str, length))
 		{
 		}
 
@@ -33,8 +33,8 @@ namespace cpprefl
 		{
 		}
 
-		template <size_t Length>
-		constexpr StringHash(const char str[Length]) : StringHash(str, Length)
+		template <size_t Size>
+		constexpr StringHash(const char str[Size]) : StringHash(str, Size - 1)
 		{
 		}
 
