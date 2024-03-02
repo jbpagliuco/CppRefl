@@ -37,8 +37,8 @@ enum class REFLECTED MissionType
 // Example of how to use reflected enums. (NB: Output is only a rough example of what you'd see)
 
 // Ways to get access to the reflected class:
-> cpprefl::Registry::GetSystemRegistry().GetEnum("ReflectedEnum")
-> cpprefl::GetReflectedEnum<MissionType>()
+> const cpprefl::EnumInfo& enumInfo = cpprefl::Registry::GetSystemRegistry().GetEnum("ReflectedEnum")
+> const cpprefl::EnumInfo& enumInfo = cpprefl::GetReflectedEnum<MissionType>()
 
 // Get the values in an enum.
 > cpprefl::GetReflectedEnum<MissionType>().mValues
@@ -64,10 +64,10 @@ public:
 // Example of how to use reflected classes (NB: Output is only a rough example of what you'd see).
 
 // Ways to get access to the reflected class:
-> cpprefl::Registry::GetSystemRegistry().GetClass("ShaderFloatParameter")
-> cpprefl::GetReflectedClass<ShaderFloatParameter>()
-> ShaderFloatParameter::StaticReflectedClass()
-> ShaderFloatParameter f; f.GetReflectedClass()
+> const cpprefl::ClassInfo& classInfo = cpprefl::Registry::GetSystemRegistry().GetClass("ShaderFloatParameter")
+> const cpprefl::ClassInfo& classInfo = cpprefl::GetReflectedClass<ShaderFloatParameter>()
+> const cpprefl::ClassInfo& classInfo = ShaderFloatParameter::StaticReflectedClass()
+> ShaderFloatParameter f; const cpprefl::ClassInfo& classInfo = f.GetReflectedClass()
 
 // Get the fields of a class.
 > cpprefl::GetReflectedClass<ShaderFloatParameter>().mFields
