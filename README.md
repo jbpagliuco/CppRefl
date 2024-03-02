@@ -3,11 +3,11 @@ CppRefl is a C++ reflection compiler and code generator. It uses Clang to parse 
 
 ### Why Use Reflection?
 Reflection is an incredibly powerful tool that gives you access to the layout of your program at runtime. This enables you to do things like:
-- Look up and invoke a function by name (great for communication across languages).
-- Write code the can serialize the data in a class, without needing to explicitly know the layout of that class.
+- Look up and invoke a function by name (e.g. for console commands, cross-programming language communication).
+- Write code the can serialize the data in a class in a generic manner.
 
 ### Why Use Code Generation?
-Oftentimes in C++ code, you can achieve a lite version of code generation using preprocessor macros. While this can work for most cases, macros cannot handle everything. And for anything even remotely complex, you often end up with code that is incredibly hard to read and debug.
+Oftentimes you might create commonly useful functions for multiple different classes, or maybe add special values to an enum to mark the max/min values. With C++, most of the time you can achieve these things using preprocessor macros or maybe templates. While this can work for most cases, they cannot handle everything without getting unwieldly (ever seen how to overload macros?). And for anything even remotely complex, you often end up with code that is incredibly hard to read and debug. Real code generation cuts down on the weirdness while giving you maximum power to get you what you're looking for.
 
 ---
 
@@ -37,8 +37,8 @@ enum class REFLECTED MissionType
 // Example of how to use reflected enums. (NB: Output is only a rough example of what you'd see)
 
 // Ways to get access to the reflected class:
-> cpprefl::Registry::GetSystemRegistry().GetEnum("ReflectedEnum")
-> cpprefl::GetReflectedEnum<MissionType>()
+> const cpprefl::EnumInfo* enumInfo = cpprefl::Registry::GetSystemRegistry().TryGetEnum("ReflectedEnum")
+> const cpprefl::EnumInfo& enumInfo = cpprefl::GetReflectedEnum<MissionType>()
 
 // Get the values in an enum.
 > cpprefl::GetReflectedEnum<MissionType>().mValues
@@ -64,10 +64,10 @@ public:
 // Example of how to use reflected classes (NB: Output is only a rough example of what you'd see).
 
 // Ways to get access to the reflected class:
-> cpprefl::Registry::GetSystemRegistry().GetClass("ShaderFloatParameter")
-> cpprefl::GetReflectedClass<ShaderFloatParameter>()
-> ShaderFloatParameter::StaticReflectedClass()
-> ShaderFloatParameter f; f.GetReflectedClass()
+> const cpprefl::ClassInfo* classInfo = cpprefl::Registry::GetSystemRegistry().TryGetClass("ShaderFloatParameter")
+> const cpprefl::ClassInfo& classInfo = cpprefl::GetReflectedClass<ShaderFloatParameter>()
+> const cpprefl::ClassInfo& classInfo = ShaderFloatParameter::StaticReflectedClass()
+> ShaderFloatParameter f; const cpprefl::ClassInfo& classInfo = f.GetReflectedClass()
 
 // Get the fields of a class.
 > cpprefl::GetReflectedClass<ShaderFloatParameter>().mFields
