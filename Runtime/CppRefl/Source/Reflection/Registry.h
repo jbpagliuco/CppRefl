@@ -70,6 +70,28 @@ namespace cpprefl
 	template <typename ... Params>
 	const TypeInfo& Registry::EmplaceType(Name name, Params&&... params)
 	{
+#if CPPREFL_DEBUG()
+		// Ensure this type has is unique.
+		if (mTypes.find(name) != mTypes.end())
+		{
+			const auto& existingTypeInfo = mTypes.at(name);
+
+#if CPPREFL_STORE_NAMES()
+			if (strcmp(existingTypeInfo.mName.mString, name.mString) != 0)
+			{
+				CPPREFL_INTERNAL_LOG(
+					LogLevel::Fatal, 
+					"Hash collision! Types '%s' and '%s' both have the same hash value: %zu. Either change one of the type names or use a different hashing algorithm.", 
+					existingTypeInfo.mName.mString, name.mString, name.mHash);
+			}
+
+			CPPREFL_INTERNAL_LOG(LogLevel::Error, "Tried to add the same type '%s' twice. How did this happen?", name.mString);
+#else
+			CPPREFL_INTERNAL_LOG(LogLevel::Error, "Tried to add the same type (hash ='%zu') twice. How did this happen?", name.mHash);
+#endif
+		}
+#endif
+
 		return mTypes.try_emplace(name, name, std::forward<Params>(params)...).first->second;
 	}
 

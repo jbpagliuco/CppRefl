@@ -1,8 +1,15 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace CppRefl.CodeGeneration.Reflection
 {
+	public class TypeHashCollisionException(TypeInfo typeInfo1, TypeInfo typeInfo2) : HashCollisionException($"Types '{typeInfo1}' and '{typeInfo2}' have the same hashes.");
+	public class FunctionHashCollisionException(FunctionInfo functionInfo, FunctionInfo functionInfo2) : HashCollisionException($"Functions '{functionInfo}' and '{functionInfo2}' have the same hashes.");
+	public class FieldHashCollisionException(ClassInfo classInfo, FieldInfo fieldInfo1, FieldInfo fieldInfo2) : HashCollisionException($"Class fields '{classInfo}::{fieldInfo1}' and '{classInfo}::{fieldInfo2}' have the same hashes.");
+	public class MethodHashCollisionException(ClassInfo classInfo, MethodInfo methodInfo1, MethodInfo methodInfo2) : HashCollisionException($"Class methods '{classInfo}::{methodInfo1}' and '{classInfo}::{methodInfo2}' have the same hashes.");
+
 	/// <summary>
 	/// Objects defined in a single file.
 	/// </summary>
@@ -65,6 +72,12 @@ namespace CppRefl.CodeGeneration.Reflection
 		public IDictionary<string, TypeInfo> Types { get; init; } = new Dictionary<string, TypeInfo>();
 
 		/// <summary>
+		/// Lookup table for type hashes.
+		/// </summary>
+		[JsonIgnore]
+		private IDictionary<uint, TypeInfo> TypeHashes { get; } = new Dictionary<uint, TypeInfo>();
+
+		/// <summary>
 		/// Reflected classes.
 		/// </summary>
 		public IDictionary<string, ClassInfo> Classes { get; init; } = new Dictionary<string, ClassInfo>();
@@ -84,6 +97,40 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// </summary>
 		public IDictionary<string, FunctionInfo> Functions { get; init; } = new Dictionary<string, FunctionInfo>();
 
+		/// <summary>
+		/// Lookup table for function name hashes.
+		/// </summary>
+		[JsonIgnore]
+		private IDictionary<uint, FunctionInfo> FunctionHashes { get; } = new Dictionary<uint, FunctionInfo>();
+
+		/// <summary>
+		/// Function used to hash string names.
+		/// </summary>
+		[JsonIgnore]
+		public Func<string, uint> HashFunction { get; init; } = Hash.Crc32;
+
+		/// <summary>
+		/// Try to add an object to a dictionary.
+		/// </summary>
+		/// <param name="objectInfo"></param>
+		/// <param name="objects"></param>
+		/// <param name="hashes"></param>
+		/// <param name="collidingItem"></param>
+		public bool TryAddObject<T>(T objectInfo, IDictionary<string, T> objects, IDictionary<uint, T> hashes, [NotNullWhen(false)] out T? collidingItem) where T : INameMixin
+		{
+			string name = objectInfo.QualifiedName();
+
+			collidingItem = Hash.FindHashCollision(hashes, name, x => x.QualifiedName(), HashFunction, out var hash);
+			if (collidingItem != null)
+			{
+				return false;
+			}
+
+			objects.Add(name, objectInfo);
+			hashes.Add(hash, objectInfo);
+
+			return true;
+		}
 
 		/// <summary>
 		/// Returns a type found in a collection, otherwise returns null.
@@ -117,7 +164,15 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Create a reflected type.
 		/// </summary>
 		/// <param name="typeInfo"></param>
-		public void AddType(TypeInfo typeInfo) => Types.Add(typeInfo.QualifiedName(), typeInfo);
+		public TypeInfo AddType(TypeInfo typeInfo)
+		{
+			if (!TryAddObject(typeInfo, Types, TypeHashes, out var collidingTypeInfo))
+			{
+				throw new TypeHashCollisionException(typeInfo, collidingTypeInfo);
+			}
+
+			return typeInfo;
+		}
 
 		/// <summary>
 		/// Returns a type in this registry.
@@ -131,7 +186,23 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Add a class to this registry.
 		/// </summary>
 		/// <param name="classInfo"></param>
-		public void AddClass(ClassInfo classInfo) => Classes.Add(classInfo.Type.QualifiedName(), classInfo);
+		public void AddClass(ClassInfo classInfo)
+		{
+			// Check for hash collisions.
+			var collidingFields = Hash.FindHashCollision(classInfo.Fields, x => x.Name, HashFunction);
+			if (collidingFields != null)
+			{
+				throw new FieldHashCollisionException(classInfo, collidingFields.Item1, collidingFields.Item2);
+			}
+
+			var collidingMethods = Hash.FindHashCollision(classInfo.Methods, x => x.Name, HashFunction);
+			if (collidingMethods != null)
+			{
+				throw new MethodHashCollisionException(classInfo, collidingMethods.Item1, collidingMethods.Item2);
+			}
+
+			Classes.Add(classInfo.Type.QualifiedName(), classInfo);
+		}
 
 		/// <summary>
 		/// Returns a class in this registry.
@@ -207,7 +278,15 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Add an function to this registry.
 		/// </summary>
 		/// <param name="functionInfo"></param>
-		public void AddFunction(FunctionInfo functionInfo) => Functions.Add(functionInfo.QualifiedName(), functionInfo);
+		public FunctionInfo AddFunction(FunctionInfo functionInfo)
+		{
+			if (!TryAddObject(functionInfo, Functions, FunctionHashes, out var collidingFunctionInfo))
+			{
+				throw new FunctionHashCollisionException(functionInfo, collidingFunctionInfo);
+			}
+
+			return functionInfo;
+		}
 
 		/// <summary>
 		/// Returns an function in this registry.

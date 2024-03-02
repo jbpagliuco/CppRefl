@@ -13,5 +13,7 @@
 		public required TypeInstanceInfo TypeInstance { get; init; }
 
 		public TypeInfo Type => TypeInstance.Type;
+
+		public override string ToString() => Name;
 	}
 }

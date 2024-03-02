@@ -1,24 +1,41 @@
 #include "CppReflConfig.h"
 
+#include <cstdarg>
 #include <cstdlib>
+#include <cstdio>
 
 namespace cpprefl
 {
-	class DefaultConfig : public IConfig
+	void* IConfig::AllocateMemory(size_t numBytes)
 	{
-	public:
-		void* AllocateMemory(size_t numBytes) override
-		{
-			return std::malloc(numBytes);
-		}
+		return std::malloc(numBytes);
+	}
 
-		void FreeMemory(void* memory) override
-		{
-			std::free(memory);
-		}
-	};
+	void IConfig::FreeMemory(void* memory)
+	{
+		std::free(memory);
+	}
 
-	DefaultConfig s_defaultConfig;
+	void IConfig::Log(LogLevel level, const char* fmt, ...)
+	{
+		static const char* const levelStrings[] =
+		{
+			"Warning",
+			"Error",
+			"Fatal"
+		};
+
+		va_list args;
+		va_start(args, fmt);
+		{
+			std::printf("CppRefl [%s]: ", levelStrings[static_cast<int>(level)]);
+			std::vprintf(fmt, args);
+			std::printf("\n");
+		}
+		va_end(args);
+	}
+
+	IConfig s_defaultConfig;
 	IConfig* s_config = &s_defaultConfig;
 
 	IConfig& IConfig::Get()

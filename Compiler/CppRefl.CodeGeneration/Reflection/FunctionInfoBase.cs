@@ -3,7 +3,7 @@
 	public abstract class FunctionInfoBase : ObjectInfo
 	{
 		/// <summary>
-		/// Field name.
+		/// Function name.
 		/// </summary>
 		public required string Name { get; init; }
 
@@ -17,7 +17,9 @@
 		/// </summary>
 		public IList<TypeInstanceInfo> ArgumentTypes { get; init; } = new List<TypeInstanceInfo>();
 
-
+		/// <summary>
+		/// Function signature.
+		/// </summary>
 		public string Signature => $"{ReturnType.Type.QualifiedName()} {Name}({string.Join(",", ArgumentTypes.Select(x => x.Type.QualifiedName()))})";
 	}
 }
