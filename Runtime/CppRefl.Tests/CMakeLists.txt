@@ -49,6 +49,7 @@ set(TEST_FILES
 	Source/Tests/FunctionTests.cpp
 	Source/Tests/MetadataTests.cpp
 	Source/Tests/SerializerTests.cpp
+	Source/Tests/StringTests.cpp
 	Source/Tests/TypesTests.cpp
 )
 

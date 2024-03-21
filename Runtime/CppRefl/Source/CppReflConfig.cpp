@@ -1,8 +1,8 @@
 #include "CppReflConfig.h"
 
 #include <cstdarg>
-#include <cstdlib>
 #include <cstdio>
+#include <cstdlib>
 
 namespace cpprefl
 {
@@ -16,7 +16,7 @@ namespace cpprefl
 		std::free(memory);
 	}
 
-	void IConfig::Log(LogLevel level, const char* fmt, ...)
+	void Log(LogLevel level, const char* fmt, va_list args)
 	{
 		static const char* const levelStrings[] =
 		{
@@ -25,14 +25,33 @@ namespace cpprefl
 			"Fatal"
 		};
 
+		std::printf("CppRefl [%s]: ", levelStrings[static_cast<int>(level)]);
+		std::vprintf(fmt, args);
+		std::printf("\n");
+	}
+
+#if CPPREFL_LOG()
+	void IConfig::Log(LogLevel level, const char* fmt, ...)
+	{
 		va_list args;
 		va_start(args, fmt);
 		{
-			std::printf("CppRefl [%s]: ", levelStrings[static_cast<int>(level)]);
-			std::vprintf(fmt, args);
-			std::printf("\n");
+			Log(level, fmt, args);
 		}
 		va_end(args);
+	}
+#endif
+
+	void IConfig::RaiseFatalError(const char* fmt, ...)
+	{
+		va_list args;
+		va_start(args, fmt);
+		{
+			Log(LogLevel::Fatal, fmt, args);
+		}
+		va_end(args);
+
+		std::abort();
 	}
 
 	IConfig s_defaultConfig;

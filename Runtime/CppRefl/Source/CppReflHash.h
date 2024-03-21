@@ -1,11 +1,16 @@
 #pragma once
 
 #include <functional>
+#include <map>
 
 #include "CppReflConfig.h"
 
 namespace cpprefl
 {
+	template <typename Key, typename Value>
+	using HashMap = std::map<Key, Value>;
+
+	// Calculates the length of a string, not including the null terminator.
 	constexpr size_t ConstexprStrlen(const char* str)
 	{
 		auto it = str;
@@ -16,17 +21,16 @@ namespace cpprefl
 
 		return it - str;
 	}
-
+	// A hash of a string.
 	template <typename HashType, HashType HashFunction(const char*, size_t)>
 	class StringHash
 	{
 	public:
-		constexpr StringHash(const char* str, size_t length) :
-#if CPPREFL_STORE_NAMES()
-			mString(str),
-#endif
-			mHash(HashFunction(str, length))
+		constexpr StringHash(const char* str, size_t length) : mHash(HashFunction(str, length))
 		{
+#if CPPREFL_STORE_NAMES()
+			AddString(mHash, str);
+#endif
 		}
 
 		constexpr StringHash(const char* str) : StringHash(str, ConstexprStrlen(str))
@@ -48,20 +52,49 @@ namespace cpprefl
 			return mHash == rhs.mHash;
 		}
 
-#if CPPREFL_STORE_NAMES()
-		constexpr operator const char*()const
-		{
-			return mString;
-		}
-#endif
-
-	public:
-#if CPPREFL_STORE_NAMES()
-		const char* mString;
-#endif
-
 		HashType mHash;
+
+
+#if CPPREFL_STORE_NAMES()
+	public:
+		// Return the string that hashes this name.
+		const char* GetString()const
+		{
+			return sStringMap.at(mHash);
+		}
+
+		operator const char* ()const
+		{
+			return GetString();
+		}
+
+	private:
+		// Add a name to a debug lookup table. We do not copy `str`, so it must be stored eternally.
+		static void AddString(HashType hash, const char* str)
+		{
+			if (sStringMap.find(hash) != sStringMap.end())
+			{
+				// Ensure we're adding something unique.
+				const auto& existingValue = sStringMap.at(hash);
+				if (strcmp(existingValue, str) != 0)
+				{
+					CPPREFL_INTERNAL_LOG(LogLevel::Fatal, "Trying to add multiple strings with the same hash. String 1: \"%s\", String 2: \"%s\"", str, existingValue);
+				}
+			}
+			else
+			{
+				sStringMap.emplace(hash, str);
+			}
+		}
+
+		static inline HashMap<HashType, const char*> sStringMap;
+#endif
 	};
+
+
+
+	////////////////////////////////////
+	// CRC32
 
 	constexpr uint32_t Crc32(const char* buf, size_t size)
 	{
@@ -124,6 +157,9 @@ namespace cpprefl
 		return ~crc;
 	}
 
+	// Alias so external code can reference it.
 	constexpr auto& NameHashFunction = Crc32;
+
+	// Represents the name of something.
 	using Name = StringHash<uint32_t, NameHashFunction>;
 }

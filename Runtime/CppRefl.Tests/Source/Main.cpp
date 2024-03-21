@@ -9,6 +9,7 @@
 class TestConfig : public cpprefl::IConfig
 {
 public:
+#if CPPREFL_LOG()
     void Log(cpprefl::LogLevel level, const char* fmt, ...) override
     {
 		va_list args;
@@ -23,6 +24,7 @@ public:
 		}
 		va_end(args);
     }
+#endif
 };
 
 int main(int argc, char** argv)

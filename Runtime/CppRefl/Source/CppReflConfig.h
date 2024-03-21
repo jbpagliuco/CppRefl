@@ -10,6 +10,9 @@
 
 #ifndef CPPREFL_LOG
 #define CPPREFL_LOG() CPPREFL_DEBUG()
+#endif
+
+#if CPPREFL_LOG()
 #define CPPREFL_INTERNAL_LOG(level, fmt, ...) IConfig::Get().Log(level, fmt, __VA_ARGS__)
 #else
 #define CPPREFL_INTERNAL_LOG(...)
@@ -19,6 +22,12 @@
 #define CPPREFL_CONCEPTS() 1
 #else
 #define CPPREFL_CONCEPTS() 0
+#endif
+
+#if CPPREFL_STORE_NAMES()
+#define CPPREFL_INTERNAL_OBJECT_CONST const
+#else
+#define CPPREFL_INTERNAL_OBJECT_CONST constexpr
 #endif
 
 namespace cpprefl
@@ -46,5 +55,7 @@ namespace cpprefl
 #if CPPREFL_LOG()
 		virtual void Log(LogLevel level, const char* fmt, ...);
 #endif
+
+		virtual void RaiseFatalError(const char* fmt, ...);
 	};
 }

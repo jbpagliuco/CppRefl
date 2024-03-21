@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using ClangSharp;
 using ClangSharp.Interop;
 using CppRefl.CodeGeneration;
 using CppRefl.CodeGeneration.Reflection;
@@ -33,7 +32,7 @@ namespace CppRefl.Compiler
 
 			var translationUnit = CXTranslationUnit.CreateFromSourceFile(index, sourceFile, clangArgs.ToArray(), ReadOnlySpan<CXUnsavedFile>.Empty);
 
-			var exceptions = new List<Exception>();
+			var exceptions = new List<System.Exception>();
 			foreach (var diagnostic in translationUnit.DiagnosticSet.Take(100))
 			{
 				switch (diagnostic.Severity)
@@ -69,7 +68,7 @@ namespace CppRefl.Compiler
 
 			if (translationUnit.Cursor.IsInvalid)
 			{
-				throw new Exception("Failed to create translation unit.");
+				throw new System.Exception("Failed to create translation unit.");
 			}
 
 			return translationUnit;
@@ -121,7 +120,7 @@ namespace CppRefl.Compiler
 
 						if (annotationTypeItems.Length != 3)
 						{
-							throw new Exception($"Unknown annotation type: {annotationItems[0]}");
+							throw new System.Exception($"Unknown annotation type: {annotationItems[0]}");
 						}
 
 						// Parse the lifetime.

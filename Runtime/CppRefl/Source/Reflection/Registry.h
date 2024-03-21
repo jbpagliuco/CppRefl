@@ -11,9 +11,6 @@
 
 namespace cpprefl
 {
-	template <typename Key, typename Value>
-	using RegistryHashMap = std::map<Key, Value>;
-
 	// Contains all the reflected information in a program.
 	class Registry
 	{
@@ -49,22 +46,22 @@ namespace cpprefl
 
 	private:
 		// Reflected types.
-		RegistryHashMap<Name, TypeInfo> mTypes;
+		HashMap<Name, TypeInfo> mTypes;
 
 		// Reflected classes.
-		RegistryHashMap<Name, ClassInfo> mClasses;
+		HashMap<Name, ClassInfo> mClasses;
 
 		// Reflected enums.
-		RegistryHashMap<Name, EnumInfo> mEnums;
+		HashMap<Name, EnumInfo> mEnums;
 
 		// Reflected functions.
-		RegistryHashMap<Name, FunctionInfo> mFunctions;
+		HashMap<Name, FunctionInfo> mFunctions;
 
 		// Dynamic array accessors.
-		RegistryHashMap<Name, DynamicArrayFunctions> mDynamicArrayFunctions;
+		HashMap<Name, DynamicArrayFunctions> mDynamicArrayFunctions;
 
 		// Base classes.
-		RegistryHashMap<const ClassInfo*, std::vector<const ClassInfo*>> mClassHierarchy;
+		HashMap<const ClassInfo*, std::vector<const ClassInfo*>> mClassHierarchy;
 	};
 
 	template <typename ... Params>
@@ -77,15 +74,7 @@ namespace cpprefl
 			const auto& existingTypeInfo = mTypes.at(name);
 
 #if CPPREFL_STORE_NAMES()
-			if (strcmp(existingTypeInfo.mName.mString, name.mString) != 0)
-			{
-				CPPREFL_INTERNAL_LOG(
-					LogLevel::Fatal, 
-					"Hash collision! Types '%s' and '%s' both have the same hash value: %zu. Either change one of the type names or use a different hashing algorithm.", 
-					existingTypeInfo.mName.mString, name.mString, name.mHash);
-			}
-
-			CPPREFL_INTERNAL_LOG(LogLevel::Error, "Tried to add the same type '%s' twice. How did this happen?", name.mString);
+			CPPREFL_INTERNAL_LOG(LogLevel::Error, "Tried to add the same type '%s' twice. How did this happen?", name.GetString());
 #else
 			CPPREFL_INTERNAL_LOG(LogLevel::Error, "Tried to add the same type (hash ='%zu') twice. How did this happen?", name.mHash);
 #endif
