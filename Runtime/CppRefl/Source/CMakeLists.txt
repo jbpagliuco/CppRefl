@@ -2,6 +2,7 @@ target_sources(CppRefl
 	PUBLIC
 	CppReflConfig.h
 	CppReflHash.h
+	CppReflInternal.h
 	CppReflMarkup.h
 	CppReflStatics.h
 

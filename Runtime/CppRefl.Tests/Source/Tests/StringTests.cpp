@@ -13,8 +13,6 @@ TEST(StringTests, Strlen)
 #if CPPREFL_STORE_NAMES()
 TEST(StringTests, StringLookup)
 {
-	// NB: Names do not automatically add the string lookup.
-	// Since this is a class name, code is generated to add the lookup.
 	const cpprefl::Name name("ReflectedClass");
 	EXPECT_STREQ(name.GetString(), "ReflectedClass");
 }

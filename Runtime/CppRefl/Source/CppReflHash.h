@@ -21,6 +21,7 @@ namespace cpprefl
 
 		return it - str;
 	}
+
 	// A hash of a string.
 	template <typename HashType, HashType HashFunction(const char*, size_t)>
 	class StringHash
@@ -78,7 +79,7 @@ namespace cpprefl
 				const auto& existingValue = sStringMap.at(hash);
 				if (strcmp(existingValue, str) != 0)
 				{
-					CPPREFL_INTERNAL_LOG(LogLevel::Fatal, "Trying to add multiple strings with the same hash. String 1: \"%s\", String 2: \"%s\"", str, existingValue);
+					CPPREFL_INTERNAL_FATAL_ERROR("Trying to add multiple strings with the same hash. String 1: \"%s\", String 2: \"%s\"", str, existingValue);
 				}
 			}
 			else

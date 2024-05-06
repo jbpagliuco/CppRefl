@@ -62,8 +62,8 @@ namespace cpprefl
 		return *s_config;
 	}
 
-	void IConfig::Set(IConfig* config)
+	void IConfig::Set(IConfig& config)
 	{
-		s_config = config;
+		s_config = &config;
 	}
 }
