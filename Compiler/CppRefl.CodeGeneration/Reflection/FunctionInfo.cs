@@ -6,5 +6,7 @@
 		/// Function namespace.
 		/// </summary>
 		public required string Namespace { get; init; }
+
+		public override string ToString() => this.QualifiedName();
 	}
 }

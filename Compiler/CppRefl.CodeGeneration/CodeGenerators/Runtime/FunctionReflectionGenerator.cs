@@ -64,22 +64,19 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
                     }
 
                     // Registry FunctionInfo
-                    using (writer.WithCodeBlock($"static const auto& functionInfo = cpprefl::Registry::GetSystemRegistry().AddFunction", "(", ");"))
+                    using (writer.WithCodeBlock($"static const auto& functionInfo = cpprefl::Registry::GetSystemRegistry().EmplaceFunction", "(", ");"))
                     {
-                        using (writer.WithCodeBlock("FunctionInfo", "(", ")"))
+                        using (writer.WithPostfix(","))
                         {
-                            using (writer.WithPostfix(","))
-                            {
-                                writer.WriteLine($"\"{functionInfo.QualifiedName()}\"");
-                                writer.WriteLine($"(void*){functionInfo.QualifiedName()}");
-                                writer.WriteLine($"{CodeGeneratorUtil.MaybeCreateReflectedType(functionInfo.ReturnType.Type)}");
-                                writer.WriteLine(functionInfo.ArgumentTypes.Any()
-                                    ? "FunctionArgTypesView(functionArgs)"
-                                    : "FunctionArgTypesView()");
-                                writer.WriteLine(functionTags);
-                            }
-                            writer.WriteLine(functionAttributes);
+                            writer.WriteLine($"\"{functionInfo.QualifiedName()}\"");
+                            writer.WriteLine($"(void*){functionInfo.QualifiedName()}");
+                            writer.WriteLine($"{CodeGeneratorUtil.MaybeCreateReflectedType(functionInfo.ReturnType.Type)}");
+                            writer.WriteLine(functionInfo.ArgumentTypes.Any()
+                                ? "FunctionArgTypesView(functionArgs)"
+                                : "FunctionArgTypesView()");
+                            writer.WriteLine(functionTags);
                         }
+                        writer.WriteLine(functionAttributes);
                     }
 
                     writer.WriteLine("return functionInfo;");

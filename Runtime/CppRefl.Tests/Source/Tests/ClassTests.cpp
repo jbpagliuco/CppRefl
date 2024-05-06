@@ -40,6 +40,46 @@ TEST(ClassTests, DerivedClasses)
 	EXPECT_TRUE(ChildClass2::StaticReflectedClass().IsA<ChildClass2>());
 }
 
+TEST(ClassTests, GetField)
+{
+	const auto& classInfo = ReflectedClass::StaticReflectedClass();
+
+	EXPECT_NE(classInfo.GetField("mPublicInt"), nullptr);
+	EXPECT_NE(classInfo.GetField("mConstInt"), nullptr);
+	EXPECT_EQ(classInfo.GetField("mNotReflectedInt"), nullptr);
+	EXPECT_NE(classInfo.GetField("mProtectedFloat"), nullptr);
+	EXPECT_NE(classInfo.GetField("mPrivateChar"), nullptr);
+	EXPECT_EQ(classInfo.GetField("blargh"), nullptr);
+}
+
+TEST(ClassTests, GetFieldValueUnsafe)
+{
+	const auto& classInfo = ReflectedClass::StaticReflectedClass();
+
+	void* obj = alloca(sizeof(::ReflectedClass));
+	classInfo.Construct(obj);
+
+	EXPECT_NE(classInfo.GetFieldValueUnsafe<int>(obj, "mPublicInt"), nullptr);
+	EXPECT_EQ(*classInfo.GetFieldValueUnsafe<int>(obj, "mPublicInt"), 1234);
+	EXPECT_NE(classInfo.GetFieldValueUnsafe<float>(obj, "mPublicInt"), nullptr);
+
+	EXPECT_EQ(classInfo.GetFieldValueUnsafe<bool>(obj, "blargh"), nullptr);
+}
+
+TEST(ClassTests, GetFieldValueSafe)
+{
+	const auto& classInfo = ReflectedClass::StaticReflectedClass();
+
+	void* obj = alloca(sizeof(::ReflectedClass));
+	classInfo.Construct(obj);
+
+	EXPECT_NE(classInfo.GetFieldValueSafe<int>(obj, "mPublicInt"), nullptr);
+	EXPECT_EQ(*classInfo.GetFieldValueSafe<int>(obj, "mPublicInt"), 1234);
+	EXPECT_EQ(classInfo.GetFieldValueSafe<float>(obj, "mPublicInt"), nullptr);
+
+	EXPECT_EQ(classInfo.GetFieldValueSafe<bool>(obj, "blargh"), nullptr);
+}
+
 TEST(ClassTests, Constructors)
 {
 	void* obj = alloca(sizeof(::ReflectedClass));

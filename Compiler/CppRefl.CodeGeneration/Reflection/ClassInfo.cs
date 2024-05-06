@@ -82,5 +82,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		public string ForwardDeclaration => Type.IsInGlobalNamespace()
 			? ForwardDeclarationNoNamespace
 			: $"namespace {Type.Namespace} {{ {ForwardDeclarationNoNamespace} }}";
+
+		public override string ToString() => Type.ToString();
 	}
 }

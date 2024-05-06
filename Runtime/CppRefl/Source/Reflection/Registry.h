@@ -17,21 +17,25 @@ namespace cpprefl
 	public:
 		static Registry& GetSystemRegistry();
 
-		TypeInfo& AddType(TypeInfo&& type);
+		template <typename... Params>
+		const TypeInfo& EmplaceType(Name name, Params&&... params);
 		const TypeInfo& GetType(const Name& name);
 
-		ClassInfo& AddClass(ClassInfo&& classInfo);
+		template <typename... Params>
+		const ClassInfo& EmplaceClass(const TypeInfo* typeInfo, Params&&... params);
 		const ClassInfo& GetClass(const Name& name);
 		const ClassInfo* TryGetClass(const Name& name);
 
-		EnumInfo& AddEnum(EnumInfo&& enumInfo);
+		template <typename... Params>
+		const EnumInfo& EmplaceEnum(const TypeInfo* typeInfo, Params&&... params);
 		const EnumInfo& GetEnum(const Name& name);
 		const EnumInfo* TryGetEnum(const Name& name);
 
-		FunctionInfo& AddFunction(FunctionInfo&& functionInfo);
+		template <typename... Params>
+		const FunctionInfo& EmplaceFunction(Name name, Params&&... params);
 		const FunctionInfo& GetFunction(const Name& name);
 
-		const DynamicArrayFunctions& AddDynamicArrayFunctions(const Name& name, const DynamicArrayFunctions& functions);
+		const DynamicArrayFunctions& AddDynamicArrayFunctions(const Name& name, DynamicArrayFunctions functions);
 		const DynamicArrayFunctions* GetDynamicArrayFunctions(const Name& name);
 
 		// Get a list of a derived classes.
@@ -42,21 +46,81 @@ namespace cpprefl
 
 	private:
 		// Reflected types.
-		std::map<Name, TypeInfo> mTypes;
+		HashMap<Name, TypeInfo> mTypes;
 
 		// Reflected classes.
-		std::map<Name, ClassInfo> mClasses;
+		HashMap<Name, ClassInfo> mClasses;
 
 		// Reflected enums.
-		std::map<Name, EnumInfo> mEnums;
+		HashMap<Name, EnumInfo> mEnums;
 
 		// Reflected functions.
-		std::map<Name, FunctionInfo> mFunctions;
+		HashMap<Name, FunctionInfo> mFunctions;
 
 		// Dynamic array accessors.
-		std::map<Name, DynamicArrayFunctions> mDynamicArrayFunctions;
+		HashMap<Name, DynamicArrayFunctions> mDynamicArrayFunctions;
 
 		// Base classes.
-		std::map<const ClassInfo*, std::vector<const ClassInfo*>> mClassHierarchy;
+		HashMap<const ClassInfo*, std::vector<const ClassInfo*>> mClassHierarchy;
 	};
+
+	template <typename ... Params>
+	const TypeInfo& Registry::EmplaceType(Name name, Params&&... params)
+	{
+#if CPPREFL_DEBUG()
+		// Ensure this type has is unique.
+		if (mTypes.find(name) != mTypes.end())
+		{
+			const auto& existingTypeInfo = mTypes.at(name);
+
+#if CPPREFL_STORE_NAMES()
+			CPPREFL_INTERNAL_LOG(LogLevel::Error, "Tried to add the same type '%s' twice. How did this happen?", name.GetString());
+#else
+			CPPREFL_INTERNAL_LOG(LogLevel::Error, "Tried to add the same type (hash ='%zu') twice. How did this happen?", name.mHash);
+#endif
+		}
+#endif
+
+		return mTypes.try_emplace(name, name, std::forward<Params>(params)...).first->second;
+	}
+
+	template <typename ... Params>
+	const ClassInfo& Registry::EmplaceClass(const TypeInfo* typeInfo, Params&&... params)
+	{
+		auto& classInfo = mClasses.try_emplace(typeInfo->mName, typeInfo, std::forward<Params>(params)...).first->second;
+
+		// Update the class heirarchy.
+		mClassHierarchy[&classInfo] = {};
+
+		// Update all base classes.
+		const ClassInfo* baseClass = classInfo.mBaseClass;
+		while (baseClass != nullptr)
+		{
+			if (mClassHierarchy.find(baseClass) == mClassHierarchy.end())
+			{
+				mClassHierarchy[baseClass] = { &classInfo };
+			}
+			else
+			{
+				mClassHierarchy[baseClass].push_back(&classInfo);
+			}
+
+			baseClass = baseClass->mBaseClass;
+		}
+
+
+		return classInfo;
+	}
+
+	template <typename ... Params>
+	const EnumInfo& Registry::EmplaceEnum(const TypeInfo* typeInfo, Params&&... params)
+	{
+		return mEnums.try_emplace(typeInfo->mName, typeInfo, std::forward<Params>(params)...).first->second;
+	}
+
+	template <typename ... Params>
+	const FunctionInfo& Registry::EmplaceFunction(Name name, Params&&... params)
+	{
+		return mFunctions.try_emplace(name, name, std::forward<Params>(params)...).first->second;
+	}
 }

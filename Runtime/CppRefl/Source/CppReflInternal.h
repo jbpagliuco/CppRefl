@@ -1,16 +1,6 @@
 #pragma once
 
-#ifndef CPPREFL_DEBUG
-#define CPPREFL_DEBUG() _DEBUG
-#endif
-
-#ifndef CPPREFL_STORE_NAMES
-#define CPPREFL_STORE_NAMES() CPPREFL_DEBUG()
-#endif
-
-#ifndef CPPREFL_LOG
-#define CPPREFL_LOG() CPPREFL_DEBUG()
-#endif
+#include "CppReflConfig.h"
 
 #if CPPREFL_LOG()
 #define CPPREFL_INTERNAL_LOG(level, fmt, ...) cpprefl::IConfig::Get().Log(level, fmt, __VA_ARGS__)

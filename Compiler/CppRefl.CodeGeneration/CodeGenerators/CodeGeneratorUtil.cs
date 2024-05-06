@@ -17,7 +17,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		public static string GetMetadataTagDefinitions(string name, MetadataInfo metadata)
 		{
 			StringBuilder sb = new();
-			sb.Append($"static constexpr std::array<cpprefl::MetadataTag, {metadata.RuntimeMetadataTags.Count()}> {name}Tags = {{");
+			sb.Append($"static const std::array<cpprefl::MetadataTag, {metadata.RuntimeMetadataTags.Count()}> {name}Tags = {{");
 			foreach (var value in metadata.RuntimeMetadataTags)
 			{
 				sb.Append($"\"{StripQuotes(value.Value)}\",");
@@ -54,7 +54,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 		public static string GetMetadataAttributeDefinitions(string name, MetadataInfo metadata)
 		{
 			StringBuilder sb = new();
-			sb.Append($"static constexpr std::array<cpprefl::MetadataAttribute, {metadata.RuntimeMetadataAttributes.Count()}> {name}Attributes = {{");
+			sb.Append($"static const std::array<cpprefl::MetadataAttribute, {metadata.RuntimeMetadataAttributes.Count()}> {name}Attributes = {{");
 			foreach (var pair in metadata.RuntimeMetadataAttributes)
 			{
 				var value = pair.Value.Value;

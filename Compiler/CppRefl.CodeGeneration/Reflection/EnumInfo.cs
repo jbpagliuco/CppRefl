@@ -32,5 +32,7 @@
 		/// Line number where the GENERATED_REFLECTION_CODE() macro is defined in this enum.
 		/// </summary>
 		public uint? GeneratedBodyLine { get; set; }
+
+		public override string ToString() => Type.ToString();
 	}
 }
