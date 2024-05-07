@@ -78,7 +78,7 @@ namespace cpprefl
 	T* ClassInfo::GetFieldValueSafe(void* classObject, const Name& fieldName) const
 	{
 		const FieldInfo* fieldInfo = GetField(fieldName);
-		if (fieldInfo != nullptr && IsSameType<T>(fieldInfo->GetType().mKind))
+		if (fieldInfo != nullptr && IsSameType<T>(fieldInfo->GetType()))
 		{
 			return fieldInfo != nullptr ? fieldInfo->GetMemoryInClass<T>(classObject) : nullptr;
 		}

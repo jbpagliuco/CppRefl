@@ -8,6 +8,16 @@
 
 #include "ClassCode.reflgen.h"
 
+struct REFLECTED ReflectedStruct
+{
+	GENERATED_REFLECTION_CODE()
+};
+
+struct REFLECTED ReflectedStruct2
+{
+	GENERATED_REFLECTION_CODE()
+};
+
 class REFLECTED ReflectedClass
 {
 	GENERATED_REFLECTION_CODE()
@@ -18,6 +28,9 @@ public:
 	int mPublicInt REFLECTED = 1234;
 	const int mConstInt REFLECTED = 1234;
 	int mNotReflectedInt = 10;
+
+	ReflectedStruct mStruct1 REFLECTED;
+	ReflectedStruct2 mStruct2 REFLECTED;
 
 protected:
 	[[maybe_unused]] float mProtectedFloat REFLECTED = 3.14f;
@@ -35,11 +48,6 @@ public:
 
 class NonReflectedClass
 {
-};
-
-struct REFLECTED ReflectedStruct
-{
-	GENERATED_REFLECTION_CODE()
 };
 
 namespace TestNamespace

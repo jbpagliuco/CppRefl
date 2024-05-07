@@ -64,6 +64,12 @@ TEST(ClassTests, GetFieldValueUnsafe)
 	EXPECT_NE(classInfo.GetFieldValueUnsafe<float>(obj, "mPublicInt"), nullptr);
 
 	EXPECT_EQ(classInfo.GetFieldValueUnsafe<bool>(obj, "blargh"), nullptr);
+
+	EXPECT_NE(classInfo.GetFieldValueUnsafe<ReflectedStruct>(obj, "mStruct1"), nullptr);
+	EXPECT_NE(classInfo.GetFieldValueUnsafe<ReflectedStruct2>(obj, "mStruct1"), nullptr);
+
+	EXPECT_NE(classInfo.GetFieldValueUnsafe<ReflectedStruct>(obj, "mStruct2"), nullptr);
+	EXPECT_NE(classInfo.GetFieldValueUnsafe<ReflectedStruct2>(obj, "mStruct2"), nullptr);
 }
 
 TEST(ClassTests, GetFieldValueSafe)
@@ -78,6 +84,12 @@ TEST(ClassTests, GetFieldValueSafe)
 	EXPECT_EQ(classInfo.GetFieldValueSafe<float>(obj, "mPublicInt"), nullptr);
 
 	EXPECT_EQ(classInfo.GetFieldValueSafe<bool>(obj, "blargh"), nullptr);
+
+	EXPECT_NE(classInfo.GetFieldValueSafe<ReflectedStruct>(obj, "mStruct1"), nullptr);
+	EXPECT_EQ(classInfo.GetFieldValueSafe<ReflectedStruct2>(obj, "mStruct1"), nullptr);
+
+	EXPECT_EQ(classInfo.GetFieldValueSafe<ReflectedStruct>(obj, "mStruct2"), nullptr);
+	EXPECT_NE(classInfo.GetFieldValueSafe<ReflectedStruct2>(obj, "mStruct2"), nullptr);
 }
 
 TEST(ClassTests, Constructors)

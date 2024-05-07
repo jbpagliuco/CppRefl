@@ -134,10 +134,4 @@ namespace cpprefl
 			return TypeKind::Class;
 		}
 	}
-
-	template <typename T>
-	bool IsSameType(TypeKind typeKind)
-	{
-		return GetTypeKind<T>() == typeKind;
-	}
 }
