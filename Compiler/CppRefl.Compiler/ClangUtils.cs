@@ -414,4 +414,13 @@ namespace CppRefl.Compiler
 			return kind == CXCursorKind.CXCursor_StructDecl ? ClassType.Struct : ClassType.Class;
 		}
 	}
+
+	internal static class ClangExtensions
+	{
+		public static bool IsValid(this CXTypeKind kind) => kind != CXTypeKind.CXType_Invalid;
+		public static bool IsInvalid(this CXTypeKind kind) => !IsValid(kind);
+
+		public static bool IsValid(this CXType type) => type.kind.IsValid();
+		public static bool IsInvalid(this CXType type) => type.kind.IsInvalid();
+	}
 }
