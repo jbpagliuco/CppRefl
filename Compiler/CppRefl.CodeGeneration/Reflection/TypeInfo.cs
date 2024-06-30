@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text.Json.Serialization;
+using ClangSharp.Interop;
 
 namespace CppRefl.CodeGeneration.Reflection
 {
@@ -67,6 +68,12 @@ namespace CppRefl.CodeGeneration.Reflection
 	[DebuggerDisplay("{QualifiedName}")]
 	public class TypeInfo : INameMixin
 	{
+		/// <summary>
+		/// Clang type information.
+		/// </summary>
+		[JsonIgnore]
+		public CXType ClangType { get; init; }
+
 		/// <summary>
 		/// Kind of type data.
 		/// </summary>
@@ -136,7 +143,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// </summary>
 		[JsonIgnore]
 		public bool IsInstantiable => !IsTemplated || Template?.IsSpecialized == true;
-
+		
 		/// <summary>
 		/// Type name (without the namespace).
 		/// </summary>

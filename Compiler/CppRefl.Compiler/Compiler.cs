@@ -382,6 +382,7 @@ public class Compiler
 
 			typeInfo = new TypeInfo()
 			{
+				ClangType = clangType,
 				Name = name,
 				Namespace = @namespace,
 				Kind = ClangUtils.GetTypeKind(clangType.CanonicalType),
@@ -406,7 +407,7 @@ public class Compiler
 	/// <returns></returns>
 	private TypeInfo ReflectType(CXCursor cursor)
 	{
-		if (cursor.Type.kind != CXTypeKind.CXType_Invalid)
+		if (cursor.Type.IsValid())
 		{
 			return ReflectType(cursor.Type);
 		}
@@ -425,6 +426,7 @@ public class Compiler
 
 			typeInfo = new TypeInfo
 			{
+				ClangType = cursor.Type, // TODO: Invalid here?
 				Name = name,
 				Namespace = ClangUtils.GetNamespace(cursor),
 				Kind = TypeKind.Class,
