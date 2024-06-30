@@ -33,7 +33,7 @@ catch (AggregateException e)
 
 	return 1;
 }
-catch (Exception e)
+catch (System.Exception e)
 {
 	Console.WriteLine("One or more compile errors occurred during reflection generation.");
 	Console.Error.WriteLine(e.Message);

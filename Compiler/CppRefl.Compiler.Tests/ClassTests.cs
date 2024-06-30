@@ -23,7 +23,7 @@ namespace CppRefl.Compiler.Tests
 		public void ClassFields()
 		{
 			var classInfo = Registry.GetClass("ReflectedClass")!;
-			Assert.That(classInfo.Fields.Count, Is.EqualTo(4));
+			Assert.That(classInfo.Fields.Count, Is.EqualTo(6));
 
 			int fieldIndex = 0;
 
@@ -33,6 +33,14 @@ namespace CppRefl.Compiler.Tests
 
 			Assert.That(classInfo.Fields[fieldIndex].Name, Is.EqualTo("mConstInt"));
 			TestUtil.TestTypeInstanceInfo(classInfo.Fields[fieldIndex].TypeInstance, Registry.GetType("int")!, isConst: true);
+			++fieldIndex;
+
+			Assert.That(classInfo.Fields[fieldIndex].Name, Is.EqualTo("mStruct1"));
+			TestUtil.TestTypeInstanceInfo(classInfo.Fields[fieldIndex].TypeInstance, Registry.GetType("ReflectedStruct")!);
+			++fieldIndex;
+
+			Assert.That(classInfo.Fields[fieldIndex].Name, Is.EqualTo("mStruct2"));
+			TestUtil.TestTypeInstanceInfo(classInfo.Fields[fieldIndex].TypeInstance, Registry.GetType("ReflectedStruct2")!);
 			++fieldIndex;
 
 			Assert.That(classInfo.Fields[fieldIndex].Name, Is.EqualTo("mProtectedFloat"));

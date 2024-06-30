@@ -70,12 +70,12 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// <summary>
 		/// Kind of type data.
 		/// </summary>
-		public TypeKind Kind { get; set; }
+		public TypeKind Kind { get; init; }
 
 		/// <summary>
 		/// Template information.
 		/// </summary>
-		public TemplateInfo? Template { get; set; }
+		public TemplateInfo? Template { get; init; }
 
 		/// <summary>
 		/// Returns true if this is a primitive data type.
