@@ -1,10 +1,10 @@
 # CppRefl
-CppRefl is a C++ reflection compiler and code generator. It uses Clang to parse reflection markup in your source code, and then generates code that can be used for runtime reflection purposes. CppRefl also allows users to write completely custom code generators for their specific libraries without every needing to touch the original CppRefl source code.
+CppRefl is a C++ reflection compiler and code generator. It uses Clang to parse reflection markup in your source code, and then generates code that can be used for runtime reflection purposes. CppRefl allows users to write completely custom code generators for their specific libraries without every needing to touch the original CppRefl source code.
 
 ### Why Use Reflection?
 Reflection is an incredibly powerful tool that gives you access to the layout of your program at runtime. This enables you to do things like:
 - Look up and invoke a function by name (e.g. for console commands, cross-programming language communication).
-- Write code the can serialize the data in a class in a generic manner.
+- Write code that can serialize the fields in a class in a generic manner.
 
 ### Why Use Code Generation?
 Oftentimes you might create commonly useful functions for multiple different classes, or maybe add special values to an enum to mark the max/min values. With C++, most of the time you can achieve these things using preprocessor macros or maybe templates. While this can work for most cases, they cannot handle everything without getting unwieldly (ever seen how to overload macros?). And for anything even remotely complex, you often end up with code that is incredibly hard to read and debug. Real code generation cuts down on the weirdness while giving you maximum power to get you what you're looking for.
@@ -31,7 +31,7 @@ Oftentimes you might create commonly useful functions for multiple different cla
 enum class REFLECTED MissionType
 {
   MainStory = 0,
-  OpenWorld
+  SideQuest
 };
 
 // Example of how to use reflected enums. (NB: Output is only a rough example of what you'd see)
@@ -43,7 +43,7 @@ enum class REFLECTED MissionType
 // Get the values in an enum.
 > cpprefl::GetReflectedEnum<MissionType>().mValues
 { mName = "MainStory", mValue = 0 }
-{ mName = "OpenWorld", mValue = 1 }
+{ mName = "SideQuest", mValue = 1 }
 ```
 
 ### Reflected Class
