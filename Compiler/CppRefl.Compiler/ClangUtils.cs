@@ -415,8 +415,10 @@ namespace CppRefl.Compiler
 		}
 	}
 
-	internal static class ClangExtensions
+	public static class ClangExtensions
 	{
+		public static bool IsValid(this CXCursor cursor) => !cursor.IsInvalid;
+
 		public static bool IsValid(this CXTypeKind kind) => kind != CXTypeKind.CXType_Invalid;
 		public static bool IsInvalid(this CXTypeKind kind) => !IsValid(kind);
 

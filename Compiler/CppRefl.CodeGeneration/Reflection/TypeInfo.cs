@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using ClangSharp.Interop;
 
 namespace CppRefl.CodeGeneration.Reflection
@@ -65,9 +64,14 @@ namespace CppRefl.CodeGeneration.Reflection
 	/// <summary>
 	/// A type declaration. Could be a class, primitive, enum, etc.
 	/// </summary>
-	[DebuggerDisplay("{QualifiedName}")]
 	public class TypeInfo : INameMixin
 	{
+		/// <summary>
+		/// Clang cursor information.
+		/// </summary>
+		[JsonIgnore]
+		public CXCursor ClangCursor { get; init; }
+
 		/// <summary>
 		/// Clang type information.
 		/// </summary>
@@ -83,7 +87,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Template information.
 		/// </summary>
 		public TemplateInfo? Template { get; init; }
-
+		
 		/// <summary>
 		/// Returns true if this is a primitive data type.
 		/// </summary>

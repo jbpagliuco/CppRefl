@@ -382,6 +382,7 @@ public class Compiler
 
 			typeInfo = new TypeInfo()
 			{
+				ClangCursor = clangType.Declaration,
 				ClangType = clangType,
 				Name = name,
 				Namespace = @namespace,
@@ -426,7 +427,8 @@ public class Compiler
 
 			typeInfo = new TypeInfo
 			{
-				ClangType = cursor.Type, // TODO: Invalid here?
+				ClangCursor = cursor,
+				ClangType = cursor.Type,
 				Name = name,
 				Namespace = ClangUtils.GetNamespace(cursor),
 				Kind = TypeKind.Class,

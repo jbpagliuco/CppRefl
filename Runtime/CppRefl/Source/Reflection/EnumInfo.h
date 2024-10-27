@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CppReflHash.h"
+#include "CppReflStatics.h"
 #include "ObjectInfo.h"
 
 namespace cpprefl

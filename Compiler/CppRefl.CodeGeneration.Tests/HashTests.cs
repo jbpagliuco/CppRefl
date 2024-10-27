@@ -9,7 +9,7 @@ namespace CppRefl.CodeGeneration.Tests
 		/// </summary>
 		/// <param name="name"></param>
 		/// <returns></returns>
-		private uint CollisionHashFunction(string name) => 1234;
+		private uint CollisionHashFunction(string name) => 0xDEADBEEF;
 
 		/// <summary>
 		/// Create a default registry.
@@ -20,7 +20,7 @@ namespace CppRefl.CodeGeneration.Tests
 		[Test]
 		public void ShouldThrowHashCollisionException()
 		{
-			var dict = new Dictionary<uint, string> { { 1234, "str1" } };
+			var dict = new Dictionary<uint, string> { { 0xDEADBEEF, "str1" } };
 			Assert.NotNull(Hash.FindHashCollision(dict, "str2", x => x, CollisionHashFunction, out _));
 		}
 

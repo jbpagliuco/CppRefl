@@ -1,4 +1,5 @@
 ﻿using CppRefl.CodeGeneration.Reflection;
+using CppRefl.Compiler;
 
 namespace CppRefl.Compiler.Tests
 {
@@ -52,6 +53,17 @@ namespace CppRefl.Compiler.Tests
 			Assert.That(type.IsClass, Is.EqualTo(isClass));
 			Assert.That(type.IsEnum, Is.EqualTo(isEnum));
 			Assert.That(type.Namespace, Is.EqualTo(typeNamespace));
+
+			if (isPrimitive)
+			{
+				Assert.IsFalse(type.ClangCursor.IsValid());
+				Assert.IsTrue(type.ClangType.IsValid());
+			}
+			else
+			{
+				Assert.IsTrue(type.ClangCursor.IsValid());
+				Assert.IsTrue(type.ClangType.IsValid());
+			}
 		}
 
 		/// <summary>

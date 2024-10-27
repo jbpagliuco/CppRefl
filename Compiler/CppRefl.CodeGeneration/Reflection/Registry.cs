@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using ClangSharp.Interop;
 
 namespace CppRefl.CodeGeneration.Reflection
 {
@@ -9,6 +9,16 @@ namespace CppRefl.CodeGeneration.Reflection
 	public class FunctionHashCollisionException(FunctionInfo functionInfo, FunctionInfo functionInfo2) : HashCollisionException($"Functions '{functionInfo}' and '{functionInfo2}' have the same hashes.");
 	public class FieldHashCollisionException(ClassInfo classInfo, FieldInfo fieldInfo1, FieldInfo fieldInfo2) : HashCollisionException($"Class fields '{classInfo}::{fieldInfo1}' and '{classInfo}::{fieldInfo2}' have the same hashes.");
 	public class MethodHashCollisionException(ClassInfo classInfo, MethodInfo methodInfo1, MethodInfo methodInfo2) : HashCollisionException($"Class methods '{classInfo}::{methodInfo1}' and '{classInfo}::{methodInfo2}' have the same hashes.");
+
+	// TODO: Remove once this project is merged with CppRefl.Compiler.
+	internal static class ClangExtensions
+	{
+		public static bool IsValid(this CXTypeKind kind) => kind != CXTypeKind.CXType_Invalid;
+		public static bool IsInvalid(this CXTypeKind kind) => !IsValid(kind);
+
+		public static bool IsValid(this CXType type) => type.kind.IsValid();
+		public static bool IsInvalid(this CXType type) => type.kind.IsInvalid();
+	}
 
 	/// <summary>
 	/// Objects defined in a single file.
@@ -78,6 +88,12 @@ namespace CppRefl.CodeGeneration.Reflection
 		private IDictionary<uint, TypeInfo> TypeHashes { get; } = new Dictionary<uint, TypeInfo>();
 
 		/// <summary>
+		/// Lookup table for clang types.
+		/// </summary>
+		[JsonIgnore]
+		private IDictionary<CXType, TypeInfo> ClangTypes { get; } = new Dictionary<CXType, TypeInfo>();
+
+		/// <summary>
 		/// Reflected classes.
 		/// </summary>
 		public IDictionary<string, ClassInfo> Classes { get; init; } = new Dictionary<string, ClassInfo>();
@@ -102,13 +118,29 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// </summary>
 		[JsonIgnore]
 		private IDictionary<uint, FunctionInfo> FunctionHashes { get; } = new Dictionary<uint, FunctionInfo>();
-
+		
 		/// <summary>
 		/// Function used to hash string names.
 		/// </summary>
 		[JsonIgnore]
 		public Func<string, uint> HashFunction { get; init; } = Hash.Crc32;
 
+		/// <summary>
+		/// Returns the innermost type of a given type. For example, if the type represents `int*&`, the innermost type is `int`.
+		/// </summary>
+		/// <param name="typeInfo"></param>
+		/// <returns></returns>
+		public TypeInfo GetInnermostType(TypeInfo typeInfo)
+		{
+			CXType innermostType = typeInfo.ClangCursor.Type;
+			while (innermostType.PointeeType.IsValid())
+			{
+				innermostType = innermostType.PointeeType;
+			}
+
+			return ClangTypes[innermostType];
+		}
+		
 		/// <summary>
 		/// Try to add an object to a dictionary.
 		/// </summary>
@@ -169,6 +201,12 @@ namespace CppRefl.CodeGeneration.Reflection
 			if (!TryAddObject(typeInfo, Types, TypeHashes, out var collidingTypeInfo))
 			{
 				throw new TypeHashCollisionException(typeInfo, collidingTypeInfo);
+			}
+
+			// Add the clang type lookup
+			if (typeInfo.ClangType.IsValid())
+			{
+				ClangTypes.Add(typeInfo.ClangType, typeInfo);
 			}
 
 			return typeInfo;
