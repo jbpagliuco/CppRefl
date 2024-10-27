@@ -14,7 +14,7 @@ namespace CppRefl.Compiler.Tests
 
 			TestUtil.TestType(Registry.GetType("TestNamespace::ReflectedClass")!, "ReflectedClass", TypeKind.Class, isClass: true, typeNamespace: "TestNamespace");
 			Assert.That(Registry.GetClass("TestNamespace::ReflectedClass")!.Type, Is.EqualTo(Registry.GetType("TestNamespace::ReflectedClass")));
-			
+
 			Assert.IsNotNull(Registry.GetClass("ReflectedStruct"));
 			Assert.IsNull(Registry.GetClass("NonReflectedClass"));
 		}

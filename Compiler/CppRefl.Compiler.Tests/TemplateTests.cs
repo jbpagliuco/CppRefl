@@ -8,12 +8,12 @@ namespace CppRefl.Compiler.Tests
 
 		[Test]
 		public void TemplateClass()
-	{
+		{
 			var typeInfo = Registry.GetType("TestNamespace::TemplatedClass")!;
 			Assert.IsNotNull(typeInfo);
 			Assert.True(typeInfo.IsTemplated);
 			Assert.False(typeInfo.Template!.IsSpecialized);
-			Assert.That(typeInfo.Template.Arguments.Select(x => x.QualifiedName()), Is.EquivalentTo(new[] {"T"}));
+			Assert.That(typeInfo.Template.Arguments.Select(x => x.QualifiedName()), Is.EquivalentTo(new[] { "T" }));
 
 			var classInfo = Registry.GetClass("TestNamespace::TemplatedClass")!;
 			Assert.IsNotNull(classInfo);

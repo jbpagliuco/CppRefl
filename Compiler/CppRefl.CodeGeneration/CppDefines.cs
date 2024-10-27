@@ -12,7 +12,7 @@
 		/// Separator for values within an annotation.
 		/// </summary>
 		public const char AnnotationSeparator = ',';
-		
+
 		/// <summary>
 		/// Preprocessor flag that that is only defined during reflection compilation.
 		/// </summary>

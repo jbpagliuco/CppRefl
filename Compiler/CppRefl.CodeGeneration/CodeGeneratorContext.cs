@@ -1,6 +1,6 @@
-﻿using System.Text;
-using CppRefl.CodeGeneration.CodeWriters;
+﻿using CppRefl.CodeGeneration.CodeWriters;
 using CppRefl.CodeGeneration.Reflection;
+using System.Text;
 
 namespace CppRefl.CodeGeneration
 {
@@ -295,14 +295,14 @@ namespace CppRefl.CodeGeneration
 			               
 			               {base.DumpHeader()}
 			               """);
-			
+
 			return sb.ToString();
 		}
 
 		public override string DumpSource()
 		{
 			StringBuilder sb = new();
-			
+
 			sb.AppendLine($$"""
 			               #include "{{Parameters.ModuleName}}{{CodeGenerator.GeneratedHeaderExtension}}"
 

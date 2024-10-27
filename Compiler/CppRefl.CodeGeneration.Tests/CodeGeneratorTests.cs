@@ -101,7 +101,7 @@ namespace CppRefl.CodeGeneration.Tests
 			CodeGenerator generator = new();
 			generator.FileGenerators.Clear();
 			generator.LoadCodeGenerators(Assembly.GetAssembly(typeof(TestFileCodeGenerator))!);
-			Assert.That(generator.FileGenerators.Select(x => x.GetType()), Is.EquivalentTo(new[]{ typeof(TestFileCodeGenerator)}));
+			Assert.That(generator.FileGenerators.Select(x => x.GetType()), Is.EquivalentTo(new[] { typeof(TestFileCodeGenerator) }));
 		}
 
 		[Test]
@@ -115,7 +115,7 @@ namespace CppRefl.CodeGeneration.Tests
 			var headerStream = result.Header.Stream as MemoryStream;
 			var sourceStream = result.Source.Stream as MemoryStream;
 
-			Assert.That(Encoding.UTF8.GetString(headerStream!.ToArray()).Trim(), 
+			Assert.That(Encoding.UTF8.GetString(headerStream!.ToArray()).Trim(),
 				Is.EqualTo($"""
 				            #undef {CppDefines.FileId}
 				            #define {CppDefines.FileId} File
@@ -130,7 +130,7 @@ namespace CppRefl.CodeGeneration.Tests
 				            Header
 				            """));
 
-			Assert.That(Encoding.UTF8.GetString(sourceStream!.ToArray()).Trim(), 
+			Assert.That(Encoding.UTF8.GetString(sourceStream!.ToArray()).Trim(),
 				Is.EqualTo($"""
 				            #include "Subfolder/File.h" 
 				            Source

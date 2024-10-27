@@ -1,7 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using ClangSharp.Interop;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using ClangSharp.Interop;
 
 namespace CppRefl.CodeGeneration.Reflection
 {
@@ -118,7 +118,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// </summary>
 		[JsonIgnore]
 		private IDictionary<uint, FunctionInfo> FunctionHashes { get; } = new Dictionary<uint, FunctionInfo>();
-		
+
 		/// <summary>
 		/// Function used to hash string names.
 		/// </summary>
@@ -140,7 +140,7 @@ namespace CppRefl.CodeGeneration.Reflection
 
 			return ClangTypes[innermostType];
 		}
-		
+
 		/// <summary>
 		/// Try to add an object to a dictionary.
 		/// </summary>
@@ -188,7 +188,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// <param name="module"></param>
 		/// <param name="collection"></param>
 		/// <returns></returns>
-		private IEnumerable<T> GetObjectsWithinModule<T>(DirectoryInfo module, IDictionary<string, T> collection) where T : ObjectInfo => 
+		private IEnumerable<T> GetObjectsWithinModule<T>(DirectoryInfo module, IDictionary<string, T> collection) where T : ObjectInfo =>
 			collection.Values.Where(x => x.Metadata.SourceLocation.FileInfo.FullName.StartsWith(module.FullName));
 
 

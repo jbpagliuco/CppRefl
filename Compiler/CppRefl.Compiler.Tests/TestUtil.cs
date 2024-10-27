@@ -1,5 +1,4 @@
 ﻿using CppRefl.CodeGeneration.Reflection;
-using CppRefl.Compiler;
 
 namespace CppRefl.Compiler.Tests
 {

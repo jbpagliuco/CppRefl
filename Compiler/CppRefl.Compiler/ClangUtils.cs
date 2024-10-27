@@ -1,7 +1,7 @@
-﻿using System.Text;
-using ClangSharp.Interop;
+﻿using ClangSharp.Interop;
 using CppRefl.CodeGeneration;
 using CppRefl.CodeGeneration.Reflection;
+using System.Text;
 
 namespace CppRefl.Compiler
 {
@@ -108,9 +108,9 @@ namespace CppRefl.Compiler
 						// Example annotations:
 						// cpprefl
 						// cpprefl-meta-{lifetime},Key,PossiblyEmptyValue
-						
+
 						var annotationItems = annotation.Split(':', 2);
-						
+
 						var annotationTypeItems = annotationItems[0].Split("-");
 						if (annotationTypeItems.Length == 1)
 						{
@@ -217,7 +217,7 @@ namespace CppRefl.Compiler
 			{
 				return cursor.TemplatedDecl.ToString();
 			}
-			
+
 			throw new NotImplementedException("Unhandled edge case.");
 		}
 

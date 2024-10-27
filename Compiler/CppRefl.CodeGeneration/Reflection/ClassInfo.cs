@@ -71,8 +71,8 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Forward declaration (without the surrounding namespace).
 		/// </summary>
 		private string ForwardDeclarationNoNamespace => Type.IsTemplated
-			? (Type.Template!.IsGeneric 
-				? $"{Type.Template.DeclarationSignature} {ClassTypeString} {Type.Name};" 
+			? (Type.Template!.IsGeneric
+				? $"{Type.Template.DeclarationSignature} {ClassTypeString} {Type.Name};"
 				: $"template <> {ClassTypeString} {Type.Name};")
 			: $"{ClassTypeString} {Type.Name};";
 

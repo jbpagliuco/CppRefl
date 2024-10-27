@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using ClangSharp.Interop;
+﻿using ClangSharp.Interop;
+using System.Text.Json.Serialization;
 
 namespace CppRefl.CodeGeneration.Reflection
 {
@@ -87,7 +87,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Template information.
 		/// </summary>
 		public TemplateInfo? Template { get; init; }
-		
+
 		/// <summary>
 		/// Returns true if this is a primitive data type.
 		/// </summary>
@@ -147,7 +147,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// </summary>
 		[JsonIgnore]
 		public bool IsInstantiable => !IsTemplated || Template?.IsSpecialized == true;
-		
+
 		/// <summary>
 		/// Type name (without the namespace).
 		/// </summary>
@@ -157,7 +157,7 @@ namespace CppRefl.CodeGeneration.Reflection
 		/// Type namespace.
 		/// </summary>
 		public required string Namespace { get; init; }
-		
+
 		public override string ToString() => this.QualifiedName();
 	}
 }

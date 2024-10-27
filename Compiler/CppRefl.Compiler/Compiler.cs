@@ -55,7 +55,7 @@ public class Compiler
 	public Compiler(CompilerParams @params)
 	{
 		Params = @params;
-		
+
 		ClangArgs = DefaultClangArgs
 			.Concat(@params.ClangArgs)
 			.Concat(@params.IncludePaths.Where(x => x != "").Select(x => $"-I{x}"))
@@ -283,7 +283,7 @@ public class Compiler
 		{
 			return CXChildVisitResult.CXChildVisit_Continue;
 		}
-		
+
 		// Reflect this type.
 		switch (cursor.Kind)
 		{
@@ -370,7 +370,7 @@ public class Compiler
 		{
 			clangType = clangType.CanonicalType;
 		}
-		
+
 		clangType = clangType.ArrayElementType.kind != CXTypeKind.CXType_Invalid ? clangType.ArrayElementType : clangType;
 
 		ClangUtils.GetNameInfo(clangType.UnqualifiedType, out var qualifiedName, out var name, out var @namespace);
@@ -595,7 +595,7 @@ public class Compiler
 			if (classInfo.Type.Template!.IsGeneric)
 			{
 				// Generic base class.
-				fields.Add(new ()
+				fields.Add(new()
 				{
 					SpecializedTemplateArguments = specializedTemplateArguments ?? throw new ArgumentNullException(),
 					GenericTemplateArguments = classInfo.Type.Template.Arguments,
@@ -622,10 +622,10 @@ public class Compiler
 		if (classInfo.Type.Template?.IsGeneric != true)
 		{
 			// Traverse into base classes (if any).
-			var templatedFieldInfos = classInfo.Type.Template?.IsSpecialized == true 
+			var templatedFieldInfos = classInfo.Type.Template?.IsSpecialized == true
 				? GetTemplateBaseClassFields(Registry.GetClass(classInfo.Type.TemplateType!)!, classInfo.Type.Template.Arguments)
 				: GetTemplateBaseClassFields(classInfo.BaseClasses.FirstOrDefault());
-			
+
 			foreach (var it in templatedFieldInfos)
 			{
 				foreach (var fieldInfo in it.Fields)
@@ -722,7 +722,7 @@ public class Compiler
 				IsAbstract = cursor.CXXRecord_IsAbstract,
 				GeneratedBodyLine = MaybeGetGeneratedReflectionBodyLine(cursor)
 			};
-			
+
 			ClangUtils.VisitCursorChildren(cursor, c => ReflectClassMember(c, classInfo));
 
 			AddTemplateBaseClassFields(classInfo);
@@ -808,7 +808,7 @@ public class Compiler
 			{
 				case CXTypeKind.CXType_Record:
 					aliasClassInfo = Registry.GetClass(aliasedName);
-					
+
 					// Special case where we're aliasing a templated specialization.
 					if (aliasClassInfo == null && aliasedType.NumTemplateArguments > 0)
 					{

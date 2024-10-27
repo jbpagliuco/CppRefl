@@ -2,10 +2,10 @@
 
 namespace CppRefl.CodeGeneration.CodeGenerators.Optional
 {
-    /// <summary>
-    /// Generates Class::Super.
-    /// </summary>
-    internal class ClassSuperGenerator : IFileCodeGenerator
+	/// <summary>
+	/// Generates Class::Super.
+	/// </summary>
+	internal class ClassSuperGenerator : IFileCodeGenerator
 	{
 		public void Execute(FileCodeGeneratorContext context)
 		{

@@ -2,19 +2,19 @@
 
 namespace CppRefl.CodeGeneration.CodeGenerators.Optional
 {
-    /// <summary>
-    /// Generates Class::GetReflectedType(), Class::GetReflectedClass().
-    /// </summary>
-    internal class ClassMemberTypeGetters : IFileCodeGenerator
+	/// <summary>
+	/// Generates Class::GetReflectedType(), Class::GetReflectedClass().
+	/// </summary>
+	internal class ClassMemberTypeGetters : IFileCodeGenerator
 	{
 		public void Execute(FileCodeGeneratorContext context)
-        {
-	        foreach (var classInfo in context.Objects.Classes)
-	        {
-		        context.WriteClassDeclaration(classInfo, writer =>
-		        {
-			        using (writer.WithPublic())
-			        {
+		{
+			foreach (var classInfo in context.Objects.Classes)
+			{
+				context.WriteClassDeclaration(classInfo, writer =>
+				{
+					using (writer.WithPublic())
+					{
 						// Avoid writing virtual functions for non-class types. Structs are generally used for pure data, so we don't want mess up their memory format with a vtable pointer.
 						if (classInfo.ClassType == ClassType.Class)
 						{
@@ -27,6 +27,6 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Optional
 					}
 				});
 			}
-        }
+		}
 	}
 }

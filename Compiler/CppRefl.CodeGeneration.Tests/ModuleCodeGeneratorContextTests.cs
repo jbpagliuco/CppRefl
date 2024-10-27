@@ -41,7 +41,7 @@
 		public void ShouldWriteInitializerFunction()
 		{
 			var context = CreateCodeGeneratorContext();
-			
+
 			context.WriteInitializer(writer =>
 			{
 				writer.WriteLine("Initializer body.");
@@ -65,7 +65,7 @@
 		public void ShouldWriteHeader()
 		{
 			var context = CreateCodeGeneratorContext();
-			
+
 			context.WriteHeader(writer =>
 			{
 				writer.WriteLine("Header Line #1.");

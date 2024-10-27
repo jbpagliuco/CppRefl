@@ -3,9 +3,9 @@ using CppRefl.CodeGeneration.Reflection;
 
 namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
 {
-    internal class FunctionReflectionGenerator : IFileCodeGenerator
-    {
-	    public void Execute(FileCodeGeneratorContext context)
+	internal class FunctionReflectionGenerator : IFileCodeGenerator
+	{
+		public void Execute(FileCodeGeneratorContext context)
 		{
 			if (!context.Objects.Functions.Any())
 			{
@@ -26,62 +26,62 @@ namespace CppRefl.CodeGeneration.CodeGenerators.Runtime
 			}
 		}
 
-	    public void WriteFunctionHeader(CppWriter writer, FunctionInfo functionInfo)
-        {
-            writer.ForwardDeclare(functionInfo);
+		public void WriteFunctionHeader(CppWriter writer, FunctionInfo functionInfo)
+		{
+			writer.ForwardDeclare(functionInfo);
 
-            using (writer.WithNamespace(CppDefines.Namespaces.Public))
-            {
-	            writer.WriteLine($"""
+			using (writer.WithNamespace(CppDefines.Namespaces.Public))
+			{
+				writer.WriteLine($"""
 	                              template <>
 	                              const FunctionInfo& GetReflectedFunction<&{functionInfo.GloballyQualifiedName()}>();
 	                              """);
-            }
-        }
+			}
+		}
 
-	    public void WriteFunctionSource(CppWriter writer, FunctionInfo functionInfo)
-        {
+		public void WriteFunctionSource(CppWriter writer, FunctionInfo functionInfo)
+		{
 			// StaticFunction<>()
 			using (writer.WithNamespace(CppDefines.Namespaces.Public))
 			{
-                writer.WriteLine("template <>");
-                using (writer.WithFunction($"const FunctionInfo& GetReflectedFunction<&{functionInfo.GloballyQualifiedName()}>()"))
-                {
-                    string functionTags = CodeGeneratorUtil.WriteMetadataTagDefinitions(writer, "Function", functionInfo.Metadata);
-                    string functionAttributes = CodeGeneratorUtil.WriteMetadataAttributeDefinitions(writer, "Function", functionInfo.Metadata);
+				writer.WriteLine("template <>");
+				using (writer.WithFunction($"const FunctionInfo& GetReflectedFunction<&{functionInfo.GloballyQualifiedName()}>()"))
+				{
+					string functionTags = CodeGeneratorUtil.WriteMetadataTagDefinitions(writer, "Function", functionInfo.Metadata);
+					string functionAttributes = CodeGeneratorUtil.WriteMetadataAttributeDefinitions(writer, "Function", functionInfo.Metadata);
 
-                    // Function arguments
-                    if (functionInfo.ArgumentTypes.Any())
-                    {
-                        using (writer.WithCodeBlock($"static const std::array<const TypeInfo*, {functionInfo.ArgumentTypes.Count}> functionArgs", "{", "};"))
-                        {
-                            using var _ = writer.WithPostfix(",");
-                            foreach (var arg in functionInfo.ArgumentTypes)
-                            {
-                                writer.WriteLine($"&{CodeGeneratorUtil.MaybeCreateReflectedType(arg.Type)}");
-                            }
-                        }
-                    }
+					// Function arguments
+					if (functionInfo.ArgumentTypes.Any())
+					{
+						using (writer.WithCodeBlock($"static const std::array<const TypeInfo*, {functionInfo.ArgumentTypes.Count}> functionArgs", "{", "};"))
+						{
+							using var _ = writer.WithPostfix(",");
+							foreach (var arg in functionInfo.ArgumentTypes)
+							{
+								writer.WriteLine($"&{CodeGeneratorUtil.MaybeCreateReflectedType(arg.Type)}");
+							}
+						}
+					}
 
-                    // Registry FunctionInfo
-                    using (writer.WithCodeBlock($"static const auto& functionInfo = cpprefl::Registry::GetSystemRegistry().EmplaceFunction", "(", ");"))
-                    {
-                        using (writer.WithPostfix(","))
-                        {
-                            writer.WriteLine($"\"{functionInfo.QualifiedName()}\"");
-                            writer.WriteLine($"(void*){functionInfo.QualifiedName()}");
-                            writer.WriteLine($"{CodeGeneratorUtil.MaybeCreateReflectedType(functionInfo.ReturnType.Type)}");
-                            writer.WriteLine(functionInfo.ArgumentTypes.Any()
-                                ? "FunctionArgTypesView(functionArgs)"
-                                : "FunctionArgTypesView()");
-                            writer.WriteLine(functionTags);
-                        }
-                        writer.WriteLine(functionAttributes);
-                    }
+					// Registry FunctionInfo
+					using (writer.WithCodeBlock($"static const auto& functionInfo = cpprefl::Registry::GetSystemRegistry().EmplaceFunction", "(", ");"))
+					{
+						using (writer.WithPostfix(","))
+						{
+							writer.WriteLine($"\"{functionInfo.QualifiedName()}\"");
+							writer.WriteLine($"(void*){functionInfo.QualifiedName()}");
+							writer.WriteLine($"{CodeGeneratorUtil.MaybeCreateReflectedType(functionInfo.ReturnType.Type)}");
+							writer.WriteLine(functionInfo.ArgumentTypes.Any()
+								? "FunctionArgTypesView(functionArgs)"
+								: "FunctionArgTypesView()");
+							writer.WriteLine(functionTags);
+						}
+						writer.WriteLine(functionAttributes);
+					}
 
-                    writer.WriteLine("return functionInfo;");
-                }
-            }
-        }
-    }
+					writer.WriteLine("return functionInfo;");
+				}
+			}
+		}
+	}
 }

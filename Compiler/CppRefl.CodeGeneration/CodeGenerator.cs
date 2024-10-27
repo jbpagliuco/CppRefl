@@ -1,13 +1,12 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-using CppRefl.CodeGeneration.CodeGenerators.Optional;
+﻿using CppRefl.CodeGeneration.CodeGenerators.Optional;
 using CppRefl.CodeGeneration.CodeGenerators.Runtime;
 using CppRefl.CodeGeneration.CodeGenerators.STL;
 using CppRefl.CodeGeneration.Reflection;
+using System.Reflection;
 
 namespace CppRefl.CodeGeneration
 {
-    public class CodeGeneratorParamsCommon
+	public class CodeGeneratorParamsCommon
 	{
 		/// <summary>
 		/// Reflection registry.
@@ -123,7 +122,7 @@ namespace CppRefl.CodeGeneration
 		/// Extension for a generated source file.
 		/// </summary>
 		public const string GeneratedSourceExtension = ".reflgen.cpp";
-		
+
 		public CodeGenerator()
 		{
 			// Essential
@@ -141,7 +140,7 @@ namespace CppRefl.CodeGeneration
 
 		public List<IFileCodeGenerator> FileGenerators { get; } = new();
 		public List<IModuleCodeGenerator> ModuleGenerators { get; } = new();
-		
+
 		/// <summary>
 		/// Returns the generated output file from a source file.
 		/// </summary>

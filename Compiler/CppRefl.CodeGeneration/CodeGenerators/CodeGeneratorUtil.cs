@@ -1,10 +1,10 @@
-﻿using System.Text;
-using CppRefl.CodeGeneration.CodeWriters;
+﻿using CppRefl.CodeGeneration.CodeWriters;
 using CppRefl.CodeGeneration.Reflection;
+using System.Text;
 
 namespace CppRefl.CodeGeneration.CodeGenerators
 {
-    public static class CodeGeneratorUtil
+	public static class CodeGeneratorUtil
 	{
 		private static string StripQuotes(string s) => s.Trim('"');
 
@@ -58,7 +58,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			foreach (var pair in metadata.RuntimeMetadataAttributes)
 			{
 				var value = pair.Value.Value;
-				
+
 				// If this attribute doesn't have quotes, then see if it's convertable to a number. If not, add quotes.
 				if (value[0] != '"')
 				{
@@ -104,7 +104,7 @@ namespace CppRefl.CodeGeneration.CodeGenerators
 			{
 				return $"cpprefl::GetReflectedType<{typeInfo.QualifiedName()}>()";
 			}
-			
+
 			return $"CppReflPrivate::MaybeCreateReflectedType<{typeInfo.QualifiedName()}>(\"{typeInfo.QualifiedName()}\")";
 		}
 
