@@ -1,14 +1,14 @@
-﻿using CppRefl.CodeGeneration;
-using CppRefl.CodeGeneration.Reflection;
+﻿using CppRefl.Compiler.Reflection;
+using CppRefl.Compiler.Tests.Reflection;
 
 namespace CppRefl.Compiler.Tests.CppRefl.Tests
 {
-	/// <summary>
-	/// This is not a traditional NUnit test, as it doesn't assert anything. It can be used to:
-	///		1. Easily generate code for our CppRefl.Tests program (just run this test from the Test Explorer).
-	///		2. Debug generation of a real program.
-	/// </summary>
-	internal class CppReflSourceTest
+    /// <summary>
+    /// This is not a traditional NUnit test, as it doesn't assert anything. It can be used to:
+    ///		1. Easily generate code for our CppRefl.Tests program (just run this test from the Test Explorer).
+    ///		2. Debug generation of a real program.
+    /// </summary>
+    internal class CppReflSourceTest
 	{
 		[Test]
 		public void Generate()

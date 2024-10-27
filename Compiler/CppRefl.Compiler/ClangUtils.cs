@@ -1,6 +1,5 @@
 ﻿using ClangSharp.Interop;
-using CppRefl.CodeGeneration;
-using CppRefl.CodeGeneration.Reflection;
+using CppRefl.Compiler.Reflection;
 using System.Text;
 
 namespace CppRefl.Compiler

@@ -1,8 +1,7 @@
 ﻿using CommandLine;
 using CommandLine.Text;
-using CppRefl.CodeGeneration;
-using CppRefl.CodeGeneration.Reflection;
 using CppRefl.Compiler;
+using CppRefl.Compiler.Reflection;
 
 var commandLine = ParseCommandLine(args);
 
