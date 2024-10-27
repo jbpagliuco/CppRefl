@@ -7,12 +7,8 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ClangSharp" Version="17.0.0" />
-		<PackageReference Include="libClangSharp" Version="17.0.4" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\CppRefl.CodeGeneration\CppRefl.CodeGeneration.csproj" />
+		<PackageReference Include="ClangSharp" Version="18.1.0" />
+		<PackageReference Include="libClangSharp" Version="18.1.3.1" />
 	</ItemGroup>
 
 	<PropertyGroup>

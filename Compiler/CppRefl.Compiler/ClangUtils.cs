@@ -1,7 +1,6 @@
-﻿using System.Text;
-using ClangSharp.Interop;
-using CppRefl.CodeGeneration;
-using CppRefl.CodeGeneration.Reflection;
+﻿using ClangSharp.Interop;
+using CppRefl.Compiler.Reflection;
+using System.Text;
 
 namespace CppRefl.Compiler
 {
@@ -108,9 +107,9 @@ namespace CppRefl.Compiler
 						// Example annotations:
 						// cpprefl
 						// cpprefl-meta-{lifetime},Key,PossiblyEmptyValue
-						
+
 						var annotationItems = annotation.Split(':', 2);
-						
+
 						var annotationTypeItems = annotationItems[0].Split("-");
 						if (annotationTypeItems.Length == 1)
 						{
@@ -217,7 +216,7 @@ namespace CppRefl.Compiler
 			{
 				return cursor.TemplatedDecl.ToString();
 			}
-			
+
 			throw new NotImplementedException("Unhandled edge case.");
 		}
 
@@ -415,8 +414,10 @@ namespace CppRefl.Compiler
 		}
 	}
 
-	internal static class ClangExtensions
+	public static class ClangExtensions
 	{
+		public static bool IsValid(this CXCursor cursor) => !cursor.IsInvalid;
+
 		public static bool IsValid(this CXTypeKind kind) => kind != CXTypeKind.CXType_Invalid;
 		public static bool IsInvalid(this CXTypeKind kind) => !IsValid(kind);
 

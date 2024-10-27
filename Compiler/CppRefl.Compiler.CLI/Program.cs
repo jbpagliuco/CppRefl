@@ -1,8 +1,7 @@
 ﻿using CommandLine;
 using CommandLine.Text;
-using CppRefl.CodeGeneration;
-using CppRefl.CodeGeneration.Reflection;
 using CppRefl.Compiler;
+using CppRefl.Compiler.Reflection;
 
 var commandLine = ParseCommandLine(args);
 
@@ -90,7 +89,7 @@ static void CompileFile(FileOptions opts)
 
 	// Compile the program.
 	compiler.GenerateRegistry();
-	
+
 	CodeGeneratorFileParams @params = new()
 	{
 		InputFilename = new(opts.InputFilename),
@@ -110,7 +109,7 @@ static void CompileModule(ModuleOptions opts)
 {
 	var moduleRegistry = Registry.CollectFileRegistries(opts.ModuleName, new DirectoryInfo(opts.ModuleDirectory),
 		new DirectoryInfo(opts.OutputDirectory));
-	
+
 	// Generate module code.
 	CodeGeneratorModuleParams @params = new()
 	{
@@ -163,4 +162,4 @@ public record FileOptions : CommonOptions
 
 [Verb("module")]
 public record ModuleOptions : CommonOptions
-{}
+{ }
