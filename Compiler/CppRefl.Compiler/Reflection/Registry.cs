@@ -5,20 +5,17 @@ using System.Text.Json.Serialization;
 
 namespace CppRefl.Compiler.Reflection
 {
-	public class TypeHashCollisionException(TypeInfo typeInfo1, TypeInfo typeInfo2) : HashCollisionException($"Types '{typeInfo1}' and '{typeInfo2}' have the same hashes.");
-	public class FunctionHashCollisionException(FunctionInfo functionInfo, FunctionInfo functionInfo2) : HashCollisionException($"Functions '{functionInfo}' and '{functionInfo2}' have the same hashes.");
-	public class FieldHashCollisionException(ClassInfo classInfo, FieldInfo fieldInfo1, FieldInfo fieldInfo2) : HashCollisionException($"Class fields '{classInfo}::{fieldInfo1}' and '{classInfo}::{fieldInfo2}' have the same hashes.");
-	public class MethodHashCollisionException(ClassInfo classInfo, MethodInfo methodInfo1, MethodInfo methodInfo2) : HashCollisionException($"Class methods '{classInfo}::{methodInfo1}' and '{classInfo}::{methodInfo2}' have the same hashes.");
+	public class TypeHashCollisionException(TypeInfo typeInfo1, TypeInfo typeInfo2) : 
+		HashCollisionException($"Types '{typeInfo1}' and '{typeInfo2}' have the same hashes.");
 
-	// TODO: Remove once this project is merged with CppRefl.Compiler.
-	internal static class ClangExtensions
-	{
-		public static bool IsValid(this CXTypeKind kind) => kind != CXTypeKind.CXType_Invalid;
-		public static bool IsInvalid(this CXTypeKind kind) => !IsValid(kind);
-
-		public static bool IsValid(this CXType type) => type.kind.IsValid();
-		public static bool IsInvalid(this CXType type) => type.kind.IsInvalid();
-	}
+	public class FunctionHashCollisionException(FunctionInfo functionInfo, FunctionInfo functionInfo2) : 
+		HashCollisionException($"Functions '{functionInfo}' and '{functionInfo2}' have the same hashes.");
+	
+	public class FieldHashCollisionException(ClassInfo classInfo, FieldInfo fieldInfo1, FieldInfo fieldInfo2) : 
+		HashCollisionException($"Class fields '{classInfo}::{fieldInfo1}' and '{classInfo}::{fieldInfo2}' have the same hashes.");
+	
+	public class MethodHashCollisionException(ClassInfo classInfo, MethodInfo methodInfo1, MethodInfo methodInfo2) : 
+		HashCollisionException($"Class methods '{classInfo}::{methodInfo1}' and '{classInfo}::{methodInfo2}' have the same hashes.");
 
 	/// <summary>
 	/// Objects defined in a single file.
