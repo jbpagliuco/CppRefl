@@ -108,7 +108,6 @@ namespace cpprefl
 			baseClass = baseClass->mBaseClass;
 		}
 
-
 		return classInfo;
 	}
 

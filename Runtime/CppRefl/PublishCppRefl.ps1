@@ -5,9 +5,10 @@ $CppReflDir = $PSScriptRoot
 $SourceDir = "$CppReflDir/Source"
 
 # Binaries of the built CppRefl project
-$BinariesDir = "$CppReflDir/x64"
+$BuildDir = "$CppReflDir/../build/CppRefl"
+$BinariesDir = "$BuildDir"
 
-$BuildConfigs = "Debug","Release"
+$BuildConfigs = "Debug","RelWithDebInfo"
 
 
 function RecreateDir {
