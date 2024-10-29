@@ -51,6 +51,12 @@ namespace CppRefl.Compiler.Reflection
 		public required bool IsAbstract { get; init; }
 
 		/// <summary>
+		/// Is this a concrete class? (i.e. not a generic template)
+		/// </summary>
+		[JsonIgnore]
+		public bool IsConcrete => !Type.IsTemplated || !Type.Template!.IsGeneric;
+
+		/// <summary>
 		/// List of all base classes, recusively enumerating upwards.
 		/// </summary>
 		[JsonIgnore]

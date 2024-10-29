@@ -7,7 +7,7 @@
 	{
 		public void Execute(FileCodeGeneratorContext context)
 		{
-			foreach (var classInfo in context.Objects.Classes)
+			foreach (var classInfo in context.Objects.Classes.Where(classInfo => classInfo.IsConcrete))
 			{
 				context.WriteClassDeclaration(classInfo, writer =>
 				{

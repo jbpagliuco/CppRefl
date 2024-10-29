@@ -22,6 +22,14 @@ namespace CppRefl.Compiler
 		/// Output directory that will contain the generated files.
 		/// </summary>
 		public required DirectoryInfo OutputDirectory { get; init; }
+
+		// Output file extension prefix.
+		public string OutputExtensionPrefix { get; init; } = CodeGenerator.DefaultGeneratedExtensionPrefix;
+		public string GeneratedHeaderExtension => CodeGenerator.GeneratedHeaderExtension(OutputExtensionPrefix);
+		public string GeneratedSourceExtension => CodeGenerator.GeneratedSourceExtension(OutputExtensionPrefix);
+
+		// List of assemblies that contain generator extensions.
+		public List<Assembly> ExtensionAssemblies { get; init; } = new();
 	}
 
 	/// <summary>
@@ -116,12 +124,17 @@ namespace CppRefl.Compiler
 		/// <summary>
 		/// Extension for a generated header file.
 		/// </summary>
-		public const string GeneratedHeaderExtension = ".reflgen.h";
+		public const string DefaultGeneratedExtensionPrefix = ".reflgen";
+
+		/// <summary>
+		/// Extension for a generated header file.
+		/// </summary>
+		public static string GeneratedHeaderExtension(string prefix = DefaultGeneratedExtensionPrefix) => $"{prefix}.h";
 
 		/// <summary>
 		/// Extension for a generated source file.
 		/// </summary>
-		public const string GeneratedSourceExtension = ".reflgen.cpp";
+		public static string GeneratedSourceExtension(string prefix = DefaultGeneratedExtensionPrefix) => $"{prefix}.cpp";
 
 		public CodeGenerator()
 		{
@@ -184,7 +197,7 @@ namespace CppRefl.Compiler
 			ModuleGenerators.Add(generator);
 			return generator;
 		}
-
+		
 		/// <summary>
 		/// Adds a code generator extension from an assembly.
 		/// </summary>
@@ -211,6 +224,18 @@ namespace CppRefl.Compiler
 		}
 
 		/// <summary>
+		/// Adds a code generator extension from an assembly.
+		/// </summary>
+		/// <param name="assemblies"></param>
+		public void LoadCodeGenerators(IList<Assembly> assemblies)
+		{
+			foreach (Assembly assembly in assemblies)
+			{
+				LoadCodeGenerators(assembly);
+			}
+		}
+
+		/// <summary>
 		/// Generate code pertaining to a single file.
 		/// </summary>
 		/// <param name="params"></param>
@@ -220,13 +245,14 @@ namespace CppRefl.Compiler
 
 			FileCodeGeneratorContext context = new(@params, @params.Registry.GetObjectsInFile(@params.InputFilename));
 
+			LoadCodeGenerators(@params.ExtensionAssemblies);
 			foreach (var generator in FileGenerators)
 			{
 				generator.Execute(context);
 			}
 
-			var headerFilename = SourceToGenerated(@params.InputFilename, @params.ModuleDirectory, @params.OutputDirectory, GeneratedHeaderExtension);
-			var sourceFilename = SourceToGenerated(@params.InputFilename, @params.ModuleDirectory, @params.OutputDirectory, GeneratedSourceExtension);
+			var headerFilename = SourceToGenerated(@params.InputFilename, @params.ModuleDirectory, @params.OutputDirectory, @params.GeneratedHeaderExtension);
+			var sourceFilename = SourceToGenerated(@params.InputFilename, @params.ModuleDirectory, @params.OutputDirectory, @params.GeneratedSourceExtension);
 			var registryFilename = SourceToGenerated(@params.InputFilename, @params.ModuleDirectory, @params.OutputDirectory, Registry.RegistryExtension);
 			FileCodeGeneratorResult result = new()
 			{
@@ -267,13 +293,14 @@ namespace CppRefl.Compiler
 				Parameters = @params
 			};
 
+			LoadCodeGenerators(@params.ExtensionAssemblies);
 			foreach (var generator in ModuleGenerators)
 			{
 				generator.Execute(context);
 			}
 
-			FileInfo headerFilename = new(Path.Combine(@params.OutputDirectory.FullName, $"{@params.ModuleName}{GeneratedHeaderExtension}"));
-			FileInfo sourceFilename = new(Path.Combine(@params.OutputDirectory.FullName, $"{@params.ModuleName}{GeneratedSourceExtension}"));
+			FileInfo headerFilename = new(Path.Combine(@params.OutputDirectory.FullName, $"{@params.ModuleName}{@params.GeneratedHeaderExtension}"));
+			FileInfo sourceFilename = new(Path.Combine(@params.OutputDirectory.FullName, $"{@params.ModuleName}{@params.GeneratedSourceExtension}"));
 			FileInfo registryFilename = new(Path.Combine(@params.OutputDirectory.FullName, $"{@params.ModuleName}{Registry.RegistryExtension}"));
 			ModuleCodeGeneratorResult result = new()
 			{

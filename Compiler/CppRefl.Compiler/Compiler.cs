@@ -32,6 +32,11 @@ public record CompilerParams
 	// Output directory containing generated code.
 	public required DirectoryInfo OutputDirectory { get; init; }
 
+	// Output file extension prefix.
+	public string OutputExtensionPrefix { get; init; } = CodeGenerator.DefaultGeneratedExtensionPrefix;
+	public string GeneratedHeaderExtension => CodeGenerator.GeneratedHeaderExtension(OutputExtensionPrefix);
+	public string GeneratedSourceExtension => CodeGenerator.GeneratedSourceExtension(OutputExtensionPrefix);
+
 	// Deletes empty header files after compilation.
 	public bool DeleteEmptyHeaderFiles { get; set; } = false;
 
@@ -64,8 +69,8 @@ public class Compiler
 
 		OutputFiles = new[]
 		{
-			CodeGenerator.SourceToGenerated(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.GeneratedHeaderExtension),
-			CodeGenerator.SourceToGenerated(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.GeneratedSourceExtension),
+			CodeGenerator.SourceToGenerated(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, Params.GeneratedHeaderExtension),
+			CodeGenerator.SourceToGenerated(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, Params.GeneratedSourceExtension),
 			CodeGenerator.SourceToGenerated(Params.InputFile, Params.ModuleDirectory, Params.OutputDirectory, Registry.RegistryExtension),
 		};
 	}
@@ -142,9 +147,9 @@ public class Compiler
 		var headerFiles = Params.ModuleDirectory.EnumerateFiles("*.h", SearchOption.AllDirectories);
 		foreach (var headerFile in headerFiles)
 		{
-			if (headerFile.Extension != CodeGenerator.GeneratedHeaderExtension)
+			if (headerFile.Extension != Params.GeneratedHeaderExtension)
 			{
-				var outputFile = CodeGenerator.SourceToGenerated(headerFile, Params.ModuleDirectory, Params.OutputDirectory, CodeGenerator.GeneratedHeaderExtension);
+				var outputFile = CodeGenerator.SourceToGenerated(headerFile, Params.ModuleDirectory, Params.OutputDirectory, Params.GeneratedHeaderExtension);
 				if (!outputFile.Exists)
 				{
 					outputFile.Directory!.Create();
@@ -215,12 +220,12 @@ public class Compiler
 	{
 		if (Params.DeleteEmptyHeaderFiles)
 		{
-			CleanupFiles(CodeGenerator.GeneratedHeaderExtension);
+			CleanupFiles(Params.GeneratedHeaderExtension);
 		}
 
 		if (Params.DeleteEmptySourceFiles)
 		{
-			CleanupFiles(CodeGenerator.GeneratedSourceExtension);
+			CleanupFiles(Params.GeneratedSourceExtension);
 		}
 
 		if (Params.DeleteEmptyDirectories)

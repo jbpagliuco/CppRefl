@@ -16,7 +16,7 @@ namespace TestNamespace
 	template <typename T>
 	class REFLECTED TemplatedClass
 	{
-		// GENERATED_REFLECTION_CODE()
+		GENERATED_REFLECTION_CODE()
 
 	public:
 		T mValue REFLECTED;

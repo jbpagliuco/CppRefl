@@ -5,16 +5,16 @@ using System.Text.Json.Serialization;
 
 namespace CppRefl.Compiler.Reflection
 {
-	public class TypeHashCollisionException(TypeInfo typeInfo1, TypeInfo typeInfo2) : 
+	public class TypeHashCollisionException(TypeInfo typeInfo1, TypeInfo typeInfo2) :
 		HashCollisionException($"Types '{typeInfo1}' and '{typeInfo2}' have the same hashes.");
 
-	public class FunctionHashCollisionException(FunctionInfo functionInfo, FunctionInfo functionInfo2) : 
+	public class FunctionHashCollisionException(FunctionInfo functionInfo, FunctionInfo functionInfo2) :
 		HashCollisionException($"Functions '{functionInfo}' and '{functionInfo2}' have the same hashes.");
-	
-	public class FieldHashCollisionException(ClassInfo classInfo, FieldInfo fieldInfo1, FieldInfo fieldInfo2) : 
+
+	public class FieldHashCollisionException(ClassInfo classInfo, FieldInfo fieldInfo1, FieldInfo fieldInfo2) :
 		HashCollisionException($"Class fields '{classInfo}::{fieldInfo1}' and '{classInfo}::{fieldInfo2}' have the same hashes.");
-	
-	public class MethodHashCollisionException(ClassInfo classInfo, MethodInfo methodInfo1, MethodInfo methodInfo2) : 
+
+	public class MethodHashCollisionException(ClassInfo classInfo, MethodInfo methodInfo1, MethodInfo methodInfo2) :
 		HashCollisionException($"Class methods '{classInfo}::{methodInfo1}' and '{classInfo}::{methodInfo2}' have the same hashes.");
 
 	/// <summary>
@@ -369,7 +369,6 @@ namespace CppRefl.Compiler.Reflection
 			};
 		}
 
-
 		private void MergeDictionary<T>(IDictionary<string, T> baseDictionary, IDictionary<string, T> newDictionary)
 		{
 			foreach (var it in newDictionary)
@@ -378,17 +377,29 @@ namespace CppRefl.Compiler.Reflection
 			}
 		}
 
+		private void MergeObjectDictionary<T>(IDictionary<string, T> baseDictionary, IDictionary<string, T> newDictionary, string sourceFilename) where T : ObjectInfo
+		{
+			foreach (var it in newDictionary)
+			{
+				if (it.Value.Metadata.SourceLocation.Filename == sourceFilename)
+				{
+					baseDictionary[it.Key] = it.Value;
+				}
+			}
+		}
+
 		/// <summary>
 		/// Merge a registry into this registry.
 		/// </summary>
+		/// <param name="sourceFilename"></param>
 		/// <param name="newRegistry"></param>
-		public void Merge(Registry newRegistry)
+		public void Merge(string sourceFilename, Registry newRegistry)
 		{
 			MergeDictionary(Types, newRegistry.Types);
-			MergeDictionary(Classes, newRegistry.Classes);
-			MergeDictionary(Enums, newRegistry.Enums);
-			MergeDictionary(Aliases, newRegistry.Aliases);
-			MergeDictionary(Functions, newRegistry.Functions);
+			MergeObjectDictionary(Classes, newRegistry.Classes, sourceFilename);
+			MergeObjectDictionary(Enums, newRegistry.Enums, sourceFilename);
+			MergeObjectDictionary(Aliases, newRegistry.Aliases, sourceFilename);
+			MergeObjectDictionary(Functions, newRegistry.Functions, sourceFilename);
 		}
 
 		/// <summary>
@@ -465,7 +476,7 @@ namespace CppRefl.Compiler.Reflection
 				}
 
 				// Merge it in.
-				moduleRegistry.Merge(fileRegistry);
+				moduleRegistry.Merge(sourceFile.FullName, fileRegistry);
 			}
 
 			return moduleRegistry;

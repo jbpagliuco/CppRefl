@@ -304,7 +304,7 @@ namespace CppRefl.Compiler
 			StringBuilder sb = new();
 
 			sb.AppendLine($$"""
-			               #include "{{Parameters.ModuleName}}{{CodeGenerator.GeneratedHeaderExtension}}"
+			               #include "{{Parameters.ModuleName}}{{Parameters.GeneratedHeaderExtension}}"
 
 			               #include "CppReflStatics.h"
 

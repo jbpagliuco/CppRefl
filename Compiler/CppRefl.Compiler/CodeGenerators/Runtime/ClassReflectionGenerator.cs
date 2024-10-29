@@ -42,7 +42,7 @@ namespace CppRefl.Compiler.CodeGenerators.Runtime
 				}
 			});
 
-			foreach (var classInfo in context.Objects.Classes)
+			foreach (var classInfo in context.Objects.Classes.Where(classInfo => classInfo.IsConcrete))
 			{
 				context.WriteClassDeclaration(classInfo, writer =>
 				{
@@ -70,11 +70,11 @@ namespace CppRefl.Compiler.CodeGenerators.Runtime
 		{
 			if (classInfo.Type.IsTemplated)
 			{
-				if (classInfo.Type.Template!.IsGeneric)
-				{
-					// Just forward declare generic templates to make life a little easier.
-					writer.ForwardDeclare(classInfo);
-				}
+				//if (classInfo.Type.Template!.IsGeneric)
+				//{
+				//	// Just forward declare generic templates to make life a little easier.
+				//	writer.ForwardDeclare(classInfo);
+				//}
 
 				return;
 			}

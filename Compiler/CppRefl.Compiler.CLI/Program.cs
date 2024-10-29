@@ -2,6 +2,7 @@
 using CommandLine.Text;
 using CppRefl.Compiler;
 using CppRefl.Compiler.Reflection;
+using System.Reflection;
 
 var commandLine = ParseCommandLine(args);
 
@@ -84,7 +85,8 @@ static void CompileFile(FileOptions opts)
 		Definitions = opts.Definitions,
 		RaiseClangWarnings = !opts.NoRaiseClangWarnings,
 		RaiseClangErrors = !opts.NoRaiseClangErrors,
-		OutputDirectory = new(opts.OutputDirectory)
+		OutputDirectory = new(opts.OutputDirectory),
+		OutputExtensionPrefix = opts.OutputExtensionPrefix
 	});
 
 	// Compile the program.
@@ -95,7 +97,9 @@ static void CompileFile(FileOptions opts)
 		InputFilename = new(opts.InputFilename),
 		Registry = compiler.Registry,
 		ModuleDirectory = new(opts.ModuleDirectory),
-		OutputDirectory = new(opts.OutputDirectory)
+		OutputDirectory = new(opts.OutputDirectory),
+		OutputExtensionPrefix = opts.OutputExtensionPrefix,
+		ExtensionAssemblies = opts.CodeGeneratorDlls.Select(x => Assembly.LoadFile(x)!).ToList()
 	};
 
 	var codeGenerator = new CodeGenerator();
@@ -116,7 +120,9 @@ static void CompileModule(ModuleOptions opts)
 		Registry = moduleRegistry,
 		ModuleName = opts.ModuleName,
 		ModuleDirectory = new(opts.ModuleDirectory),
-		OutputDirectory = new(opts.OutputDirectory)
+		OutputDirectory = new(opts.OutputDirectory),
+		OutputExtensionPrefix = opts.OutputExtensionPrefix,
+		ExtensionAssemblies = opts.CodeGeneratorDlls.Select(x => Assembly.LoadFile(x)!).ToList()
 	};
 
 	var codeGenerator = new CodeGenerator();
@@ -134,8 +140,11 @@ public record CommonOptions
 	[Option(Required = true, HelpText = "The directory to generate output files under.")]
 	public required string OutputDirectory { get; init; }
 
-	//[Option(HelpText = "List of .DLL files containing external code generators.", Separator = ';')]
-	//public IEnumerable<string> CodeGeneratorDlls { get; init; } = Enumerable.Empty<string>();
+	[Option(HelpText = "Output extension (defaults to .reflgen).")]
+	public string OutputExtensionPrefix { get; init; } = CodeGenerator.DefaultGeneratedExtensionPrefix;
+
+	[Option(HelpText = "List of .DLL files containing external code generators.", Separator = ';')]
+	public IEnumerable<string> CodeGeneratorDlls { get; init; } = Enumerable.Empty<string>();
 }
 
 [Verb("file")]
@@ -162,4 +171,5 @@ public record FileOptions : CommonOptions
 
 [Verb("module")]
 public record ModuleOptions : CommonOptions
-{ }
+{
+}
