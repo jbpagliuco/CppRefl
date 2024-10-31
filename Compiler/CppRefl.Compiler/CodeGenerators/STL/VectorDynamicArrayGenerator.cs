@@ -18,7 +18,7 @@ namespace CppRefl.Compiler.CodeGenerators.STL
 							foreach (var fieldInfo in dynamicArrayFields)
 							{
 								string elementType = fieldInfo.Type.Template!.Arguments.First().ToString();
-								string dynamicArrayFunctions = $"{CppDefines.Namespaces.Public}::StdVectorFunctionsFactory::Create<{elementType}>(\"{elementType}\")";
+								string dynamicArrayFunctions = $"{CppDefines.Namespaces.Public}::StdVectorFunctionsFactory::Create<{elementType}>(cpprefl::EnsureName(\"{elementType}\"))";
 								writer.WriteLine(CodeGeneratorUtil.RegisterDynamicArrayFunctions(classInfo, fieldInfo, dynamicArrayFunctions));
 							}
 						}

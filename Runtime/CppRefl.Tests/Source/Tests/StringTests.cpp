@@ -13,7 +13,7 @@ TEST(StringTests, Strlen)
 #if CPPREFL_STORE_NAMES()
 TEST(StringTests, StringLookup)
 {
-	const cpprefl::Name name("ReflectedClass");
-	EXPECT_STREQ(name.GetString(), "ReflectedClass");
+	constexpr cpprefl::Name name("ReflectedClass");
+	EXPECT_STREQ(cpprefl::GetNameDebugString(name), "ReflectedClass");
 }
 #endif

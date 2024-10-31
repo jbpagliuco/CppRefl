@@ -61,7 +61,7 @@ namespace CppRefl.Compiler.CodeGenerators.Runtime
                                   template <>
                                   const TypeInfo& GetReflectedType<{{enumInfo.Type.GloballyQualifiedName()}}>()
                                   {
-                                      static auto& type = cpprefl::Registry::GetSystemRegistry().EmplaceType("{{enumInfo.Type.QualifiedName()}}", cpprefl::TypeKind::Enum, sizeof({{enumInfo.Type.GloballyQualifiedName()}}));
+                                      static auto& type = cpprefl::Registry::GetSystemRegistry().EmplaceType(cpprefl::EnsureName("{{enumInfo.Type.QualifiedName()}}"), cpprefl::TypeKind::Enum, sizeof({{enumInfo.Type.GloballyQualifiedName()}}));
                                       return type;
                                   }
                                   """);
@@ -82,7 +82,7 @@ namespace CppRefl.Compiler.CodeGenerators.Runtime
 						{
 							string enumValueTags = CodeGeneratorUtil.WriteMetadataTagDefinitions(writer, value.Name, value.Metadata);
 							string enumValueAttributes = CodeGeneratorUtil.WriteMetadataAttributeDefinitions(writer, value.Name, value.Metadata);
-							writer.WriteLine($"cpprefl::EnumValueInfo(\"{value.Name}\", (int){enumInfo.Type.GloballyQualifiedName()}::{value.Name}, {enumValueTags}, {enumValueAttributes}),");
+							writer.WriteLine($"cpprefl::EnumValueInfo(cpprefl::EnsureName(\"{value.Name}\"), (int){enumInfo.Type.GloballyQualifiedName()}::{value.Name}, {enumValueTags}, {enumValueAttributes}),");
 						}
 					}
 

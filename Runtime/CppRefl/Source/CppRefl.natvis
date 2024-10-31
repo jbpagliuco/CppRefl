@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="cpprefl::Span&lt;*&gt;">
+		<Expand>
+			<ArrayItems>
+				<Size>mSize</Size>
+				<ValuePointer>mElements</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	<Type Name="cpprefl::Name">
+		<DisplayString>{{{sDebugStringHashMap.mRecords[mHash % sDebugStringHashMap.Capacity].mValue}}}</DisplayString>
+	</Type>
+	<Type Name="cpprefl::TypeInfo">
+		<DisplayString>{{{mName}}}</DisplayString>
+	</Type>
+	<Type Name="cpprefl::ClassInfo">
+		<DisplayString>{{{mType}}}</DisplayString>
+	</Type>
+	<Type Name="cpprefl::FieldInfo">
+		<DisplayString>{{{mName}}}</DisplayString>
+	</Type>
+</AutoVisualizer>

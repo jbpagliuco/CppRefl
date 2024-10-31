@@ -19,36 +19,36 @@ void TestType(const cpprefl::Name& expectedName, const cpprefl::TypeInfo& typeIn
 
 TEST(StaticTests, PrimitiveTypes)
 {
-	TestType<bool>("bool");
+	TestType<bool>(cpprefl::Name("bool"));
 
-	TestType<unsigned char>("unsigned char");
-	TestType<char>("char");
+	TestType<unsigned char>(cpprefl::Name("unsigned char"));
+	TestType<char>(cpprefl::Name("char"));
 
-	TestType<unsigned short>("unsigned short");
-	TestType<short>("short");
+	TestType<unsigned short>(cpprefl::Name("unsigned short"));
+	TestType<short>(cpprefl::Name("short"));
 
-	TestType<unsigned int>("unsigned int");
-	TestType<int>("int");
+	TestType<unsigned int>(cpprefl::Name("unsigned int"));
+	TestType<int>(cpprefl::Name("int"));
 
-	TestType<unsigned long>("unsigned long");
-	TestType<long>("long");
+	TestType<unsigned long>(cpprefl::Name("unsigned long"));
+	TestType<long>(cpprefl::Name("long"));
 
-	TestType<unsigned long long>("unsigned long long");
-	TestType<long long>("long long");
+	TestType<unsigned long long>(cpprefl::Name("unsigned long long"));
+	TestType<long long>(cpprefl::Name("long long"));
 
-	TestType<float>("float");
-	TestType<double>("double");
-	TestType<long double>("long double");
+	TestType<float>(cpprefl::Name("float"));
+	TestType<double>(cpprefl::Name("double"));
+	TestType<long double>(cpprefl::Name("long double"));
 
-	TestType<char>("char", PrimitiveTypes::StaticReflectedClass().GetField("mString")->GetType());
-	TestType<int>("int", PrimitiveTypes::StaticReflectedClass().GetField("mIntArray")->GetType());
+	TestType<char>(cpprefl::Name("char"), PrimitiveTypes::StaticReflectedClass().GetField(cpprefl::Name("mString"))->GetType());
+	TestType<int>(cpprefl::Name("int"), PrimitiveTypes::StaticReflectedClass().GetField(cpprefl::Name("mIntArray"))->GetType());
 
-	EXPECT_EQ(cpprefl::GetReflectedType<void>().mName, cpprefl::Name("void"));
+	EXPECT_EQ(cpprefl::GetReflectedType<void>().mName, cpprefl::Name(cpprefl::Name("void")));
 }
 
 TEST(StaticTests, TypeInstance)
 {
-	auto field = PrimitiveTypes::StaticReflectedClass().GetField("mString");
+	auto field = PrimitiveTypes::StaticReflectedClass().GetField(cpprefl::Name("mString"));
 	EXPECT_EQ(field->mTypeInstance.mIsArray, true);
 	EXPECT_EQ(field->mTypeInstance.mIsConst, false);
 	EXPECT_EQ(field->mTypeInstance.IsFixedSizeString(), true);
@@ -56,21 +56,21 @@ TEST(StaticTests, TypeInstance)
 	EXPECT_EQ(field->mTypeInstance.IsString(), true);
 	EXPECT_EQ(field->mTypeInstance.mArraySize, 64);
 
-	field = PrimitiveTypes::StaticReflectedClass().GetField("mDynamicString");
+	field = PrimitiveTypes::StaticReflectedClass().GetField(cpprefl::Name("mDynamicString"));
 	EXPECT_EQ(field->mTypeInstance.mIsArray, false);
 	EXPECT_EQ(field->mTypeInstance.mIsConst, false);
 	EXPECT_EQ(field->mTypeInstance.IsFixedSizeString(), false);
 	EXPECT_EQ(field->mTypeInstance.IsDynamicString(), true);
 	EXPECT_EQ(field->mTypeInstance.IsString(), true);
 
-	field = PrimitiveTypes::StaticReflectedClass().GetField("mIntArray");
+	field = PrimitiveTypes::StaticReflectedClass().GetField(cpprefl::Name("mIntArray"));
 	EXPECT_EQ(field->mTypeInstance.mIsArray, true);
 	EXPECT_EQ(field->mTypeInstance.mIsConst, false);
 	EXPECT_EQ(field->mTypeInstance.IsFixedSizeString(), false);
 	EXPECT_EQ(field->mTypeInstance.IsDynamicString(), false);
 	EXPECT_EQ(field->mTypeInstance.mArraySize, 12);
 
-	field = PrimitiveTypes::StaticReflectedClass().GetField("mConstBool");
+	field = PrimitiveTypes::StaticReflectedClass().GetField(cpprefl::Name("mConstBool"));
 	EXPECT_EQ(field->mTypeInstance.mIsArray, false);
 	EXPECT_EQ(field->mTypeInstance.mIsConst, true);
 	EXPECT_EQ(field->mTypeInstance.IsFixedSizeString(), false);

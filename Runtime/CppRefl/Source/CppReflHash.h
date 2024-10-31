@@ -22,81 +22,6 @@ namespace cpprefl
 		return it - str;
 	}
 
-	// A hash of a string.
-	template <typename HashType, HashType HashFunction(const char*, size_t)>
-	class StringHash
-	{
-	public:
-		constexpr StringHash(const char* str, size_t length) : mHash(HashFunction(str, length))
-		{
-#if CPPREFL_STORE_NAMES()
-			AddString(mHash, str);
-#endif
-		}
-
-		constexpr StringHash(const char* str) : StringHash(str, ConstexprStrlen(str))
-		{
-		}
-
-		template <size_t Size>
-		constexpr StringHash(const char str[Size]) : StringHash(str, Size - 1)
-		{
-		}
-
-		constexpr bool operator<(const StringHash& rhs)const
-		{
-			return mHash < rhs.mHash;
-		}
-
-		constexpr bool operator==(const StringHash& rhs)const
-		{
-			return mHash == rhs.mHash;
-		}
-
-		HashType mHash;
-
-
-#if CPPREFL_STORE_NAMES()
-	public:
-		// Return the string that hashes this name.
-		const char* GetString()const
-		{
-			return sStringMap.at(mHash);
-		}
-
-		operator const char* ()const
-		{
-			return GetString();
-		}
-
-	private:
-		// Add a name to a debug lookup table. We do not copy `str`, so it must be stored eternally.
-		static void AddString(HashType hash, const char* str)
-		{
-			if (sStringMap.find(hash) != sStringMap.end())
-			{
-				// Ensure we're adding something unique.
-				const auto& existingValue = sStringMap.at(hash);
-				if (strcmp(existingValue, str) != 0)
-				{
-					CPPREFL_INTERNAL_FATAL_ERROR("Trying to add multiple strings with the same hash. String 1: \"%s\", String 2: \"%s\"", str, existingValue);
-				}
-			}
-			else
-			{
-				sStringMap.emplace(hash, str);
-			}
-		}
-
-		static inline HashMap<HashType, const char*> sStringMap;
-#endif
-	};
-
-
-
-	////////////////////////////////////
-	// CRC32
-
 	constexpr uint32_t Crc32(const char* buf, size_t size)
 	{
 		/** http://c.snippets.org/snip_lister.php?fname=crc_32.c */
@@ -158,9 +83,109 @@ namespace cpprefl
 		return ~crc;
 	}
 
-	// Alias so external code can reference it.
-	constexpr auto& NameHashFunction = Crc32;
+	// A hash of a string.
+	class Name
+	{
+		using HashType = uint32_t;
 
-	// Represents the name of something.
-	using Name = StringHash<uint32_t, NameHashFunction>;
+	public:
+		constexpr Name() = default;
+
+		constexpr explicit Name(const char* str, size_t length) : mHash(Crc32(str, length))
+		{
+		}
+
+		constexpr explicit Name(const char* str) : Name(str, ConstexprStrlen(str))
+		{
+		}
+
+		template <size_t Size>
+		constexpr explicit Name(const char str[Size]) : Name(str, Size - 1)
+		{
+		}
+
+		constexpr bool operator<(const Name& rhs)const
+		{
+			return mHash < rhs.mHash;
+		}
+
+		constexpr bool operator==(const Name& rhs)const
+		{
+			return mHash == rhs.mHash;
+		}
+
+	private:
+		HashType mHash = 0;
+
+	public:
+		static constexpr Name Invalid() { return Name(); }
+		static inline constexpr const char* InvalidString = "None";
+
+		friend class DebugStringHashMap;
+	};
+
+
+
+#if CPPREFL_STORE_NAMES()
+	////////////////////////////////////
+	// Simple hash map
+
+	class DebugStringHashMap
+	{
+	public:
+		DebugStringHashMap() = default;
+		~DebugStringHashMap() = default;
+		DebugStringHashMap(const DebugStringHashMap&) = delete;
+		DebugStringHashMap(const DebugStringHashMap&&) = delete;
+		DebugStringHashMap& operator=(const DebugStringHashMap&) = delete;
+		DebugStringHashMap&& operator=(const DebugStringHashMap&&) = delete;
+
+		void Insert(Name key, const char* value)
+		{
+			const size_t hashIndex = CalculateHashIndex(key);
+			Record& record = mRecords[hashIndex];
+
+			if (record.mKey != Name::Invalid() && key != record.mKey)
+			{
+				CPPREFL_INTERNAL_FATAL_ERROR("Hash collision!");
+			}
+
+			record = { key, value };
+		}
+
+		const char* Get(const Name& key)const
+		{
+			const size_t hashIndex = CalculateHashIndex(key);
+			const Record& record = mRecords[hashIndex];
+			if (record.mValue != nullptr)
+				return record.mValue;
+
+			return Name::InvalidString;
+		}
+
+	private:
+		size_t CalculateHashIndex(Name key)const
+		{
+			return key.mHash % Capacity;
+		}
+
+		struct Record
+		{
+			Name mKey;
+			const char* mValue;
+		};
+
+		static constexpr size_t Capacity = 0xFFFFFF;
+		Record mRecords[Capacity];
+	};
+#endif
+
+
+
+#if CPPREFL_STORE_NAMES()
+	Name EnsureName(const char* string);
+	const char* GetNameDebugString(const Name& name);
+#else
+	constexpr Name EnsureName(const char* string) { return Name(string); }
+#endif
 }

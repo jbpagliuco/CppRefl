@@ -74,7 +74,7 @@ namespace cpprefl
 			const auto& existingTypeInfo = mTypes.at(name);
 
 #if CPPREFL_STORE_NAMES()
-			CPPREFL_INTERNAL_LOG(LogLevel::Error, "Tried to add the same type '%s' twice. How did this happen?", name.GetString());
+			CPPREFL_INTERNAL_LOG(LogLevel::Error, "Tried to add the same type '%s' twice. How did this happen?", GetNameDebugString(name));
 #else
 			CPPREFL_INTERNAL_LOG(LogLevel::Error, "Tried to add the same type (hash ='%zu') twice. How did this happen?", name.mHash);
 #endif

@@ -108,7 +108,7 @@ namespace CppRefl.Compiler.CodeGenerators.Runtime
 				using (writer.WithFunction($"const TypeInfo& GetReflectedType<{classInfo.Type.GloballyQualifiedName()}>()"))
 				{
 					writer.WriteLine(
-						$"static auto& type = cpprefl::Registry::GetSystemRegistry().EmplaceType(\"{classInfo.Type.QualifiedName()}\", cpprefl::TypeKind::Class, sizeof({classInfo.Type.GloballyQualifiedName()}));");
+						$"static auto& type = cpprefl::Registry::GetSystemRegistry().EmplaceType(cpprefl::EnsureName(\"{classInfo.Type.QualifiedName()}\"), cpprefl::TypeKind::Class, sizeof({classInfo.Type.GloballyQualifiedName()}));");
 					writer.WriteLine("return type;");
 				}
 
@@ -146,7 +146,7 @@ namespace CppRefl.Compiler.CodeGenerators.Runtime
 									                  cpprefl::FieldInfo(
 									                  	cpprefl::MakeTypeInstance<decltype({classInfo.Type.GloballyQualifiedName()}::{field.Name})>({CodeGeneratorUtil.MaybeCreateReflectedType(field.Type)}),
 									                  	offsetof({classInfo.Type.GloballyQualifiedName()}, {field.Name}),
-									                  	"{field.Name}",
+									                  	cpprefl::EnsureName("{field.Name}"),
 									                  	{fieldTags[field]},
 									                  	{fieldAttributes[field]}
 									                  ),

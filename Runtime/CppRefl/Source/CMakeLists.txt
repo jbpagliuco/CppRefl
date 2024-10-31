@@ -7,6 +7,7 @@ target_sources(CppRefl
 
 	PRIVATE
 	CppReflConfig.cpp
+	CppReflHash.cpp
 )
 
 add_subdirectory("Private")

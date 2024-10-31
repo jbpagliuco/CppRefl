@@ -20,7 +20,7 @@ namespace CppRefl.Compiler.CodeGenerators
 			sb.Append($"static const std::array<cpprefl::MetadataTag, {metadata.RuntimeMetadataTags.Count()}> {name}Tags = {{");
 			foreach (var value in metadata.RuntimeMetadataTags)
 			{
-				sb.Append($"\"{StripQuotes(value.Value)}\",");
+				sb.Append($"cpprefl::EnsureName(\"{StripQuotes(value.Value)}\"),");
 			}
 			sb.Append("};");
 
@@ -68,7 +68,12 @@ namespace CppRefl.Compiler.CodeGenerators
 					}
 				}
 
-				sb.Append($"std::make_pair(\"{pair.Key}\",MetadataAttributeValue({value})),");
+				if (value[0] == '"')
+				{
+					value = $"cpprefl::EnsureName({value})";
+				}
+
+				sb.Append($"std::make_pair(cpprefl::EnsureName(\"{pair.Key}\"),MetadataAttributeValue({value})),");
 			}
 			sb.Append("};");
 
@@ -105,7 +110,7 @@ namespace CppRefl.Compiler.CodeGenerators
 				return $"cpprefl::GetReflectedType<{typeInfo.QualifiedName()}>()";
 			}
 
-			return $"CppReflPrivate::MaybeCreateReflectedType<{typeInfo.QualifiedName()}>(\"{typeInfo.QualifiedName()}\")";
+			return $"CppReflPrivate::MaybeCreateReflectedType<{typeInfo.QualifiedName()}>(cpprefl::EnsureName(\"{typeInfo.QualifiedName()}\"))";
 		}
 
 		/// <summary>
@@ -115,7 +120,7 @@ namespace CppRefl.Compiler.CodeGenerators
 		public static string RegisterDynamicArrayFunctions(ClassInfo classInfo, FieldInfo fieldInfo, string dynamicArrayFunctions)
 		{
 			string varName = $"{classInfo.Type.FlattenedName()}{fieldInfo.Name}_DynamicArray";
-			return $"const auto& {varName} = cpprefl::Registry::GetSystemRegistry().AddDynamicArrayFunctions(\"{fieldInfo.Type.QualifiedName()}\", {dynamicArrayFunctions});";
+			return $"const auto& {varName} = cpprefl::Registry::GetSystemRegistry().AddDynamicArrayFunctions(cpprefl::EnsureName(\"{fieldInfo.Type.QualifiedName()}\"), {dynamicArrayFunctions});";
 		}
 	}
 }

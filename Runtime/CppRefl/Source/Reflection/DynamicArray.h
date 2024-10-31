@@ -53,7 +53,7 @@ namespace cpprefl
 
 	public:
 		template <typename T>
-		static DynamicArrayFunctions Create(const char* elementTypeName)
+		static DynamicArrayFunctions Create(const Name& elementTypeName)
 		{
 			return DynamicArrayFunctions(MakeTypeInstance<T>(elementTypeName), SetSize<T>, GetData<T>);
 		}

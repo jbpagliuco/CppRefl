@@ -220,8 +220,8 @@ namespace
 		// Determines if a field can be deserialized.
 		bool CanDeserialize(void* classObject, const cpprefl::ClassInfo& classInfo, const cpprefl::FieldInfo& fieldInfo) override
 		{
-			// The "enable" attribute allows a field to skip deserialization based on another field.
-			const auto& enableAttr = fieldInfo.GetAttribute("enable");
+			// The Name("enable") attribute allows a field to skip deserialization based on another field.
+			const auto& enableAttr = fieldInfo.GetAttribute(cpprefl::Name("enable"));
 			if (enableAttr != nullptr)
 			{
 				const auto& otherFieldValue = classInfo.GetFieldValueSafe<bool>(classObject, *enableAttr);
@@ -256,7 +256,7 @@ namespace
 		template <typename T, typename U>
 		void MultiplyValue(const cpprefl::FieldInfo& fieldInfo, U& value)
 		{
-			const auto& multiplierAttr = fieldInfo.GetAttribute("multiplier");
+			const auto& multiplierAttr = fieldInfo.GetAttribute(cpprefl::Name("multiplier"));
 			if (multiplierAttr != nullptr)
 			{
 				value *= (T)*multiplierAttr;

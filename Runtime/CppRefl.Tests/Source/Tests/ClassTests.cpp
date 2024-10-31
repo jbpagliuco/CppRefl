@@ -44,12 +44,12 @@ TEST(ClassTests, GetField)
 {
 	const auto& classInfo = ReflectedClass::StaticReflectedClass();
 
-	EXPECT_NE(classInfo.GetField("mPublicInt"), nullptr);
-	EXPECT_NE(classInfo.GetField("mConstInt"), nullptr);
-	EXPECT_EQ(classInfo.GetField("mNotReflectedInt"), nullptr);
-	EXPECT_NE(classInfo.GetField("mProtectedFloat"), nullptr);
-	EXPECT_NE(classInfo.GetField("mPrivateChar"), nullptr);
-	EXPECT_EQ(classInfo.GetField("blargh"), nullptr);
+	EXPECT_NE(classInfo.GetField(Name("mPublicInt")), nullptr);
+	EXPECT_NE(classInfo.GetField(Name("mConstInt")), nullptr);
+	EXPECT_EQ(classInfo.GetField(Name("mNotReflectedInt")), nullptr);
+	EXPECT_NE(classInfo.GetField(Name("mProtectedFloat")), nullptr);
+	EXPECT_NE(classInfo.GetField(Name("mPrivateChar")), nullptr);
+	EXPECT_EQ(classInfo.GetField(Name("blargh")), nullptr);
 }
 
 TEST(ClassTests, GetFieldValueUnsafe)
@@ -59,17 +59,17 @@ TEST(ClassTests, GetFieldValueUnsafe)
 	void* obj = alloca(sizeof(::ReflectedClass));
 	classInfo.Construct(obj);
 
-	EXPECT_NE(classInfo.GetFieldValueUnsafe<int>(obj, "mPublicInt"), nullptr);
-	EXPECT_EQ(*classInfo.GetFieldValueUnsafe<int>(obj, "mPublicInt"), 1234);
-	EXPECT_NE(classInfo.GetFieldValueUnsafe<float>(obj, "mPublicInt"), nullptr);
+	EXPECT_NE(classInfo.GetFieldValueUnsafe<int>(obj, Name("mPublicInt")), nullptr);
+	EXPECT_EQ(*classInfo.GetFieldValueUnsafe<int>(obj, Name("mPublicInt")), 1234);
+	EXPECT_NE(classInfo.GetFieldValueUnsafe<float>(obj, Name("mPublicInt")), nullptr);
 
-	EXPECT_EQ(classInfo.GetFieldValueUnsafe<bool>(obj, "blargh"), nullptr);
+	EXPECT_EQ(classInfo.GetFieldValueUnsafe<bool>(obj, Name("blargh")), nullptr);
 
-	EXPECT_NE(classInfo.GetFieldValueUnsafe<ReflectedStruct>(obj, "mStruct1"), nullptr);
-	EXPECT_NE(classInfo.GetFieldValueUnsafe<ReflectedStruct2>(obj, "mStruct1"), nullptr);
+	EXPECT_NE(classInfo.GetFieldValueUnsafe<ReflectedStruct>(obj, Name("mStruct1")), nullptr);
+	EXPECT_NE(classInfo.GetFieldValueUnsafe<ReflectedStruct2>(obj, Name("mStruct1")), nullptr);
 
-	EXPECT_NE(classInfo.GetFieldValueUnsafe<ReflectedStruct>(obj, "mStruct2"), nullptr);
-	EXPECT_NE(classInfo.GetFieldValueUnsafe<ReflectedStruct2>(obj, "mStruct2"), nullptr);
+	EXPECT_NE(classInfo.GetFieldValueUnsafe<ReflectedStruct>(obj, Name("mStruct2")), nullptr);
+	EXPECT_NE(classInfo.GetFieldValueUnsafe<ReflectedStruct2>(obj, Name("mStruct2")), nullptr);
 }
 
 TEST(ClassTests, GetFieldValueSafe)
@@ -79,17 +79,17 @@ TEST(ClassTests, GetFieldValueSafe)
 	void* obj = alloca(sizeof(::ReflectedClass));
 	classInfo.Construct(obj);
 
-	EXPECT_NE(classInfo.GetFieldValueSafe<int>(obj, "mPublicInt"), nullptr);
-	EXPECT_EQ(*classInfo.GetFieldValueSafe<int>(obj, "mPublicInt"), 1234);
-	EXPECT_EQ(classInfo.GetFieldValueSafe<float>(obj, "mPublicInt"), nullptr);
+	EXPECT_NE(classInfo.GetFieldValueSafe<int>(obj, Name("mPublicInt")), nullptr);
+	EXPECT_EQ(*classInfo.GetFieldValueSafe<int>(obj, Name("mPublicInt")), 1234);
+	EXPECT_EQ(classInfo.GetFieldValueSafe<float>(obj, Name("mPublicInt")), nullptr);
 
-	EXPECT_EQ(classInfo.GetFieldValueSafe<bool>(obj, "blargh"), nullptr);
+	EXPECT_EQ(classInfo.GetFieldValueSafe<bool>(obj, Name("blargh")), nullptr);
 
-	EXPECT_NE(classInfo.GetFieldValueSafe<ReflectedStruct>(obj, "mStruct1"), nullptr);
-	EXPECT_EQ(classInfo.GetFieldValueSafe<ReflectedStruct2>(obj, "mStruct1"), nullptr);
+	EXPECT_NE(classInfo.GetFieldValueSafe<ReflectedStruct>(obj, Name("mStruct1")), nullptr);
+	EXPECT_EQ(classInfo.GetFieldValueSafe<ReflectedStruct2>(obj, Name("mStruct1")), nullptr);
 
-	EXPECT_EQ(classInfo.GetFieldValueSafe<ReflectedStruct>(obj, "mStruct2"), nullptr);
-	EXPECT_NE(classInfo.GetFieldValueSafe<ReflectedStruct2>(obj, "mStruct2"), nullptr);
+	EXPECT_EQ(classInfo.GetFieldValueSafe<ReflectedStruct>(obj, Name("mStruct2")), nullptr);
+	EXPECT_NE(classInfo.GetFieldValueSafe<ReflectedStruct2>(obj, Name("mStruct2")), nullptr);
 }
 
 TEST(ClassTests, Constructors)
