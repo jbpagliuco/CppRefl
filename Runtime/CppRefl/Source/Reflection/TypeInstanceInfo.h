@@ -39,9 +39,9 @@ namespace cpprefl
 		};
 
 	public:
-		bool IsFixedSizeString()const { return mIsArray && mType.mKind == TypeKind::Int8; }
-		bool IsDynamicString()const { return mIsPointer && mType.mKind == TypeKind::Int8; }
-		bool IsString()const { return IsFixedSizeString() || IsDynamicString(); }
+		bool IsFixedSizeCString()const { return mIsArray && mType.mKind == TypeKind::Int8; }
+		bool IsDynamicCString()const { return mIsPointer && mType.mKind == TypeKind::Int8; }
+		bool IsCString()const { return IsFixedSizeCString() || IsDynamicCString(); }
 	};
 
 	template <typename T>

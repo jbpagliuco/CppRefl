@@ -1,6 +1,6 @@
 #pragma once
 
-#define CPPREFL_WITH_STL() 1
+#include "CppReflConfig.h"
 
 #if CPPREFL_WITH_STL()
 #include <vector>

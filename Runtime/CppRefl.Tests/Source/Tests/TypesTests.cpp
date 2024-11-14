@@ -51,30 +51,30 @@ TEST(StaticTests, TypeInstance)
 	auto field = PrimitiveTypes::StaticReflectedClass().GetField(cpprefl::Name("mString"));
 	EXPECT_EQ(field->mTypeInstance.mIsArray, true);
 	EXPECT_EQ(field->mTypeInstance.mIsConst, false);
-	EXPECT_EQ(field->mTypeInstance.IsFixedSizeString(), true);
-	EXPECT_EQ(field->mTypeInstance.IsDynamicString(), false);
-	EXPECT_EQ(field->mTypeInstance.IsString(), true);
+	EXPECT_EQ(field->mTypeInstance.IsFixedSizeCString(), true);
+	EXPECT_EQ(field->mTypeInstance.IsDynamicCString(), false);
+	EXPECT_EQ(field->mTypeInstance.IsCString(), true);
 	EXPECT_EQ(field->mTypeInstance.mArraySize, 64);
 
 	field = PrimitiveTypes::StaticReflectedClass().GetField(cpprefl::Name("mDynamicString"));
 	EXPECT_EQ(field->mTypeInstance.mIsArray, false);
 	EXPECT_EQ(field->mTypeInstance.mIsConst, false);
-	EXPECT_EQ(field->mTypeInstance.IsFixedSizeString(), false);
-	EXPECT_EQ(field->mTypeInstance.IsDynamicString(), true);
-	EXPECT_EQ(field->mTypeInstance.IsString(), true);
+	EXPECT_EQ(field->mTypeInstance.IsFixedSizeCString(), false);
+	EXPECT_EQ(field->mTypeInstance.IsDynamicCString(), true);
+	EXPECT_EQ(field->mTypeInstance.IsCString(), true);
 
 	field = PrimitiveTypes::StaticReflectedClass().GetField(cpprefl::Name("mIntArray"));
 	EXPECT_EQ(field->mTypeInstance.mIsArray, true);
 	EXPECT_EQ(field->mTypeInstance.mIsConst, false);
-	EXPECT_EQ(field->mTypeInstance.IsFixedSizeString(), false);
-	EXPECT_EQ(field->mTypeInstance.IsDynamicString(), false);
+	EXPECT_EQ(field->mTypeInstance.IsFixedSizeCString(), false);
+	EXPECT_EQ(field->mTypeInstance.IsDynamicCString(), false);
 	EXPECT_EQ(field->mTypeInstance.mArraySize, 12);
 
 	field = PrimitiveTypes::StaticReflectedClass().GetField(cpprefl::Name("mConstBool"));
 	EXPECT_EQ(field->mTypeInstance.mIsArray, false);
 	EXPECT_EQ(field->mTypeInstance.mIsConst, true);
-	EXPECT_EQ(field->mTypeInstance.IsFixedSizeString(), false);
-	EXPECT_EQ(field->mTypeInstance.IsDynamicString(), false);
+	EXPECT_EQ(field->mTypeInstance.IsFixedSizeCString(), false);
+	EXPECT_EQ(field->mTypeInstance.IsDynamicCString(), false);
 }
 
 TEST(StaticTests, ClassTypes)

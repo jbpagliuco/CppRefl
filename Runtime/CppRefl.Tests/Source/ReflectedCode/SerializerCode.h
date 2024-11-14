@@ -5,6 +5,7 @@
 #if TEST_SERIALIZER_CODE()
 
 #include <cstdint>
+#include <string>
 #include <vector>
 
 #include "CppReflMarkup.h"
@@ -33,6 +34,7 @@ public:
 	DeserializeEnum enumValue REFLECTED;
 	char string[64] REFLECTED;
 	const char* dynamicString REFLECTED;
+	std::string stdstring REFLECTED;
 	int intArray[4] REFLECTED;
 	std::vector<int> dynamicArray REFLECTED;
 };

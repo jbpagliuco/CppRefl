@@ -19,6 +19,7 @@ namespace
 	"enumValue": "Bar",
 	"string": "some string",
 	"dynamicString": "some dynamic string",
+	"stdstring": "some std::string value",
 	"intArray":
 	[
 		7,
@@ -43,6 +44,7 @@ namespace
 		"enumValue": "Bar",
 		"string": "some string",
 		"dynamicString": "some dynamic string",
+		"stdstring": "some std::string value",
 		"intArray": [
 			7,
 			14,
@@ -114,7 +116,7 @@ namespace
 
 TEST(SerializerTests, JsonDeserializeSimpleClass)
 {
-	cpprefl::serialization::extensions::JsonDeserializer jsonDeserializer(SimpleClassJson);
+	cpprefl::json::JsonDeserializer jsonDeserializer(SimpleClassJson);
 
 	cpprefl::serialization::Deserializer deserializer;
 	const auto objectResult = deserializer.Deserialize<DeserializeSimple>(jsonDeserializer);
@@ -130,6 +132,7 @@ TEST(SerializerTests, JsonDeserializeSimpleClass)
 
 	EXPECT_STREQ(object.string, "some string");
 	EXPECT_STREQ(object.dynamicString, "some dynamic string");
+	EXPECT_STREQ(object.stdstring.c_str(), "some std::string value");
 
 	EXPECT_EQ(object.intArray[0], 7);
 	EXPECT_EQ(object.intArray[1], 14);
@@ -147,7 +150,7 @@ TEST(SerializerTests, JsonDeserializeSimpleClass)
 
 TEST(SerializerTests, JsonDeserializeNestedClass)
 {
-	cpprefl::serialization::extensions::JsonDeserializer jsonDeserializer(NestedClassJson);
+	cpprefl::json::JsonDeserializer jsonDeserializer(NestedClassJson);
 
 	cpprefl::serialization::Deserializer deserializer;
 	const auto objectResult = deserializer.Deserialize<DeserializeNested>(jsonDeserializer);
@@ -165,6 +168,7 @@ TEST(SerializerTests, JsonDeserializeNestedClass)
 
 	EXPECT_STREQ(object.nested.string, "some string");
 	EXPECT_STREQ(object.nested.dynamicString, "some dynamic string");
+	EXPECT_STREQ(object.nested.stdstring.c_str(), "some std::string value");
 
 	EXPECT_EQ(object.nested.intArray[0], 7);
 	EXPECT_EQ(object.nested.intArray[1], 14);
@@ -186,7 +190,7 @@ TEST(SerializerTests, JsonDeserializeNestedClass)
 
 TEST(SerializerTests, JsonInvalid)
 {
-	cpprefl::serialization::extensions::JsonDeserializer jsonDeserializer(InvalidJson);
+	cpprefl::json::JsonDeserializer jsonDeserializer(InvalidJson);
 
 	cpprefl::serialization::Deserializer deserializer;
 	const auto objectResult = deserializer.Deserialize<DeserializeNested>(jsonDeserializer);
@@ -196,7 +200,7 @@ TEST(SerializerTests, JsonInvalid)
 
 TEST(SerializerTests, JsonOverflow)
 {
-	cpprefl::serialization::extensions::JsonDeserializer jsonDeserializer(OverflowJson);
+	cpprefl::json::JsonDeserializer jsonDeserializer(OverflowJson);
 
 	cpprefl::serialization::Deserializer deserializer;
 	const auto objectResult = deserializer.Deserialize<DeserializeOverflow>(jsonDeserializer);
@@ -267,7 +271,7 @@ namespace
 
 TEST(SerializerTests, JsonMetadata)
 {
-	cpprefl::serialization::extensions::JsonDeserializer jsonDeserializer(MetadataClassJson);
+	cpprefl::json::JsonDeserializer jsonDeserializer(MetadataClassJson);
 
 	cpprefl::serialization::Deserializer deserializer;
 
@@ -284,7 +288,7 @@ TEST(SerializerTests, JsonMetadata)
 
 TEST(SerializerTests, JsonDynamic)
 {
-	cpprefl::serialization::extensions::JsonDeserializer jsonDeserializer(DynamicClassJson);
+	cpprefl::json::JsonDeserializer jsonDeserializer(DynamicClassJson);
 
 	cpprefl::serialization::Deserializer deserializer;
 

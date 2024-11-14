@@ -2,6 +2,12 @@
 
 #include <type_traits>
 
+#include "CppReflConfig.h"
+
+#if CPPREFL_WITH_STL()
+#include <string>
+#endif
+
 #include "Reflection/TypeInfo.h"
 #include "CppReflConfig.h"
 #include "CppReflHash.h"
@@ -39,6 +45,10 @@ namespace cpprefl
 	template <> inline const TypeInfo& GetReflectedType<double>()				{ return CppReflPrivate::MaybeCreateReflectedType<double>(EnsureName("double")); }
 	template <> inline const TypeInfo& GetReflectedType<long double>()			{ return CppReflPrivate::MaybeCreateReflectedType<long double>(EnsureName("long double")); }
 	template <> inline const TypeInfo& GetReflectedType<void>()					{ return CppReflPrivate::MaybeCreateReflectedType<void>(EnsureName("void")); }
+
+#if CPPREFL_WITH_STL()
+	template <> inline const TypeInfo& GetReflectedType<std::string>()			{ return CppReflPrivate::MaybeCreateReflectedType<std::string>(EnsureName("std::string")); }
+#endif
 
 	// Returns a static enum known at compile time.
 	template <typename T>
@@ -104,6 +114,14 @@ namespace CppReflPrivate
 	template <typename T>
 	const cpprefl::TypeInfo& MaybeCreateReflectedType(const cpprefl::Name& typeName)
 	{
+#if CPPREFL_WITH_STL()
+		if constexpr (std::is_same_v<T, std::string>)
+		{
+			static cpprefl::TypeInfo staticType(typeName, cpprefl::TypeKind::Class, sizeof(T));
+			return staticType;
+		}
+#endif
+
 #if CPPREFL_CONCEPTS()
 		if constexpr (std::is_class_v<T> && cpprefl::ReflectedType<T>)
 		{

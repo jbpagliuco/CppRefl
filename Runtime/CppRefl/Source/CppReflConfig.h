@@ -32,6 +32,10 @@
 #define CPPREFL_INTERNAL_OBJECT_CONST constexpr
 #endif
 
+#ifndef CPPREFL_WITH_STL
+#define CPPREFL_WITH_STL() 1
+#endif
+
 namespace cpprefl
 {
 	enum class LogLevel
