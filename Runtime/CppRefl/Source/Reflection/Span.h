@@ -15,7 +15,7 @@ namespace cpprefl
 
 		// Constructs a span from an array.
 		template <SizeType N>
-		constexpr Span(const ElementType elements[N]) : mSize(N), mElements(elements.data()) {}
+		constexpr Span(const ElementType elements[N]) : mSize(N), mElements(elements) {}
 
 		// Constructs a span from an array.
 		template <SizeType N>

@@ -11,7 +11,7 @@ namespace CppRefl.Compiler.CodeGenerators.Optional
 		{
 			foreach (var classInfo in context.Objects.Classes)
 			{
-				var baseClass = classInfo.BaseClasses.FirstOrDefault(x => !x.IsAbstract);
+				var baseClass = classInfo.BaseClasses.FirstOrDefault();
 				if (baseClass != null)
 				{
 					context.WriteClassDeclaration(classInfo, writer =>

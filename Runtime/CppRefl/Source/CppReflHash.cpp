@@ -2,15 +2,14 @@
 
 namespace cpprefl
 {
+#if CPPREFL_STORE_NAMES()
 	DebugStringHashMap sDebugStringHashMap;
 
 	Name EnsureName(const char* string)
 	{
 		const Name name = Name(string);
 
-#if CPPREFL_STORE_NAMES()
-		sDebugStringHashMap.Insert(name, string);
-#endif
+		sDebugStringHashMap.Insert(name, string)
 
 		return name;
 	}
@@ -19,4 +18,5 @@ namespace cpprefl
 	{
 		return sDebugStringHashMap.Get(name);
 	}
+#endif
 }
